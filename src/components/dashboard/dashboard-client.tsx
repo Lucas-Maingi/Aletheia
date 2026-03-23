@@ -84,13 +84,14 @@ export function DashboardClient({
                         }
                     }}
                     placeholder="Search Identity, Domain, or Signal..."
-                    className="w-full h-16 pl-14 pr-36 bg-surface/40 backdrop-blur-[40px] border border-border/20 rounded-2xl text-lg font-bold text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-accent/40 focus:ring-1 focus:ring-accent/10 transition-all shadow-2xl shadow-accent/5 focus:shadow-accent/10"
+                    className="w-full h-16 pl-14 pr-36 bg-surface/40 backdrop-blur-[40px] border border-border/20 rounded-2xl text-lg font-bold text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-accent/40 focus:ring-1 focus:ring-accent/10 transition-all shadow-2xl shadow-accent/5 focus:shadow-[0_0_30px_rgba(0,240,255,0.15)]"
                 />
                 <button 
                    onClick={() => searchQuery && router.push(`/dashboard/investigations/new?q=${encodeURIComponent(searchQuery)}`)}
-                   className="absolute right-3 top-1/2 -translate-y-1/2 h-10 px-6 rounded-xl bg-accent text-background font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-accent transition-all shadow-lg active:scale-95 flex items-center gap-2"
+                   className="absolute right-3 top-1/2 -translate-y-1/2 h-10 px-6 rounded-xl bg-accent text-background font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-accent transition-all shadow-lg active:scale-95 flex items-center gap-2 group/btn"
                 >
                     Target_Sweep
+                    <Search className="w-3.5 h-3.5 group-hover/btn:scale-110 transition-transform" />
                 </button>
             </div>
           </div>
@@ -111,9 +112,9 @@ export function DashboardClient({
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="bg-surface/30 backdrop-blur-2xl border border-white/5 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-accent/20 transition-all duration-500"
+              className="bg-surface/30 backdrop-blur-2xl border border-white/5 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-accent/20 hover:-translate-y-1.5 hover:shadow-2xl transition-all duration-500 cursor-default"
             >
-              <div className={`absolute -right-6 -top-6 w-24 h-24 blur-[40px] opacity-10 transition-all duration-700 group-hover:opacity-30 ${stat.glow}`} />
+              <div className={`absolute -right-6 -top-6 w-24 h-24 blur-[40px] opacity-10 transition-all duration-700 group-hover:opacity-40 ${stat.glow}`} />
               
               <div className="flex items-center justify-between mb-4">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center border border-accent/20 bg-accent/5 ${stat.color}`}>

@@ -76,10 +76,10 @@ export default async function DashboardLayout({
             <div className="flex h-screen overflow-hidden bg-background">
                 {/* Sidebar Navigation — hidden on mobile, shown via MobileSidebarToggle */}
                 <MobileSidebarToggle>
-                    <aside className="w-64 border-r border-border/10 bg-surface/80 backdrop-blur-2xl flex flex-col relative z-20 shadow-[10px_0_50px_rgba(0,0,0,0.3)] h-full overflow-hidden">
+                    <aside className="w-64 border-r border-border/10 bg-surface/80 backdrop-blur-2xl flex flex-col relative z-20 shadow-[10px_0_50px_rgba(0,0,0,0.3)] h-full">
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
                     
-                    <div className="h-16 px-8 border-b border-border/10 relative overflow-hidden group/side-brand bg-foreground/[0.03] shadow-[inset_0_0_40px_rgba(0,0,0,0.05)] flex items-center vibrant-indicator">
+                    <div className="h-16 px-8 border-b border-border/10 relative overflow-hidden group/side-brand bg-foreground/[0.03] shadow-[inset_0_0_40px_rgba(0,0,0,0.05)] flex items-center vibrant-indicator z-30">
                         {/* Tactical Background Overlay */}
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,var(--accent)_0%,transparent_40%)] opacity-[0.05] group-hover/side-brand:opacity-10 transition-opacity duration-1000" />
                         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:10px_10px] opacity-10" />
@@ -94,11 +94,11 @@ export default async function DashboardLayout({
                         </div>
                     </div>
 
-                    <nav className="flex-1 p-4 overflow-y-auto no-scrollbar relative z-30">
+                    <nav className="flex-1 p-4 overflow-y-auto no-scrollbar border-r border-border/10 relative z-30">
                         <SidebarNav isGuest={user.isGuest} />
                     </nav>
 
-                    <div className="p-4 border-t border-border/10 mt-auto bg-foreground/[0.02] backdrop-blur-3xl relative z-30 space-y-2">
+                    <div className="p-4 border-t border-r border-border/10 mt-auto bg-foreground/[0.02] backdrop-blur-3xl relative z-30 space-y-2">
                         <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-foreground/[0.05] text-text-tertiary hover:text-text-primary transition-all group/home border border-transparent hover:border-border/10">
                             <Shield className="w-4 h-4 text-text-tertiary group-hover/home:text-accent transition-colors" />
                             <span className="text-[11px] font-black uppercase tracking-widest flex-1">Site_Home</span>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MessageSquare, Layers, Shield, Zap, Search, Activity, ArrowUpRight } from "lucide-react";
+import { MessageSquare, Layers, Shield, Zap, Search, Activity, ArrowUpRight, LayoutDashboard } from "lucide-react";
 
 interface NavLinkProps {
     href: string;
@@ -21,16 +21,16 @@ function NavLink({ href, label, icon, badge, isPrimary }: NavLinkProps) {
             href={href}
             className={`flex items-center gap-3 px-4 py-2.5 text-[11px] rounded-xl transition-all duration-300 group relative overflow-hidden ${
                 isActive 
-                    ? "text-text-primary bg-accent/5 border-accent/20 shadow-sm" 
-                    : "text-text-secondary hover:text-text-primary border-transparent hover:bg-foreground/[0.04] dark:hover:bg-white/[0.02]"
-            } border ${isPrimary ? "mb-4" : ""}`}
+                    ? "text-text-primary bg-accent/5 border-accent/20 shadow-[0_0_20px_rgba(0,240,255,0.08)]" 
+                    : "text-text-secondary hover:text-text-primary border-transparent hover:bg-foreground/[0.04] dark:hover:bg-white/[0.02] hover:border-accent/10 hover:shadow-lg hover:shadow-accent/[0.02]"
+            } border active:scale-[0.98] active:brightness-110 ${isPrimary ? "mb-4" : ""}`}
         >
             {/* Active Glow Indicator */}
             {isActive && (
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-accent shadow-[0_0_15px_var(--accent)] rounded-full" />
             )}
 
-            <div className={`transition-all duration-500 ${isActive ? "text-accent scale-110" : "text-text-tertiary group-hover:text-accent group-hover:scale-110"}`}>
+            <div className={`transition-all duration-500 ${isActive ? "text-accent scale-110 drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]" : "text-text-tertiary group-hover:text-accent group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]"}`}>
                 {icon}
             </div>
 
@@ -62,7 +62,7 @@ export function SidebarNav({ isGuest }: { isGuest?: boolean }) {
                 <NavLink 
                     href="/dashboard" 
                     label="Dashboard Overview" 
-                    icon={<Activity className="w-4 h-4" />} 
+                    icon={<LayoutDashboard className="w-4 h-4" />} 
                 />
 
                 <Link
