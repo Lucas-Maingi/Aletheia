@@ -86,6 +86,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                                 )}
                             </div>
                         );
+                    })}
                     </nav>
                 </div>
 
