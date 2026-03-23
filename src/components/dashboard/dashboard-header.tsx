@@ -45,8 +45,11 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-4">
-                <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-foreground/[0.03] border border-border/10 text-[9px] font-bold text-text-tertiary uppercase tracking-widest cursor-pointer hover:bg-foreground/[0.05] transition-all">
-                    <Search className="w-3 h-3" />
+                <div 
+                    onClick={() => window.dispatchEvent(new CustomEvent('ale-toggle-command-palette'))}
+                    className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-foreground/[0.03] border border-border/10 text-[9px] font-bold text-text-tertiary uppercase tracking-widest cursor-pointer hover:bg-foreground/[0.05] transition-all group/search"
+                >
+                    <Search className="w-3 h-3 group-hover/search:text-accent transition-colors" />
                     <span>Quick Search (⌘K)</span>
                 </div>
                 

@@ -13,7 +13,7 @@ export function CommandPalette() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
-    // Toggle the menu when ⌘K is pressed
+    // Toggle the menu when ⌘K is pressed or via custom event
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
             if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -22,8 +22,15 @@ export function CommandPalette() {
             }
         };
 
+        const toggle = () => setOpen((open) => !open);
+
         document.addEventListener("keydown", down);
-        return () => document.removeEventListener("keydown", down);
+        window.addEventListener("ale-toggle-command-palette", toggle);
+        
+        return () => {
+            document.removeEventListener("keydown", down);
+            window.removeEventListener("ale-toggle-command-palette", toggle);
+        };
     }, []);
 
     // Perform search when input changes
