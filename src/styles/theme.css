@@ -57,9 +57,9 @@
   --success: #10b981;
   --success-hover: #059669;
   --success-subtle: #f0fdf4;
-  --text-primary: #09090b;
-  --text-secondary: #3f3f46;
-  --text-tertiary: #71717a;
+  --text-primary: #0f172a;    /* Slate 900 */
+  --text-secondary: #334155;  /* Slate 700 */
+  --text-tertiary: #64748b;   /* Slate 500 - significant increase for legibility */
   --text-on-accent: #ffffff;
   --text-on-error: #ffffff;
   --text-on-warning: #18181b;

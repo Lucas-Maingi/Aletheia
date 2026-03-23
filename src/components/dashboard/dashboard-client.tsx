@@ -67,14 +67,14 @@ export function DashboardClient({
       <section className="shrink-0 pt-4">
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-10 gap-8">
           <div className="flex-1 w-full max-w-2xl">
-            <div className="text-[10px] font-bold text-accent uppercase tracking-[0.3em] mb-3 flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+            <div className="text-[11px] font-black text-accent uppercase tracking-[0.3em] mb-3 flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse" />
                 System_Status: Operational_Node_Active
             </div>
             
             <div className="relative group/search-main">
                 <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
-                    <Search className="w-5 h-5 text-accent opacity-50 group-hover/search-main:opacity-100 transition-opacity" />
+                    <Search className="w-5 h-5 text-accent opacity-60 group-hover/search-main:opacity-100 transition-opacity" />
                 </div>
                 <input 
                     type="text"
@@ -86,7 +86,7 @@ export function DashboardClient({
                         }
                     }}
                     placeholder="Initiate New Investigation (Name, Email, or Username)..."
-                    className="w-full h-16 pl-14 pr-32 bg-surface/30 backdrop-blur-3xl border border-white/5 rounded-2xl text-lg font-bold text-text-primary placeholder:text-text-tertiary/20 focus:outline-none focus:border-accent/40 focus:ring-1 focus:ring-accent/20 transition-all shadow-2xl"
+                    className="w-full h-16 pl-14 pr-32 bg-surface/40 backdrop-blur-3xl border border-border/20 rounded-2xl text-lg font-bold text-text-primary placeholder:text-text-secondary/40 focus:outline-none focus:border-accent/60 focus:ring-1 focus:ring-accent/20 transition-all shadow-xl shadow-accent/5"
                 />
                 <button 
                    onClick={() => searchQuery && router.push(`/dashboard/investigations/new?q=${encodeURIComponent(searchQuery)}`)}
@@ -118,19 +118,19 @@ export function DashboardClient({
               <div className={`absolute -right-6 -top-6 w-24 h-24 blur-[40px] opacity-10 transition-all duration-700 group-hover:opacity-30 ${stat.glow}`} />
               
               <div className="flex items-center justify-between mb-4">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border border-white/5 bg-white/[0.03] ${stat.color}`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border border-accent/20 bg-accent/5 ${stat.color}`}>
                     <stat.icon className={`w-5 h-5 ${(stat as any).active ? 'animate-pulse' : ''}`} />
                 </div>
-                <div className="text-[8px] font-bold text-text-tertiary uppercase tracking-widest opacity-40">System_Metric</div>
+                <div className="text-[9px] font-bold text-text-tertiary uppercase tracking-widest opacity-70">System_Metric</div>
               </div>
 
               <div>
-                <h3 className="text-text-tertiary font-bold text-[9px] uppercase tracking-widest mb-1">{stat.label}</h3>
-                <div className="text-3xl font-bold text-text-primary tracking-tighter flex items-baseline gap-2">
+                <h3 className="text-text-secondary font-black text-[9px] uppercase tracking-widest mb-1">{stat.label}</h3>
+                <div className="text-3xl font-black text-text-primary tracking-tighter flex items-baseline gap-2">
                     {stat.value}
-                    {stat.label === "Global Signal Yield" && <span className="text-[10px] text-accent opacity-50 uppercase tracking-widest font-bold">Artifacts</span>}
+                    {stat.label === "Global Signal Yield" && <span className="text-[10px] text-accent opacity-60 uppercase tracking-widest font-black">Artifacts</span>}
                 </div>
-                <p className="text-[10px] text-text-tertiary mt-2 opacity-60 italic">{stat.detail}</p>
+                <p className="text-[10px] text-text-secondary mt-2 font-medium italic opacity-80">{stat.detail}</p>
               </div>
             </motion.div>
           ))}
@@ -166,13 +166,13 @@ export function DashboardClient({
                   key={inv.id} 
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
+                  layout
                   className={`group border rounded-2xl transition-all duration-500 overflow-hidden relative ${
                     isExpanded 
-                      ? 'bg-surface/60 border-accent/30 shadow-2xl' 
+                      ? 'bg-surface border-accent/40 shadow-2xl' 
                       : isChat 
-                        ? 'bg-emerald-500/[0.02] border-emerald-500/5 hover:border-emerald-500/20'
-                        : 'bg-surface/20 border-white/[0.03] hover:border-white/10'
+                        ? 'bg-emerald-500/[0.03] border-emerald-500/10 hover:border-emerald-500/30'
+                        : 'bg-surface/40 border-border/10 hover:border-border/30 shadow-sm'
                   }`}
                 >
                   <button 
@@ -192,22 +192,22 @@ export function DashboardClient({
                             {isChat ? inv.title.replace(/^Chat:\s?/, '') : inv.title}
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="text-[9px] text-text-tertiary uppercase tracking-wider">{isChat ? 'AI Session' : 'Tactical Dossier'}</span>
-                            <div className="w-1 h-1 rounded-full bg-white/10" />
-                            <span className="text-[9px] text-text-tertiary font-mono">{inv.target}</span>
+                            <span className="text-[10px] font-black text-text-tertiary uppercase tracking-widest opacity-80">{isChat ? 'AI Session' : 'Tactical Dossier'}</span>
+                            <div className="w-1 h-1 rounded-full bg-border/20" />
+                            <span className="text-[10px] text-text-secondary font-mono font-bold">{inv.target}</span>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-4">
-                        <div className="hidden sm:block text-right pr-4 border-r border-white/5">
-                            <div className="text-[9px] font-bold text-text-tertiary/40 uppercase tracking-tighter mb-0.5">Yield</div>
-                            <div className="text-[11px] font-mono text-text-secondary">{inv.leads} pts</div>
+                        <div className="flex items-center gap-4">
+                            <div className="hidden sm:block text-right pr-4 border-r border-border/10">
+                                <div className="text-[10px] font-black text-text-tertiary uppercase tracking-tighter mb-0.5">Yield</div>
+                                <div className="text-[11px] font-mono font-bold text-text-secondary">{inv.leads} pts</div>
+                            </div>
+                            <div className={`p-1.5 rounded-md transition-all ${isExpanded ? 'rotate-180 bg-accent/20 text-accent' : 'text-text-tertiary opacity-60'}`}>
+                                <ChevronDown className="w-4 h-4" />
+                            </div>
                         </div>
-                        <div className={`p-1.5 rounded-md transition-all ${isExpanded ? 'rotate-180 bg-accent/10 text-accent' : 'text-text-tertiary opacity-30'}`}>
-                            <ChevronDown className="w-3.5 h-3.5" />
-                        </div>
-                    </div>
                   </button>
 
                   <AnimatePresence>
@@ -218,7 +218,7 @@ export function DashboardClient({
                         exit={{ height: 0, opacity: 0 }}
                         className="px-4 pb-4 overflow-hidden"
                       >
-                         <div className="p-4 bg-background/40 border border-white/5 rounded-xl text-[11px] text-text-secondary leading-relaxed italic mb-4">
+                         <div className="p-4 bg-foreground/[0.04] border border-border/10 rounded-xl text-[11px] text-text-secondary leading-relaxed italic mb-4 font-medium">
                              "{inv.details}"
                          </div>
                          
@@ -229,7 +229,7 @@ export function DashboardClient({
                                 }`}>
                                    {isChat ? 'Briefing' : 'Discovery'}
                                 </Badge>
-                                <span className="text-[9px] font-mono text-text-tertiary opacity-40 uppercase">UID: {inv.id.slice(0,8)}</span>
+                                 <span className="text-[10px] font-mono text-text-tertiary font-bold uppercase">Record_UID: {inv.id.slice(0,8)}</span>
                             </div>
                             
                             <div className="flex items-center gap-2">
@@ -241,11 +241,11 @@ export function DashboardClient({
                                 >
                                     Access Intelligence <ArrowUpRight className="w-3 h-3" />
                                 </Link>
-                                <button
+                                 <button
                                     onClick={() => setPendingDeleteId(inv.id)}
-                                    className="p-2 rounded-lg bg-white/5 text-text-tertiary hover:text-rose-500 hover:bg-rose-500/10 transition-all"
+                                    className="p-2 rounded-lg bg-foreground/[0.05] text-text-tertiary hover:text-white hover:bg-rose-500 transition-all border border-border/10"
                                 >
-                                    <Trash2 className="w-3.5 h-3.5" />
+                                    <Trash2 className="w-4 h-4" />
                                 </button>
                             </div>
                          </div>
@@ -260,12 +260,12 @@ export function DashboardClient({
 
         {/* Real-Time Discovery Feed Sidebar */}
         <aside className="hidden lg:flex flex-col bg-surface/20 border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
-            <div className="p-6 border-b border-white/5 bg-foreground/[0.02]">
+            <div className="p-6 border-b border-border/10 bg-foreground/[0.03]">
                 <div className="flex items-center gap-2 mb-1">
-                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                    <h2 className="text-[11px] font-bold text-text-primary uppercase tracking-[0.2em]">Real-Time Signal Feed</h2>
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                    <h2 className="text-[11px] font-black text-text-primary uppercase tracking-[0.2em]">Real-Time Signal Feed</h2>
                 </div>
-                <p className="text-[9px] text-text-tertiary uppercase opacity-50 tracking-widest">Global Discovery Log</p>
+                <p className="text-[9px] text-text-secondary uppercase opacity-70 tracking-widest font-bold">Global Discovery Log</p>
             </div>
 
             <div className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-4">
@@ -286,19 +286,19 @@ export function DashboardClient({
                              <div className="p-1 rounded bg-accent/10 border border-accent/20 text-accent">
                                 <Cpu className="w-2.5 h-2.5" />
                              </div>
-                             <span className="text-[9px] font-bold text-accent uppercase tracking-tighter truncate max-w-[140px] opacity-70">
+                             <span className="text-[9px] font-black text-accent uppercase tracking-tighter truncate max-w-[140px] opacity-90">
                                 {discovery.investigation?.title || 'System'}
                              </span>
-                             <span className="text-[8px] text-text-tertiary ml-auto font-mono">
+                             <span className="text-[9px] text-text-secondary ml-auto font-mono font-bold">
                                 {new Date(discovery.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
                              </span>
                         </div>
-                        <h4 className="text-[11px] font-bold text-text-primary mb-1 line-clamp-1 group-hover:text-emerald-400 transition-colors">
+                        <h4 className="text-[11px] font-black text-text-primary mb-1 line-clamp-1 group-hover:text-emerald-500 transition-colors">
                             {discovery.title}
                         </h4>
                         <div className="flex items-center gap-1.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40" />
-                            <span className="text-[9px] text-text-tertiary tracking-tight uppercase line-clamp-1">{discovery.source} Intelligence</span>
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_5px_var(--success)]" />
+                            <span className="text-[9px] text-text-secondary font-bold tracking-tight uppercase line-clamp-1">Intelligence Discovery</span>
                         </div>
                     </motion.div>
                 ))}
