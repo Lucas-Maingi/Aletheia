@@ -67,14 +67,14 @@ export function SidebarNav({ isGuest }: { isGuest?: boolean }) {
 
                 <Link
                     href="/dashboard/investigations/new"
-                    className="flex items-center justify-between px-4 py-3.5 mt-4 mb-6 text-[11px] text-accent bg-accent/10 border border-accent/40 rounded-xl hover:bg-accent/20 transition-all duration-500 font-black uppercase tracking-widest group relative overflow-hidden shadow-[0_0_25px_rgba(0,240,255,0.15)] hover:shadow-accent/40"
+                    className="flex items-center justify-between px-4 py-3 text-[11px] text-accent bg-accent/5 border border-accent/20 rounded-xl hover:bg-accent/10 transition-all duration-500 font-bold uppercase tracking-tight group relative overflow-hidden shadow-[0_0_20px_rgba(0,240,255,0.1)] hover:shadow-accent/30"
                 >
-                    <div className="flex items-center gap-2.5 relative z-10">
-                        <Search className="w-4 h-4" />
-                        <span>Start_New_Investigation</span>
+                    <div className="flex items-center gap-2.5 relative z-10 overflow-hidden">
+                        <Search className="w-3.5 h-3.5 shrink-0" />
+                        <span className="truncate">Start New Investigation</span>
                     </div>
-                    <span className="text-[8px] border border-accent/30 px-2 py-0.5 rounded bg-accent/20 text-accent animate-pulse relative z-10">NEW</span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-accent/10 via-transparent to-transparent translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-700" />
+                    <span className="text-[7px] border border-accent/30 px-1.5 py-0.5 rounded bg-accent/20 text-accent animate-pulse relative z-10 shrink-0">NEW</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-accent/5 via-transparent to-transparent translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-700" />
                 </Link>
 
                 <NavLink 
