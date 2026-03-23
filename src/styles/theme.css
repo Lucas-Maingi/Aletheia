@@ -393,6 +393,18 @@
     background-clip: text;
   }
 
+  .text-gradient-vibrant {
+    background: linear-gradient(to right, var(--accent), #a855f7, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3));
+  }
+
+  .vibrant-indicator {
+    @apply relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[2px] after:bg-gradient-to-r after:from-accent after:to-purple-500 after:shadow-[0_0_10px_rgba(0,240,255,0.8)];
+  }
+
   .bg-radial-glow {
     background: radial-gradient(circle at center, var(--accent) 0%, transparent 70%);
   }
