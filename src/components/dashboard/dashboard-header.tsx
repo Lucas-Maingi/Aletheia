@@ -97,5 +97,3 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
         </AnimatePresence>
     );
 }
-    );
-}
