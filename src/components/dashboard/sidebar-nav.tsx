@@ -19,11 +19,11 @@ function NavLink({ href, label, icon, badge, isPrimary }: NavLinkProps) {
     return (
         <Link
             href={href}
-            className={`flex items-center gap-3 px-4 py-3 text-[11px] rounded-xl transition-all duration-300 group relative overflow-hidden ${
+            className={`flex items-center gap-3 px-4 py-2.5 text-[11px] rounded-xl transition-all duration-300 group relative overflow-hidden ${
                 isActive 
                     ? "text-text-primary bg-accent/5 border-accent/20 shadow-sm" 
                     : "text-text-secondary hover:text-text-primary border-transparent hover:bg-foreground/[0.04] dark:hover:bg-white/[0.02]"
-            } border ${isPrimary ? "mb-6" : ""}`}
+            } border ${isPrimary ? "mb-4" : ""}`}
         >
             {/* Active Glow Indicator */}
             {isActive && (
@@ -53,8 +53,8 @@ function NavLink({ href, label, icon, badge, isPrimary }: NavLinkProps) {
 
 export function SidebarNav({ isGuest }: { isGuest?: boolean }) {
     return (
-        <div className="space-y-2 flex flex-col h-full">
-            <div className="text-[9px] font-bold text-text-tertiary uppercase tracking-[0.4em] mb-4 mt-4 px-4 border-l-2 border-accent/10 ml-1">
+        <div className="space-y-1 flex flex-col h-full">
+            <div className="text-[9px] font-bold text-text-tertiary uppercase tracking-[0.4em] mb-2 mt-2 px-4 border-l-2 border-accent/10 ml-1">
                 {isGuest ? 'Anonymous_Session' : 'Mission_Operations'}
             </div>
 
@@ -67,7 +67,7 @@ export function SidebarNav({ isGuest }: { isGuest?: boolean }) {
 
                 <Link
                     href="/dashboard/investigations/new"
-                    className="flex items-center justify-between px-4 py-3.5 mt-2 mb-8 text-[11px] text-white bg-accent border border-accent shadow-xl shadow-accent/20 rounded-xl hover:bg-accent-hover hover:scale-[1.02] transition-all duration-300 font-black uppercase tracking-widest group relative overflow-hidden"
+                    className="flex items-center justify-between px-4 py-3 mt-1.5 mb-4 text-[11px] text-white bg-accent border border-accent shadow-xl shadow-accent/20 rounded-xl hover:bg-accent-hover hover:scale-[1.02] transition-all duration-300 font-black uppercase tracking-widest group relative overflow-hidden"
                 >
                     <div className="flex items-center gap-2.5 relative z-10 overflow-hidden">
                         <Search className="w-3.5 h-3.5 shrink-0" />
@@ -98,10 +98,10 @@ export function SidebarNav({ isGuest }: { isGuest?: boolean }) {
                 />
             </div>
 
-            <div className="mt-auto pt-12 pb-2">
+            <div className="mt-auto pt-4 pb-1">
                 <Link
                     href="/premium"
-                    className="relative flex flex-col p-5 rounded-2xl bg-slate-900 border border-white/10 hover:border-accent shadow-2xl transition-all duration-500 group overflow-hidden"
+                    className="relative flex flex-col p-4 rounded-2xl bg-slate-900 border border-white/10 hover:border-accent shadow-2xl transition-all duration-500 group overflow-hidden"
                 >
                     <div className="absolute -right-4 -top-4 w-16 h-16 bg-accent/20 blur-2xl group-hover:bg-accent/30 transition-all" />
                     
@@ -118,8 +118,8 @@ export function SidebarNav({ isGuest }: { isGuest?: boolean }) {
                             Access unfiltered Intelligence nodes & data feeds.
                         </p>
 
-                        <div className="mt-5 flex items-center gap-2 text-[10px] font-black text-accent uppercase tracking-widest group-hover:gap-3 transition-all duration-500">
-                            Upgrade Mission Profile
+                        <div className="mt-3.5 flex items-center gap-2 text-[10px] font-black text-accent uppercase tracking-widest group-hover:gap-3 transition-all duration-500">
+                            Upgrade Profile
                             <ArrowUpRight className="w-3.5 h-3.5" />
                         </div>
                     </div>

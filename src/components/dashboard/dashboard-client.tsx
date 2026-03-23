@@ -73,9 +73,7 @@ export function DashboardClient({
             </div>
             
             <div className="relative group/search-main">
-                <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
-                    <Search className="w-5 h-5 text-accent opacity-60 group-hover/search-main:opacity-100 transition-opacity" />
-                </div>
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-accent opacity-50 group-hover/search-main:opacity-100 transition-opacity duration-300" />
                 <input 
                     type="text"
                     value={searchQuery}
@@ -85,14 +83,14 @@ export function DashboardClient({
                             router.push(`/dashboard/investigations/new?q=${encodeURIComponent(searchQuery)}`);
                         }
                     }}
-                    placeholder="Initiate New Investigation (Name, Email, or Username)..."
-                    className="w-full h-16 pl-14 pr-32 bg-surface/40 backdrop-blur-3xl border border-border/20 rounded-2xl text-lg font-bold text-text-primary placeholder:text-text-secondary/40 focus:outline-none focus:border-accent/60 focus:ring-1 focus:ring-accent/20 transition-all shadow-xl shadow-accent/5"
+                    placeholder="Search Identity, Domain, or Signal..."
+                    className="w-full h-16 pl-14 pr-36 bg-surface/40 backdrop-blur-[40px] border border-border/20 rounded-2xl text-lg font-bold text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-accent/40 focus:ring-1 focus:ring-accent/10 transition-all shadow-2xl shadow-accent/5 focus:shadow-accent/10"
                 />
                 <button 
                    onClick={() => searchQuery && router.push(`/dashboard/investigations/new?q=${encodeURIComponent(searchQuery)}`)}
-                   className="absolute right-3 top-1/2 -translate-y-1/2 h-10 px-6 rounded-xl bg-accent text-background font-bold text-[10px] uppercase tracking-widest hover:bg-white transition-all shadow-lg active:scale-95"
+                   className="absolute right-3 top-1/2 -translate-y-1/2 h-10 px-6 rounded-xl bg-accent text-background font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-accent transition-all shadow-lg active:scale-95 flex items-center gap-2"
                 >
-                    Target_Acquisition
+                    Target_Sweep
                 </button>
             </div>
           </div>

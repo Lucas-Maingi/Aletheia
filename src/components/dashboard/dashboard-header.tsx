@@ -23,7 +23,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
         <header className="h-16 border-b border-border/10 bg-surface/60 backdrop-blur-2xl sticky top-0 z-40 px-8 flex items-center justify-between shadow-sm vibrant-indicator">
             {/* Breadcrumbs */}
             <nav className="flex items-center gap-2 text-[10px] uppercase font-black tracking-[0.2em] text-text-tertiary">
-                {segments.map((segment, index) => {
+                {segments.filter(s => s.toLowerCase() !== 'dashboard').map((segment, index) => {
                     const isLast = index === segments.length - 1;
                     const path = `/${segments.slice(0, index + 1).join('/')}`;
                     const label = segment.replace(/-/g, ' ');
@@ -50,7 +50,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                     className="hidden lg:flex items-center gap-3 px-4 py-2 rounded-xl bg-accent/5 border border-accent/20 text-[9px] font-black text-accent uppercase tracking-widest cursor-pointer hover:bg-accent/10 hover:border-accent/40 hover:scale-[1.02] transition-all group/search shadow-lg shadow-accent/5"
                 >
                     <Search className="w-3.5 h-3.5 group-hover/search:scale-110 transition-transform" />
-                    <span>Search Control Center</span>
+                    <span>Quick Search</span>
                     <span className="opacity-40 ml-1">⌘K</span>
                 </div>
                 
