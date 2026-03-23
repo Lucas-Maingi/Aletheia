@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { 
   Activity, Fingerprint, Database, ChevronDown, ChevronUp, Terminal,
-  MapPin, Clock, ArrowUpRight, Crosshair, ShieldAlert, Cpu, Trash2, RefreshCw
+  MapPin, Clock, ArrowUpRight, Crosshair, ShieldAlert, Cpu, Trash2, RefreshCw,
+  Search, MessageSquare
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 
 interface InvestigationProp {
@@ -18,19 +20,32 @@ interface InvestigationProp {
     details: string;
     leads: number;
     source: string;
+    updatedAt?: Date | string;
 }
 
 export function DashboardClient({ 
     investigations, 
-    totalScans 
+    totalInvestigations,
+    signalYield,
+    activeOps,
+    recentDiscoveries = []
 }: { 
     investigations: InvestigationProp[];
-    totalScans: number;
+    totalInvestigations: number;
+    signalYield: number;
+    activeOps: number;
+    recentDiscoveries?: any[];
 }) {
   const [expandedCase, setExpandedCase] = useState<string | null>(null);
   const [localInvestigations, setLocalInvestigations] = useState<InvestigationProp[]>(investigations);
-  const [localTotalScans, setLocalTotalScans] = useState(totalScans);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+
+  // Combine and sort missions chronologically (Dossiers + Chats)
+  const unifiedMissions = [...localInvestigations].sort((a, b) => 
+    new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
+  );
 
   useEffect(() => {
     setLocalInvestigations(investigations);
@@ -40,289 +55,264 @@ export function DashboardClient({
   const dossiers = localInvestigations.filter(i => i.source === 'dossier');
   const chats = localInvestigations.filter(i => i.source === 'chat');
 
-  const activeCount = localInvestigations.filter(i => i.status.toLowerCase() === 'active').length;
-  const analyzedCount = localInvestigations.filter(i => i.status.toLowerCase() === 'analyzed').length;
-
   const topStats = [
-    { label: "Total Investigations", value: localTotalScans.toLocaleString(), icon: Database, color: "text-accent", glow: "bg-accent/10" },
-    { label: "Active Investigations", value: activeCount.toString(), icon: Activity, color: "text-success", glow: "bg-success/10" },
-    { label: "Completed Reports", value: analyzedCount.toString(), icon: Fingerprint, color: "text-accent", glow: "bg-accent/10" }
+    { label: "Global Signal Yield", value: signalYield.toLocaleString(), icon: Cpu, color: "text-accent", glow: "bg-accent/10", detail: "Intelligence artifacts captured" },
+    { label: "Active Operations", value: activeOps.toString(), icon: Activity, color: "text-emerald-400", glow: "bg-emerald-400/10", detail: "Background scanners running", active: activeOps > 0 },
+    { label: "Total Intelligence Missions", value: totalInvestigations.toString(), icon: Database, color: "text-text-tertiary", glow: "bg-white/5", detail: "Archived dossiers & briefings" }
   ];
 
   return (
     <div className="w-full max-w-[1400px] mx-auto space-y-10 h-full flex flex-col pt-2 pb-10">
       
-      {/* HUD Header & Stats */}
-      <section className="shrink-0">
-        <div className="flex items-end justify-between mb-6 px-1">
-          <div>
-            <div className="text-[10px] font-bold text-accent uppercase tracking-widest mb-1">System Status: Online</div>
-            <h1 className="text-4xl font-black text-text-primary tracking-tight flex items-center gap-3 transition-colors">
-              Dashboard Overview
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]" />
-            </h1>
+      {/* HUD Header & Mission Control */}
+      <section className="shrink-0 pt-4">
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-10 gap-8">
+          <div className="flex-1 w-full max-w-2xl">
+            <div className="text-[10px] font-bold text-accent uppercase tracking-[0.3em] mb-3 flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                System_Status: Operational_Node_Active
+            </div>
+            
+            <div className="relative group/search-main">
+                <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+                    <Search className="w-5 h-5 text-accent opacity-50 group-hover/search-main:opacity-100 transition-opacity" />
+                </div>
+                <input 
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && searchQuery) {
+                            router.push(`/dashboard/investigations/new?q=${encodeURIComponent(searchQuery)}`);
+                        }
+                    }}
+                    placeholder="Initiate New Investigation (Name, Email, or Username)..."
+                    className="w-full h-16 pl-14 pr-32 bg-surface/30 backdrop-blur-3xl border border-white/5 rounded-2xl text-lg font-bold text-text-primary placeholder:text-text-tertiary/20 focus:outline-none focus:border-accent/40 focus:ring-1 focus:ring-accent/20 transition-all shadow-2xl"
+                />
+                <button 
+                   onClick={() => searchQuery && router.push(`/dashboard/investigations/new?q=${encodeURIComponent(searchQuery)}`)}
+                   className="absolute right-3 top-1/2 -translate-y-1/2 h-10 px-6 rounded-xl bg-accent text-background font-bold text-[10px] uppercase tracking-widest hover:bg-white transition-all shadow-lg active:scale-95"
+                >
+                    Target_Acquisition
+                </button>
+            </div>
+          </div>
+
+          <div className="hidden lg:block text-right">
+             <div className="text-[10px] font-bold text-text-tertiary uppercase tracking-widest mb-1 opacity-50">Local Intelligence Time</div>
+             <div className="text-3xl font-bold text-text-primary tabular-nums tracking-tighter">
+                {new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' })}
+             </div>
           </div>
         </div>
 
-        <div className="flex overflow-x-auto snap-x snap-mandatory gap-5 pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 no-scrollbar">
+        {/* Global Statistics Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {topStats.map((stat, i) => (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="snap-center shrink-0 w-[85vw] md:w-auto bg-surface/40 backdrop-blur-xl border border-border/10 rounded-2xl p-6 shadow-2xl relative overflow-hidden group hover:border-border/20 transition-all duration-500"
+              className="bg-surface/30 backdrop-blur-2xl border border-white/5 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-accent/20 transition-all duration-500"
             >
-              <div className={`absolute -right-6 -top-6 w-24 h-24 blur-[40px] opacity-20 transition-all duration-700 group-hover:opacity-40 ${stat.glow}`} />
+              <div className={`absolute -right-6 -top-6 w-24 h-24 blur-[40px] opacity-10 transition-all duration-700 group-hover:opacity-30 ${stat.glow}`} />
               
               <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center border border-border/10 bg-foreground/5 ${stat.color} shadow-inner`}>
-                    <stat.icon className="w-5 h-5" />
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border border-white/5 bg-white/[0.03] ${stat.color}`}>
+                    <stat.icon className={`w-5 h-5 ${(stat as any).active ? 'animate-pulse' : ''}`} />
                 </div>
+                <div className="text-[8px] font-bold text-text-tertiary uppercase tracking-widest opacity-40">System_Metric</div>
               </div>
 
               <div>
-                <h3 className="text-text-secondary font-bold text-[10px] uppercase tracking-widest mb-1">{stat.label}</h3>
-                <div className="text-4xl font-black text-text-primary tracking-tighter">{stat.value}</div>
+                <h3 className="text-text-tertiary font-bold text-[9px] uppercase tracking-widest mb-1">{stat.label}</h3>
+                <div className="text-3xl font-bold text-text-primary tracking-tighter flex items-baseline gap-2">
+                    {stat.value}
+                    {stat.label === "Global Signal Yield" && <span className="text-[10px] text-accent opacity-50 uppercase tracking-widest font-bold">Artifacts</span>}
+                </div>
+                <p className="text-[10px] text-text-tertiary mt-2 opacity-60 italic">{stat.detail}</p>
               </div>
-
-              <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* Tactical Dossiers - Target Acquisition Feed */}
-      <section className="flex-1 min-h-0 flex flex-col">
-        <div className="flex items-center justify-between mb-5 px-1">
-          <h2 className="text-[13px] font-bold text-text-secondary uppercase tracking-widest flex items-center gap-2.5">
-            <div className="w-3 h-[1px] bg-accent" />
-            Tactical Dossiers
-          </h2>
-          <Link href="/dashboard/investigations" className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest hover:text-accent transition-all flex items-center gap-1.5 group">
-            All Dossiers
-            <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-          </Link>
-        </div>
+      {/* Tactical Feed & Unified Activity */}
+      <div className="flex flex-col lg:grid lg:grid-cols-[1fr_320px] gap-8 flex-1 min-h-0">
         
-        <div className="space-y-4 flex-1 overflow-y-auto no-scrollbar pb-4 pr-1">
-          {dossiers.length === 0 ? (
-              <div className="text-center py-10 border border-dashed border-border/10 rounded-2xl bg-surface/10 text-text-tertiary text-[10px] font-mono uppercase tracking-[0.2em]">
-                  No tactical dossiers on file.
-              </div>
-          ) : dossiers.map((inv, i) => {
-            const isExpanded = expandedCase === inv.id;
-            return (
-              <motion.div 
-                key={inv.id} 
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className={`group border rounded-2xl transition-all duration-500 overflow-hidden relative ${
-                  isExpanded 
-                    ? 'bg-surface/60 border-accent/40 shadow-xl' 
-                    : 'bg-surface/20 border-border/10 hover:border-border/30 hover:bg-surface/40'
-                }`}
-              >
-                {/* Header (Always Visible) */}
-                <button 
-                  onClick={() => setExpandedCase(isExpanded ? null : inv.id)}
-                  className="w-full p-5 flex items-center justify-between text-left focus:outline-none relative z-10"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-500 ${
-                      inv.status === 'Critical' ? 'bg-error/10 border-error/20 text-error' : 
-                      inv.status === 'Analyzed' ? 'bg-accent/10 border-accent/20 text-accent' :
-                      'bg-surface-elevated/50 border-border/10 text-text-tertiary shadow-inner'
-                    }`}>
-                      {inv.status === 'Critical' ? <ShieldAlert className="w-5 h-5" /> : <Crosshair className="w-5 h-5" />}
-                    </div>
-                    <div>
-                      <div className="text-base font-bold text-text-primary tracking-tight mb-0.5">{inv.title}</div>
-                      <div className="text-[11px] text-text-secondary tracking-tight uppercase">{inv.target}</div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-6">
-                    <div className="hidden sm:block text-right">
-                      <div className="text-[8px] uppercase tracking-widest text-text-tertiary font-bold mb-1">Search Progress</div>
-                      <div className={`text-xs font-bold ${inv.progress > 80 ? 'text-accent' : 'text-text-secondary'}`}>{(inv.progress * 1.2).toFixed(0).slice(0, 2)}%</div>
-                    </div>
-                    <div className={`p-2 rounded-lg bg-foreground/[0.03] border border-border/10 transition-all ${isExpanded ? 'rotate-180 bg-accent/10 border-accent/20 text-accent' : 'text-text-tertiary'}`}>
-                        <ChevronDown className="w-4 h-4" />
-                    </div>
-                  </div>
-                </button>
+        {/* Main Activity Timeline */}
+        <section className="flex flex-col min-h-0 bg-surface/10 border border-white/5 rounded-3xl p-6 backdrop-blur-sm">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-[13px] font-bold text-text-secondary uppercase tracking-widest flex items-center gap-3">
+              <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+              Operational Chronology
+            </h2>
+            <Link href="/dashboard/investigations" className="text-[10px] font-bold text-text-tertiary uppercase tracking-[0.2em] hover:text-white transition-all">
+              Complete_Archive
+            </Link>
+          </div>
 
-                {/* Expanded Content */}
-                <AnimatePresence>
-                  {isExpanded && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden relative z-10"
-                    >
-                      <div className="px-6 pb-6 pt-3 border-t border-border/5 mt-1 bg-foreground/[0.01]">
-                        <div className="relative group/text mb-6 p-4 bg-background/40 border border-border/10 rounded-xl shadow-inner">
-                            <p className="text-[12px] text-text-secondary leading-relaxed italic pr-10">
-                                "{inv.details}"
-                            </p>
-                            <Terminal className="absolute top-4 right-4 w-4 h-4 text-text-tertiary/20" />
+          <div className="space-y-4 overflow-y-auto no-scrollbar pb-4 pr-1">
+            {unifiedMissions.length === 0 ? (
+                <div className="text-center py-16 border border-dashed border-white/5 rounded-2xl bg-white/[0.02] text-text-tertiary text-[10px] font-mono uppercase tracking-[0.3em]">
+                    No active mission telemetry.
+                </div>
+            ) : unifiedMissions.map((inv, i) => {
+              const isExpanded = expandedCase === inv.id;
+              const isChat = inv.source === 'chat';
+              
+              return (
+                <motion.div 
+                  key={inv.id} 
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className={`group border rounded-2xl transition-all duration-500 overflow-hidden relative ${
+                    isExpanded 
+                      ? 'bg-surface/60 border-accent/30 shadow-2xl' 
+                      : isChat 
+                        ? 'bg-emerald-500/[0.02] border-emerald-500/5 hover:border-emerald-500/20'
+                        : 'bg-surface/20 border-white/[0.03] hover:border-white/10'
+                  }`}
+                >
+                  <button 
+                    onClick={() => setExpandedCase(isExpanded ? null : inv.id)}
+                    className="w-full p-4 flex items-center justify-between text-left focus:outline-none relative z-10"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`w-9 h-9 rounded-lg flex items-center justify-center border transition-all duration-500 ${
+                        inv.status === 'Critical' ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 
+                        isChat ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
+                        'bg-accent/10 border-accent/20 text-accent'
+                      }`}>
+                        {isChat ? <MessageSquare className="w-4 h-4" /> : <Crosshair className="w-4 h-4" />}
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-text-primary tracking-tight mb-0.5">
+                            {isChat ? inv.title.replace(/^Chat:\s?/, '') : inv.title}
                         </div>
-                        
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-6 border-t border-border/5">
-                            <div className="flex items-center gap-8">
-                              <div className="flex items-center gap-3">
-                                  <div className="text-[9px] uppercase tracking-[0.2em] text-text-tertiary font-bold">Signal_Nodes:</div>
-                                  <div className="flex -space-x-1.5">
-                                    {[...Array(3)].map((_, i) => (
-                                      <div key={i} className="w-7 h-7 rounded-lg border border-border/10 bg-surface-elevated flex items-center justify-center text-[9px] font-bold text-text-tertiary shadow-inner">
-                                        L{i+1}
-                                      </div>
-                                    ))}
-                                    <div className="w-7 h-7 rounded-lg border border-accent/20 bg-surface-elevated flex items-center justify-center text-[9px] font-bold text-accent shadow-inner">
-                                      +{inv.leads}
-                                    </div>
-                                  </div>
-                              </div>
-                                                            <div className="h-4 w-[1px] bg-border/20" />
-                              
-                               <div className="flex items-center gap-3">
-                                <div className="text-[9px] uppercase tracking-widest text-text-tertiary font-bold">Threat Level:</div>
-                                <Badge variant="outline" className={`text-[9px] font-bold tracking-widest px-2.5 py-1 rounded-lg border-opacity-50 ${
-                                  inv.leads > 10 ? 'bg-error/10 border-error/30 text-error' : 
-                                  inv.leads > 5 ? 'bg-warning/10 border-warning/30 text-warning' : 
-                                  'bg-success/10 border-success/30 text-success'
-                                }`}>
-                                  {inv.leads > 10 ? 'CRITICAL' : inv.leads > 5 ? 'ELEVATED' : 'STABLE'}
-                                </Badge>
-                              </div>
-                            </div>
-                           
-                           <div className="flex items-center gap-3">
-                             <div className="flex items-center p-1 rounded-xl bg-foreground/[0.02] border border-border/10">
-                                {pendingDeleteId === inv.id ? (
-                                    <button
-                                        onClick={async () => {
-                                        const invToDelete = inv;
-                                        setLocalInvestigations(prev => prev.filter(i => i.id !== inv.id));
-                                        setLocalTotalScans(prev => Math.max(0, prev - 1));
-                                        try {
-                                            const res = await fetch(`/api/investigations/${inv.id}`, { method: 'DELETE' });
-                                            if (!res.ok) throw new Error('Deletion failed');
-                                        } catch (err) {
-                                            setLocalInvestigations(prev => [invToDelete, ...prev]);
-                                            setLocalTotalScans(prev => prev + 1);
-                                            alert('Failed to delete.');
-                                        }
-                                        }}
-                                    className="px-4 py-2 rounded-lg text-white bg-error hover:bg-error/80 transition-all text-[9px] font-bold uppercase tracking-widest shadow-lg flex items-center gap-2"
-                                    >
-                                    <Trash2 className="w-3 h-3" /> Confirm Delete
-                                    </button>
-                                ) : (
-                                    <button
-                                    onClick={() => setPendingDeleteId(inv.id)}
-                                    className="p-2.5 rounded-lg text-text-tertiary hover:text-error hover:bg-error/10 transition-all"
-                                    title="Delete Investigation"
-                                    >
-                                    <Trash2 className="w-4 h-4" />
-                                    </button>
-                                )}
-                                <Link
-                                    href={`/dashboard/investigations/${inv.id}?scanning=1`}
-                                    className="p-2.5 rounded-lg text-text-tertiary hover:text-accent hover:bg-accent/10 transition-all"
-                                    title="Restart Analysis"
-                                >
-                                    <RefreshCw className="w-4 h-4" />
-                                </Link>
-                             </div>
-                             
-                             <Link href={`/dashboard/investigations/${inv.id}`} className="h-10 px-5 rounded-xl bg-accent text-background hover:bg-text-primary hover:text-background transition-all font-bold text-[10px] uppercase tracking-widest flex items-center gap-2 shadow-lg hover:shadow-accent/40">
-                                Open Investigation <ArrowUpRight className="w-3.5 h-3.5" />
-                             </Link>
-                           </div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-[9px] text-text-tertiary uppercase tracking-wider">{isChat ? 'AI Session' : 'Tactical Dossier'}</span>
+                            <div className="w-1 h-1 rounded-full bg-white/10" />
+                            <span className="text-[9px] text-text-tertiary font-mono">{inv.target}</span>
                         </div>
                       </div>
-                      
-                      {/* Scanline overlay only for expanded */}
-                      <div className="absolute inset-0 scanline opacity-[0.02] pointer-events-none" />
+                    </div>
+                    
+                    <div className="flex items-center gap-4">
+                        <div className="hidden sm:block text-right pr-4 border-r border-white/5">
+                            <div className="text-[9px] font-bold text-text-tertiary/40 uppercase tracking-tighter mb-0.5">Yield</div>
+                            <div className="text-[11px] font-mono text-text-secondary">{inv.leads} pts</div>
+                        </div>
+                        <div className={`p-1.5 rounded-md transition-all ${isExpanded ? 'rotate-180 bg-accent/10 text-accent' : 'text-text-tertiary opacity-30'}`}>
+                            <ChevronDown className="w-3.5 h-3.5" />
+                        </div>
+                    </div>
+                  </button>
+
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="px-4 pb-4 overflow-hidden"
+                      >
+                         <div className="p-4 bg-background/40 border border-white/5 rounded-xl text-[11px] text-text-secondary leading-relaxed italic mb-4">
+                             "{inv.details}"
+                         </div>
+                         
+                         <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                <Badge variant="outline" className={`text-[8px] font-bold tracking-[0.2em] px-2 py-0.5 rounded border-opacity-30 ${
+                                    isChat ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500' : 'bg-accent/10 border-accent/20 text-accent'
+                                }`}>
+                                   {isChat ? 'Briefing' : 'Discovery'}
+                                </Badge>
+                                <span className="text-[9px] font-mono text-text-tertiary opacity-40 uppercase">UID: {inv.id.slice(0,8)}</span>
+                            </div>
+                            
+                            <div className="flex items-center gap-2">
+                                <Link 
+                                    href={isChat ? `/dashboard/chat?id=${inv.id}` : `/dashboard/investigations/${inv.id}`}
+                                    className={`h-8 px-4 rounded-lg font-bold text-[9px] uppercase tracking-widest flex items-center gap-2 transition-all ${
+                                        isChat ? 'bg-emerald-500 text-background hover:bg-white' : 'bg-accent text-background hover:bg-white'
+                                    }`}
+                                >
+                                    Access Intelligence <ArrowUpRight className="w-3 h-3" />
+                                </Link>
+                                <button
+                                    onClick={() => setPendingDeleteId(inv.id)}
+                                    className="p-2 rounded-lg bg-white/5 text-text-tertiary hover:text-rose-500 hover:bg-rose-500/10 transition-all"
+                                >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                            </div>
+                         </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Real-Time Discovery Feed Sidebar */}
+        <aside className="hidden lg:flex flex-col bg-surface/20 border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+            <div className="p-6 border-b border-white/5 bg-foreground/[0.02]">
+                <div className="flex items-center gap-2 mb-1">
+                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                    <h2 className="text-[11px] font-bold text-text-primary uppercase tracking-[0.2em]">Real-Time Signal Feed</h2>
+                </div>
+                <p className="text-[9px] text-text-tertiary uppercase opacity-50 tracking-widest">Global Discovery Log</p>
+            </div>
+
+            <div className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-4">
+                {recentDiscoveries.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full text-center opacity-30 p-8 grayscale">
+                        <Activity className="w-8 h-8 mb-4 opacity-20" />
+                        <p className="text-[10px] font-mono uppercase tracking-widest leading-relaxed">Awaiting system handshake. Signal yield is currently idle.</p>
+                    </div>
+                ) : recentDiscoveries.map((discovery, i) => (
+                    <motion.div
+                        key={discovery.id}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        className="p-3.5 bg-background/20 border border-white/[0.03] rounded-xl hover:border-emerald-500/10 transition-all group"
+                    >
+                        <div className="flex items-center gap-2.5 mb-2">
+                             <div className="p-1 rounded bg-accent/10 border border-accent/20 text-accent">
+                                <Cpu className="w-2.5 h-2.5" />
+                             </div>
+                             <span className="text-[9px] font-bold text-accent uppercase tracking-tighter truncate max-w-[140px] opacity-70">
+                                {discovery.investigation?.title || 'System'}
+                             </span>
+                             <span className="text-[8px] text-text-tertiary ml-auto font-mono">
+                                {new Date(discovery.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
+                             </span>
+                        </div>
+                        <h4 className="text-[11px] font-bold text-text-primary mb-1 line-clamp-1 group-hover:text-emerald-400 transition-colors">
+                            {discovery.title}
+                        </h4>
+                        <div className="flex items-center gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40" />
+                            <span className="text-[9px] text-text-tertiary tracking-tight uppercase line-clamp-1">{discovery.source} Intelligence</span>
+                        </div>
                     </motion.div>
-                  )}
-                </AnimatePresence>
-                
-                {/* Background Noise Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.01] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-              </motion.div>
-            );
-          })}
-        </div>
-      </section>
+                ))}
+            </div>
 
-      {/* Assistant Intelligence - Chat Session Feed */}
-      <section className="flex-1 min-h-0 flex flex-col pt-10 border-t border-border/10">
-        <div className="flex items-center justify-between mb-5 px-1">
-          <h2 className="text-[13px] font-bold text-text-secondary uppercase tracking-widest flex items-center gap-2.5">
-            <div className="w-3 h-[1px] bg-emerald-500" />
-            Assistant Intelligence
-          </h2>
-          <Link href="/dashboard/chat" className="text-[11px] font-bold text-text-tertiary uppercase tracking-widest hover:text-emerald-500 transition-all flex items-center gap-1.5 group">
-            Open Chat
-            <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-          </Link>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-8 pr-1">
-          {chats.length === 0 ? (
-              <div className="col-span-full text-center py-10 border border-dashed border-border/10 rounded-2xl bg-surface/10 text-text-tertiary text-[10px] font-mono uppercase tracking-[0.2em]">
-                  No recent assistant interactions.
-              </div>
-          ) : chats.map((inv, i) => {
-            return (
-              <motion.div 
-                key={inv.id} 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="group p-4 bg-surface/20 border border-border/10 rounded-2xl hover:border-emerald-500/30 hover:bg-emerald-500/[0.02] transition-all duration-500 relative overflow-hidden"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500">
-                    <Terminal className="w-4 h-4" />
-                  </div>
-                  <Badge variant="outline" className="text-[8px] font-bold uppercase tracking-tighter bg-emerald-500/5 text-emerald-500 border-emerald-500/20">
-                    Briefing
-                  </Badge>
+            <div className="p-4 border-t border-white/5 bg-foreground/[0.01]">
+                <div className="flex items-center justify-between text-[8px] font-bold text-text-tertiary uppercase tracking-widest">
+                    <span>Signal Relay Status</span>
+                    <span className="text-emerald-400">UP_STREAM</span>
                 </div>
-
-                <div className="mb-6">
-                  <h3 className="text-sm font-bold text-text-primary mb-1 line-clamp-1 group-hover:text-emerald-500 transition-colors">
-                    {inv.title.replace(/^Chat:\s?/, '')}
-                  </h3>
-                  <p className="text-[10px] text-text-tertiary uppercase tracking-tight">Debrief regarding {inv.target}</p>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex -space-x-1">
-                    <div className="w-5 h-5 rounded-md border border-border/20 bg-emerald-500/20" />
-                    <div className="w-5 h-5 rounded-md border border-border/20 bg-emerald-500/10" />
-                  </div>
-                  <Link 
-                    href={`/dashboard/chat?id=${inv.id}`}
-                    className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-text-secondary hover:text-white transition-colors"
-                  >
-                    Resume <ArrowUpRight className="w-3 h-3" />
-                  </Link>
-                </div>
-
-                {/* Background Noise Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-              </motion.div>
-            );
-          })}
-        </div>
-      </section>
+            </div>
+        </aside>
+      </div>
       
     </div>
   );
