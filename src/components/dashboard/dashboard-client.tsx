@@ -49,8 +49,7 @@ export function DashboardClient({
 
   useEffect(() => {
     setLocalInvestigations(investigations);
-    setLocalTotalScans(totalScans);
-  }, [investigations, totalScans]);
+  }, [investigations]);
 
   const dossiers = localInvestigations.filter(i => i.source === 'dossier');
   const chats = localInvestigations.filter(i => i.source === 'chat');
