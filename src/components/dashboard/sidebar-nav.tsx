@@ -101,24 +101,24 @@ export function SidebarNav({ isGuest }: { isGuest?: boolean }) {
             <div className="mt-auto pt-4 pb-1">
                 <Link
                     href="/premium"
-                    className="relative flex flex-col p-4 rounded-2xl bg-slate-900 border border-white/10 hover:border-accent shadow-2xl transition-all duration-500 group overflow-hidden"
+                    className="relative flex flex-col p-4 rounded-2xl bg-accent/5 dark:bg-slate-900 border border-accent/20 dark:border-white/10 hover:border-accent shadow-2xl transition-all duration-500 group overflow-hidden"
                 >
                     <div className="absolute -right-4 -top-4 w-16 h-16 bg-accent/20 blur-2xl group-hover:bg-accent/30 transition-all" />
                     
                     <div className="relative z-10">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="p-2 rounded-lg bg-accent/20 border border-accent/30">
+                            <div className="p-2 rounded-lg bg-accent/10 border border-accent/20">
                                 <Zap className="w-4 h-4 text-accent" />
                             </div>
-                            <span className="text-[8px] font-black text-white uppercase tracking-widest border border-white/10 px-2 py-0.5 rounded-md bg-white/5">Elite_Tier</span>
+                            <span className="text-[8px] font-black text-accent dark:text-white uppercase tracking-widest border border-accent/20 dark:border-white/10 px-2 py-0.5 rounded-md bg-accent/5 dark:bg-white/5">Elite_Tier</span>
                         </div>
                         
-                        <h4 className="text-[12px] font-black text-white uppercase tracking-widest mb-1.5">Go Premium</h4>
-                        <p className="text-[10px] text-slate-400 leading-tight uppercase tracking-tight">
+                        <h4 className="text-[12px] font-black text-text-primary dark:text-white uppercase tracking-widest mb-1">Go Premium</h4>
+                        <p className="text-[10px] text-text-tertiary dark:text-slate-400 leading-tight uppercase tracking-tight">
                             Access unfiltered Intelligence nodes & data feeds.
                         </p>
 
-                        <div className="mt-3.5 flex items-center gap-2 text-[10px] font-black text-accent uppercase tracking-widest group-hover:gap-3 transition-all duration-500">
+                        <div className="mt-4 flex items-center gap-2 text-[10px] font-black text-accent uppercase tracking-widest group-hover:gap-3 transition-all duration-500">
                             Upgrade Profile
                             <ArrowUpRight className="w-3.5 h-3.5" />
                         </div>

@@ -79,17 +79,17 @@ export default async function DashboardLayout({
                     <aside className="w-64 border-r border-border/10 bg-surface/80 backdrop-blur-2xl flex flex-col relative z-20 shadow-[10px_0_50px_rgba(0,0,0,0.3)] h-full overflow-hidden">
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
                     
-                    <div className="p-8 border-b border-border/10 relative overflow-hidden group/side-brand bg-foreground/[0.03] shadow-[inset_0_0_40px_rgba(0,0,0,0.05)] vibrant-indicator">
+                    <div className="h-16 px-8 border-b border-border/10 relative overflow-hidden group/side-brand bg-foreground/[0.03] shadow-[inset_0_0_40px_rgba(0,0,0,0.05)] flex items-center vibrant-indicator">
                         {/* Tactical Background Overlay */}
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,var(--accent)_0%,transparent_40%)] opacity-[0.05] group-hover/side-brand:opacity-10 transition-opacity duration-1000" />
                         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:10px_10px] opacity-10" />
 
-                        <div className="relative z-10 flex flex-col gap-4">
+                        <div className="relative z-10 w-full">
                             <Link href="/dashboard" className="flex items-center gap-3.5 group">
-                                <div className="p-2.5 bg-accent/10 rounded-xl border border-accent/30 shadow-lg shadow-accent/5 group-hover:scale-110 transition-all duration-500">
-                                    <AletheiaLogo className="w-6 h-6 text-accent" />
+                                <div className="p-1 px-2.5 bg-accent/10 rounded-lg border border-accent/30 shadow-lg shadow-accent/5 group-hover:scale-110 transition-all duration-500">
+                                    <AletheiaLogo className="w-5 h-5 text-accent" />
                                 </div>
-                                <span className="font-black tracking-[0.2em] text-xl text-gradient-vibrant uppercase">Aletheia</span>
+                                <span className="font-black tracking-[0.2em] text-lg text-gradient-vibrant uppercase">Aletheia</span>
                             </Link>
                         </div>
                     </div>
