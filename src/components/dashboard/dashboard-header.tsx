@@ -27,12 +27,12 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
             
-            // Show header when scrolling up or at the very top
-            if (currentScrollY < lastScrollY || currentScrollY < 10) {
+            // Show header when scrolling up or at the very top (wider threshold)
+            if (currentScrollY < lastScrollY || currentScrollY < 40) {
                 setIsVisible(true);
             } 
-            // Hide header when scrolling down and past the header height
-            else if (currentScrollY > 100 && currentScrollY > lastScrollY) {
+            // Hide header when scrolling down and past a meaningful offset
+            else if (currentScrollY > 120 && currentScrollY > lastScrollY) {
                 setIsVisible(false);
             }
             
@@ -48,8 +48,8 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
             <motion.header 
                 initial={{ y: 0 }}
                 animate={{ y: isVisible ? 0 : -100 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="h-16 border-b border-border/10 bg-surface/80 backdrop-blur-3xl sticky top-0 z-40 px-8 flex items-center justify-between shadow-sm vibrant-indicator w-full"
+                transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+                className="h-16 border-b border-border/10 bg-surface/90 backdrop-blur-3xl sticky top-0 z-50 px-8 flex items-center justify-between shadow-xl vibrant-indicator w-full"
             >
                 {/* Breadcrumbs */}
                 <nav className="flex items-center gap-2 text-[10px] uppercase font-black tracking-[0.2em] text-text-tertiary">

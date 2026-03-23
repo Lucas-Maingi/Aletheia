@@ -112,9 +112,9 @@ export function DashboardClient({
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="bg-surface/30 backdrop-blur-2xl border border-white/5 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-accent/20 hover:-translate-y-1.5 hover:shadow-2xl transition-all duration-500 cursor-default"
+              className="bg-surface/30 backdrop-blur-2xl border border-white/5 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-accent/30 hover:-translate-y-2 hover:shadow-[0_22px_45px_rgba(0,0,0,0.15)] transition-all duration-500 cursor-default active:scale-[0.98]"
             >
-              <div className={`absolute -right-6 -top-6 w-24 h-24 blur-[40px] opacity-10 transition-all duration-700 group-hover:opacity-40 ${stat.glow}`} />
+              <div className={`absolute -right-6 -top-6 w-24 h-24 blur-[40px] opacity-10 transition-all duration-700 group-hover:opacity-60 ${stat.glow}`} />
               
               <div className="flex items-center justify-between mb-4">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center border border-accent/20 bg-accent/5 ${stat.color}`}>

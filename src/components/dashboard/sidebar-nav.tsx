@@ -30,18 +30,18 @@ function NavLink({ href, label, icon, badge, isPrimary }: NavLinkProps) {
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-accent shadow-[0_0_15px_var(--accent)] rounded-full" />
             )}
 
-            <div className={`transition-all duration-500 ${isActive ? "text-accent scale-110 drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]" : "text-text-tertiary group-hover:text-accent group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]"}`}>
+            <div className={`transition-all duration-500 ${isActive ? "text-accent scale-110 drop-shadow-[0_0_12px_rgba(0,240,255,0.5)]" : "text-text-tertiary group-hover:text-accent group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_rgba(0,240,255,0.3)]"}`}>
                 {icon}
             </div>
 
-            <span className={`tracking-widest font-black uppercase text-[10px]`}>
+            <span className={`tracking-widest font-black uppercase text-[10px] ${isActive ? "text-text-primary" : "text-text-tertiary group-hover:text-text-primary"}`}>
                 {label}
             </span>
 
             {badge && (
                 <span className={`ml-auto text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter transition-all ${
                     isActive 
-                        ? "bg-accent text-white border border-accent" 
+                        ? "bg-accent text-white border border-accent shadow-[0_0_8px_rgba(0,240,255,0.4)]" 
                         : "bg-foreground/[0.06] text-text-secondary border border-border/10 group-hover:bg-accent/10 group-hover:text-accent opacity-100"
                 }`}>
                     {badge}
