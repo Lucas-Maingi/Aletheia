@@ -8,6 +8,7 @@ import { AlertBell } from "./alert-bell";
 import { ThemeSwitcher } from "../ui/theme-switcher";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { AletheiaLogo } from "../AletheiaLogo";
 
 interface DashboardHeaderProps {
     user: {
@@ -49,10 +50,25 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                 initial={{ y: 0 }}
                 animate={{ y: isVisible ? 0 : -100 }}
                 transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-                className="h-16 border-b border-border/10 bg-surface/90 backdrop-blur-3xl sticky top-0 z-50 px-8 flex items-center justify-between shadow-xl vibrant-indicator w-full"
+                className="h-16 border-b border-border/10 bg-surface/90 backdrop-blur-3xl fixed top-0 left-0 right-0 z-50 px-8 flex items-center justify-between shadow-xl vibrant-indicator"
             >
-                {/* Breadcrumbs */}
-                <nav className="flex items-center gap-2 text-[10px] uppercase font-black tracking-[0.2em] text-text-tertiary">
+                {/* Unified Branding & Breadcrumbs */}
+                <div className="flex items-center gap-8">
+                    {/* Brand Section */}
+                    <div className="flex items-center gap-3.5 group/header-brand">
+                        <Link href="/dashboard" className="flex items-center gap-3.5">
+                            <div className="p-1 px-2.5 bg-accent/10 rounded-lg border border-accent/30 shadow-lg shadow-accent/5 group-hover/header-brand:scale-110 transition-all duration-500">
+                                <AletheiaLogo className="w-5 h-5 text-accent" />
+                            </div>
+                            <span className="font-black tracking-[0.2em] text-lg text-gradient-vibrant uppercase hidden sm:block">Aletheia</span>
+                        </Link>
+                    </div>
+
+                    {/* Separator */}
+                    <div className="h-6 w-px bg-border/20 hidden md:block" />
+
+                    {/* Breadcrumbs */}
+                    <nav className="flex items-center gap-2 text-[10px] uppercase font-black tracking-[0.2em] text-text-tertiary">
                     {segments.filter(s => s.toLowerCase() !== 'dashboard').map((segment, index) => {
                         const isLast = index === segments.length - 1;
                         const path = `/${segments.slice(0, index + 1).join('/')}`;
@@ -70,8 +86,8 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                                 )}
                             </div>
                         );
-                    })}
-                </nav>
+                    </nav>
+                </div>
 
                 {/* Right Side Actions */}
                 <div className="flex items-center gap-6">

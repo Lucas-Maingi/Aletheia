@@ -73,50 +73,35 @@ export default async function DashboardLayout({
 
     return (
         <InvestigationProvider>
-            <div className="flex h-screen overflow-hidden bg-background">
-                {/* Sidebar Navigation — hidden on mobile, shown via MobileSidebarToggle */}
-                <MobileSidebarToggle>
-                    <aside className="w-64 bg-surface/80 backdrop-blur-2xl flex flex-col relative z-20 shadow-[10px_0_50px_rgba(0,0,0,0.3)] h-full overflow-hidden">
-                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
-                    
-                    <div className="h-16 px-8 border-b border-border/10 relative overflow-hidden group/side-brand bg-foreground/[0.03] shadow-[inset_0_0_40px_rgba(0,0,0,0.05)] flex items-center vibrant-indicator z-30">
-                        {/* Tactical Background Overlay */}
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,var(--accent)_0%,transparent_40%)] opacity-[0.05] group-hover/side-brand:opacity-10 transition-opacity duration-1000" />
-                        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:10px_10px] opacity-10" />
+            <div className="flex flex-col h-screen overflow-hidden bg-background">
+                <DashboardHeader user={user} />
+                
+                <div className="flex flex-1 overflow-hidden pt-16">
+                    {/* Sidebar Navigation — hidden on mobile, shown via MobileSidebarToggle */}
+                    <MobileSidebarToggle>
+                        <aside className="w-64 bg-surface/80 backdrop-blur-2xl flex flex-col relative z-20 shadow-[10px_0_50px_rgba(0,0,0,0.3)] h-full overflow-hidden">
+                            <nav className="flex-1 p-4 overflow-y-auto no-scrollbar border-r border-border/10 relative z-30 bg-surface/40">
+                                <SidebarNav isGuest={user.isGuest} />
+                            </nav>
 
-                        <div className="relative z-10 w-full">
-                            <Link href="/dashboard" className="flex items-center gap-3.5 group">
-                                <div className="p-1 px-2.5 bg-accent/10 rounded-lg border border-accent/30 shadow-lg shadow-accent/5 group-hover:scale-110 transition-all duration-500">
-                                    <AletheiaLogo className="w-5 h-5 text-accent" />
-                                </div>
-                                <span className="font-black tracking-[0.2em] text-lg text-gradient-vibrant uppercase">Aletheia</span>
-                            </Link>
-                        </div>
-                    </div>
-
-                    <nav className="flex-1 p-4 overflow-y-auto no-scrollbar border-r border-border/10 relative z-30 bg-surface/40">
-                        <SidebarNav isGuest={user.isGuest} />
-                    </nav>
-
-                    <div className="p-4 border-t border-r border-border/10 mt-auto bg-foreground/[0.04] backdrop-blur-3xl relative z-30 space-y-2">
-                        <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-foreground/[0.05] text-text-tertiary hover:text-text-primary transition-all group/home border border-transparent hover:border-border/10">
-                            <Shield className="w-4 h-4 text-text-tertiary group-hover/home:text-accent transition-colors" />
-                            <span className="text-[11px] font-black uppercase tracking-widest flex-1">Site_Home</span>
-                            <ArrowRight className="w-3 h-3 opacity-0 group-hover/home:opacity-100 transition-all translate-x-[-4px] group-hover/home:translate-x-0" />
-                        </Link>
-                        <Link href="/dashboard/settings" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-foreground/[0.05] text-text-secondary hover:text-text-primary transition-all group/settings border border-transparent hover:border-border/10">
-                            <Palette className="w-4 h-4 text-text-tertiary group-hover/settings:text-accent transition-colors" />
-                            <span className="text-[11px] font-black uppercase tracking-widest flex-1">System_Config</span>
-                            <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shadow-[0_0_8px_rgba(0,240,255,0.6)]" />
-                        </Link>
-                    </div>
-                    </aside>
-                </MobileSidebarToggle>
+                            <div className="p-4 border-t border-r border-border/10 mt-auto bg-foreground/[0.04] backdrop-blur-3xl relative z-30 space-y-2">
+                                <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-foreground/[0.05] text-text-tertiary hover:text-text-primary transition-all group/home border border-transparent hover:border-border/10">
+                                    <Shield className="w-4 h-4 text-text-tertiary group-hover/home:text-accent transition-colors" />
+                                    <span className="text-[11px] font-black uppercase tracking-widest flex-1">Site_Home</span>
+                                    <ArrowRight className="w-3 h-3 opacity-0 group-hover/home:opacity-100 transition-all translate-x-[-4px] group-hover/home:translate-x-0" />
+                                </Link>
+                                <Link href="/dashboard/settings" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-foreground/[0.05] text-text-secondary hover:text-text-primary transition-all group/settings border border-transparent hover:border-border/10">
+                                    <Palette className="w-4 h-4 text-text-tertiary group-hover/settings:text-accent transition-colors" />
+                                    <span className="text-[11px] font-black uppercase tracking-widest flex-1">System_Config</span>
+                                    <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shadow-[0_0_8px_rgba(0,240,255,0.6)]" />
+                                </Link>
+                            </div>
+                        </aside>
+                    </MobileSidebarToggle>
 
 
                 {/* Main Content Area */}
                 <main className="flex-1 overflow-y-auto no-scrollbar relative bg-surface-2 flex flex-col">
-                    <DashboardHeader user={user} />
                     <CommandPalette />
 
                     <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
@@ -137,6 +122,8 @@ export default async function DashboardLayout({
                         {children}
                     </div>
                 </main>
+
+                </div>
 
                 <MobileNav />
             </div>
