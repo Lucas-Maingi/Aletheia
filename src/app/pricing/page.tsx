@@ -90,8 +90,7 @@ const features = [
 const plans = [
   {
     name: "Analyst",
-    priceMonthly: "0",
-    priceYearly: "0",
+    price: "0",
     desc: "The ultimate free starting point for independent researchers.",
     features: [
       "50 Concurrent Investigations",
@@ -108,9 +107,7 @@ const plans = [
   },
   {
     name: "Tactical Pro",
-    priceMonthly: "49",
-    priceYearly: "39",
-    priceLtd: "399",
+    price: "99",
     desc: "The professional standard for investigators and SOC operators.",
     features: [
       "Unlimited Investigations",
@@ -122,17 +119,13 @@ const plans = [
       "Deep Web Breach Retrieval",
       "Autonomous Agent Clusters"
     ],
-    cta: "Start Hunting",
-    gumroadMonthly: "https://gumroad.com/l/aletheia-pro-monthly",
-    gumroadYearly: "https://gumroad.com/l/aletheia-pro-yearly",
-    gumroadLtd: "https://gumroad.com/l/aletheia-pro-ltd",
+    cta: "Get Lifetime Access",
+    gumroadLink: "https://lucas808.gumroad.com/l/aletheia-pro",
     popular: true
   },
   {
     name: "Elite Team",
-    priceMonthly: "149",
-    priceYearly: "119",
-    priceLtd: "999",
+    price: "299",
     desc: "Team-wide surveillance and high-volume batch processing.",
     features: [
       "Everything in Tactical Pro",
@@ -144,17 +137,13 @@ const plans = [
       "API Webhook Integration",
       "Priority 24/7 Human Support"
     ],
-    cta: "Upgrade Agency",
-    gumroadMonthly: "https://gumroad.com/l/aletheia-team-monthly",
-    gumroadYearly: "https://gumroad.com/l/aletheia-team-yearly",
-    gumroadLtd: "https://gumroad.com/l/aletheia-team-ltd",
+    cta: "Get Lifetime Access",
+    gumroadLink: "https://lucas808.gumroad.com/l/aletheia-team",
     popular: false
   }
 ];
 
 export default function PricingPage() {
-  const [isYearly, setIsYearly] = useState(true);
-
   return (
     <div className="w-full bg-background min-h-screen">
       <LandingHeader />
@@ -174,27 +163,8 @@ export default function PricingPage() {
             Pick your power.
           </h1>
           <p className="text-xl text-text-secondary max-w-2xl mx-auto mb-10 leading-relaxed">
-            From basic scouting to autonomous global sweeps. Choose the tier that matches your intelligence requirements.
+            From basic scouting to autonomous global sweeps. Get lifetime access to the tier that matches your intelligence requirements.
           </p>
-          
-          {/* Billing Toggle */}
-          <div className="flex items-center justify-center gap-4 mt-8">
-            <span className={`text-sm font-bold uppercase tracking-widest transition-colors ${!isYearly ? 'text-white' : 'text-text-tertiary'}`}>Monthly</span>
-            <button 
-              onClick={() => setIsYearly(!isYearly)}
-              className="relative w-16 h-8 rounded-full bg-surface-elevated border border-border/10 p-1 transition-colors"
-            >
-              <motion.div 
-                className="w-6 h-6 rounded-full bg-accent absolute top-1"
-                animate={{ left: isYearly ? "calc(100% - 28px)" : "4px" }}
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              />
-            </button>
-            <div className="flex items-center gap-2">
-              <span className={`text-sm font-bold uppercase tracking-widest transition-colors ${isYearly ? 'text-white' : 'text-text-tertiary'}`}>Yearly</span>
-              <Badge variant="accent" className="text-[9px] px-2 py-0.5 animate-pulse">Save 20%</Badge>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -202,7 +172,7 @@ export default function PricingPage() {
       <section className="pb-24 px-6 relative z-10 mt-8">
         <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
           {plans.map((plan, i) => (
-            <PricingCard key={plan.name} plan={plan} isYearly={isYearly} index={i} />
+            <PricingCard key={plan.name} plan={plan} index={i} />
           ))}
         </div>
       </section>
@@ -251,10 +221,9 @@ export default function PricingPage() {
   );
 }
 
-function PricingCard({ plan, isYearly, index }: { plan: any, isYearly: boolean, index: number }) {
-  const price = isYearly ? plan.priceYearly : plan.priceMonthly;
-  const isFree = price === "0";
-  const mainCheckout = isFree ? plan.href : (isYearly ? plan.gumroadYearly : plan.gumroadMonthly);
+function PricingCard({ plan, index }: { plan: any, index: number }) {
+  const isFree = plan.price === "0";
+  const mainCheckout = isFree ? plan.href : plan.gumroadLink;
 
   return (
     <motion.div
@@ -278,14 +247,14 @@ function PricingCard({ plan, isYearly, index }: { plan: any, isYearly: boolean, 
           {plan.name}
         </h3>
         <div className="flex items-baseline gap-1 mb-1">
-          <span className="text-5xl font-black text-text-primary tracking-tighter">${price}</span>
-          {!isFree && <span className="text-text-tertiary font-bold uppercase tracking-widest text-[10px]">/mo</span>}
+          <span className="text-5xl font-black text-text-primary tracking-tighter">${plan.price}</span>
+          {!isFree && <span className="text-text-tertiary font-bold uppercase tracking-widest text-[10px]">/lifetime</span>}
         </div>
         
-        {/* Height preservation for the toggles */}
+        {/* Height preservation */}
         <div className="h-4 mb-4">
-           {!isFree && isYearly && (
-              <span className="text-success text-[10px] font-bold uppercase tracking-widest">Billed annually</span>
+           {!isFree && (
+              <span className="text-success text-[10px] font-bold uppercase tracking-widest">One-time payment</span>
            )}
         </div>
 
@@ -305,8 +274,8 @@ function PricingCard({ plan, isYearly, index }: { plan: any, isYearly: boolean, 
         ))}
       </div>
 
-      <div className="mt-auto space-y-3">
-        <a href={mainCheckout} className="block w-full">
+      <div className="mt-auto space-y-3 relative z-20">
+        <a href={mainCheckout} className="block w-full text-center">
           <Button
             size="lg"
             className={`w-full font-black uppercase tracking-widest text-xs h-14 rounded-2xl shadow-2xl transition-all transform hover:scale-[1.02] ${
@@ -319,16 +288,6 @@ function PricingCard({ plan, isYearly, index }: { plan: any, isYearly: boolean, 
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </a>
-
-        {!isFree && plan.priceLtd && (
-          <a href={plan.gumroadLtd} className="block w-full">
-            <div className="w-full mt-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-400/50 transition-all cursor-pointer group">
-              <span className="text-amber-400 text-[9px] font-black uppercase tracking-[0.2em] group-hover:text-amber-300 transition-colors">
-                ♾ Lifetime Deal — ${plan.priceLtd} one-time
-              </span>
-            </div>
-          </a>
-        )}
       </div>
 
       {/* Decorative backgrounds */}
