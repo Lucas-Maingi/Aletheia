@@ -113,10 +113,12 @@ const plans = [
     desc: "Unlimited force for the professional security analyst.",
     features: [
       "Unlimited Investigations",
-      "All 12+ Elite Features",
-      "Full API Powerhouse Access",
-      "Autonomous Agent Clusters",
+      "10 Active Watchlists",
+      "Reverse Image Search (AI)",
+      "Web3 & Crypto Correlation",
+      "30+ Premium API Data Sources",
       "Deep Web & Breach Access",
+      "Autonomous Agent Clusters",
       "Priority Recursive Intel"
     ],
     cta: "Start Hunting",
@@ -132,10 +134,12 @@ const plans = [
     priceLtd: "999",
     desc: "Team-wide intelligence and batch processing power.",
     features: [
+      "Everything in Tactical Pro",
       "Batch Intelligence (100 Targets)",
       "3 Team Collaborator Seats",
       "50 Active Watchlists",
-      "Web3 & Crypto Correlation",
+      "Reverse Image Search (Unlimited)",
+      "30+ Premium API Data Sources",
       "API Webhook Access",
       "Dedicated Forensic Support"
     ],
@@ -317,9 +321,11 @@ function PricingCard({ plan, isYearly, index }: { plan: any, isYearly: boolean, 
 
         {!isFree && plan.priceLtd && (
           <a href={plan.gumroadLtd} className="block w-full">
-            <Button variant="ghost" className="w-full h-10 text-[10px] uppercase font-bold tracking-widest text-text-tertiary hover:bg-accent/10 hover:text-accent border border-transparent hover:border-accent/20 transition-all rounded-xl">
-              Or Lifetime Access (${plan.priceLtd})
-            </Button>
+            <div className="w-full mt-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-400/50 transition-all cursor-pointer group">
+              <span className="text-amber-400 text-[9px] font-black uppercase tracking-[0.2em] group-hover:text-amber-300 transition-colors">
+                ♾ Lifetime Deal — ${plan.priceLtd} one-time
+              </span>
+            </div>
           </a>
         )}
       </div>
