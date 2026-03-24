@@ -33,22 +33,13 @@ export function UserNav({ user }: UserNavProps) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-3 p-1.5 pr-3 rounded-full hover:bg-foreground/[0.05] transition-all border border-transparent hover:border-border/10 group">
-                    <Avatar className="h-8 w-8 border border-border/10 shadow-sm transition-transform group-hover:scale-105">
+                <button className="flex items-center justify-center rounded-full p-0.5 hover:ring-2 hover:ring-accent/20 transition-all group outline-none">
+                    <Avatar className="h-9 w-9 border border-border/10 shadow-sm transition-transform group-hover:scale-105">
                         <AvatarImage src="" />
-                        <AvatarFallback className="bg-accent/5 text-[10px] font-black text-accent uppercase">
+                        <AvatarFallback className="bg-accent/10 text-[11px] font-black text-accent uppercase">
                             {initials}
                         </AvatarFallback>
                     </Avatar>
-                    <div className="hidden md:flex flex-col items-start leading-none gap-1">
-                        <span className="text-[11px] font-black text-text-primary tracking-tight">
-                            {user.isGuest ? "Guest Analyst" : (user.email?.split('@')[0] || "Analyst")}
-                        </span>
-                        <div className="flex items-center gap-1.5">
-                            <span className="text-[9px] font-bold text-text-tertiary uppercase tracking-widest">Node_Active</span>
-                            <ChevronDown className="w-2.5 h-2.5 text-text-tertiary transition-transform group-data-[state=open]:rotate-180" />
-                        </div>
-                    </div>
                 </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-64 p-2 bg-surface/95 backdrop-blur-2xl border-border/10 shadow-2xl rounded-2xl" align="end" sideOffset={8}>

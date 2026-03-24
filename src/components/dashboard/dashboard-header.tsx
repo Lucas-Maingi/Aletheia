@@ -68,7 +68,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                     <div className="h-6 w-px bg-border/20 hidden md:block" />
 
                     {/* Breadcrumbs */}
-                    <nav className="flex items-center gap-2 text-[10px] uppercase font-black tracking-[0.2em] text-text-tertiary">
+                    <nav className="flex items-center gap-2 text-[11px] uppercase font-black tracking-[0.2em] text-text-tertiary">
                     {segments.filter(s => s.toLowerCase() !== 'dashboard').map((segment, index) => {
                         const isLast = index === segments.length - 1;
                         const path = `/${segments.slice(0, index + 1).join('/')}`;
@@ -94,16 +94,16 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                 <div className="flex items-center gap-6">
                     <div 
                         onClick={() => window.dispatchEvent(new CustomEvent('ale-toggle-command-palette'))}
-                        className="hidden lg:flex items-center gap-3 px-4 py-2 rounded-xl bg-accent/5 border border-accent/20 text-[9px] font-black text-accent uppercase tracking-widest cursor-pointer hover:bg-accent/10 hover:border-accent/40 hover:scale-[1.02] transition-all group/search shadow-lg shadow-accent/5"
+                        className="hidden lg:flex items-center gap-3 px-4 py-2.5 rounded-xl bg-accent/5 border border-accent/20 text-[11px] font-black text-accent uppercase tracking-widest cursor-pointer hover:bg-accent/10 hover:border-accent/40 hover:scale-[1.02] transition-all group/search shadow-lg shadow-accent/5"
                     >
-                        <Search className="w-3.5 h-3.5 group-hover/search:scale-110 transition-transform" />
+                        <Search className="w-4 h-4 group-hover/search:scale-110 transition-transform" />
                         <span>Quick Search</span>
                         <span className="opacity-40 ml-1">⌘K</span>
                     </div>
                     
-                    <div className="flex items-center gap-3">
-                        <AlertBell iconSize={18} className="p-2.5 rounded-xl hover:bg-accent/10 transition-all border border-transparent hover:border-accent/20 text-text-secondary hover:text-accent" />
-                        <ThemeSwitcher iconOnly={true} align="bottom" side="right" />
+                    <div className="flex items-center gap-4">
+                        <AlertBell iconSize={20} className="p-2.5 rounded-xl hover:bg-accent/10 transition-all border border-transparent hover:border-accent/20 text-text-secondary hover:text-accent" />
+                        <ThemeSwitcher iconOnly={true} align="bottom" side="right" className="p-2.5" />
                     </div>
                     
                     <div className="h-6 w-px bg-border/20 hidden md:block" />
