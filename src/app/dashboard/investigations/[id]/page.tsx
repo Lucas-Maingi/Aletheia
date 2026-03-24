@@ -140,7 +140,7 @@ export default async function InvestigationDetailPage({
                         <a href={`/api/investigations/${id}/export`} download>
                             <Button variant="outline" size="sm" className="border-border/10 bg-foreground/[0.02] hover:bg-foreground/[0.05] rounded-xl font-bold uppercase tracking-wider text-[11px]">
                                 <FileText className="w-4 h-4 mr-2 text-accent" />
-                                Export_Log
+                                Export Dossier
                             </Button>
                         </a>
                     </div>
@@ -154,7 +154,7 @@ export default async function InvestigationDetailPage({
                     <CardHeader className="pb-4 border-b border-border/10 mb-5 bg-foreground/[0.01]">
                         <CardTitle className="text-[10px] font-mono text-text-tertiary uppercase tracking-[0.3em] flex items-center gap-3">
                             <Activity className="w-4 h-4 text-accent animate-pulse" />
-                            Target_Vectors
+                            Target Vectors
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6 relative z-10 px-6 pb-8">
@@ -162,8 +162,8 @@ export default async function InvestigationDetailPage({
                         <VectorItem label="Handle / Alias" value={safeInvestigation.subjectUsername} icon={<AtSign className="w-4 h-4 text-accent/70" />} />
                         <VectorItem label="Primary Email" value={safeInvestigation.subjectEmail} icon={<Mail className="w-4 h-4 text-success/60" />} />
                         <VectorItem label="Phone Line" value={safeInvestigation.subjectPhone} icon={<Phone className="w-4 h-4 text-text-tertiary/40" />} />
-                        <VectorItem label="Domain_Node" value={(safeInvestigation as any).subjectDomain} icon={<Globe className="w-4 h-4 text-cyan-500/60" />} />
-                        <VectorItem label="Biometric_ID" value={(safeInvestigation as any).subjectImageUrl} icon={<Search className="w-4 h-4 text-text-tertiary/40" />} />
+                        <VectorItem label="Infrastructure" value={(safeInvestigation as any).subjectDomain} icon={<Globe className="w-4 h-4 text-cyan-500/60" />} />
+                        <VectorItem label="Reference Identity" value={(safeInvestigation as any).subjectImageUrl} icon={<Search className="w-4 h-4 text-text-tertiary/40" />} />
                     </CardContent>
                 </Card>
 
@@ -183,14 +183,15 @@ export default async function InvestigationDetailPage({
 }
 
 function VectorItem({ label, value, icon }: { label: string, value: string | null, icon: React.ReactNode }) {
+    if (!value) return null;
     return (
         <div className="group/item">
             <div className="flex items-center gap-2 mb-2 font-mono text-[9px] font-black uppercase tracking-[0.2em] text-text-tertiary opacity-70 group-hover/item:text-accent transition-colors duration-300">
                 {icon}
                 {label}
             </div>
-            <div className="text-[13px] font-mono font-bold text-text-primary px-4 py-3 bg-foreground/[0.03] border border-border/5 rounded-xl truncate hover:border-accent/30 transition-all duration-500" title={value || 'Unresolved'}>
-                {value || <span className="text-text-tertiary/30 italic font-normal">UNRESOLVED</span>}
+            <div className="text-[12px] font-mono font-bold text-text-primary px-4 py-3 bg-foreground/[0.03] border border-border/5 rounded-xl truncate hover:border-accent/30 transition-all duration-500" title={value || ''}>
+                {value}
             </div>
         </div>
     );
@@ -204,12 +205,8 @@ function EmptyState({ message, icon }: { message: string, icon: React.ReactNode 
                 <div className="text-accent/20 mb-6 group-hover:text-accent/40 transition-colors duration-700 group-hover:scale-110 transform transition-transform duration-700">
                     {icon}
                 </div>
-                <h3 className="text-xs font-mono font-black uppercase tracking-[0.2em] text-text-tertiary mb-3">Handshake_Pending</h3>
+                <h3 className="text-xs font-mono font-black uppercase tracking-[0.2em] text-text-tertiary mb-3">Intelligence Search Suspended</h3>
                 <p className="text-[11px] font-mono max-w-[240px] leading-relaxed opacity-60 tracking-tight">{message}</p>
-                <div className="mt-8 flex gap-3">
-                    <Button variant="outline" size="sm" className="border-border/10 bg-foreground/[0.02] hover:bg-foreground/[0.05] rounded-xl text-[10px] font-bold uppercase font-mono">Manual_Link</Button>
-                    <Button variant="primary" size="sm" className="rounded-xl text-[10px] font-bold uppercase font-mono tracking-widest shadow-lg shadow-accent/20">Init_Pulse</Button>
-                </div>
             </CardContent>
         </Card>
     );

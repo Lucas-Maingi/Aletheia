@@ -145,16 +145,13 @@ function EvidenceCard({ ev, getConfidenceColor }: { ev: any, getConfidenceColor:
     return (
         <Card className={`bg-surface border hover:border-accent/40 transition-all duration-500 group overflow-hidden ${isPostcard ? 'border-accent/30 shadow-lg' : 'border-border/10 hover:bg-foreground/5'}`}>
             <CardContent className="p-0 flex flex-col h-full relative">
-                {/* CRT Screen Effect overlay */}
-                <div className="absolute inset-0 scanline opacity-[0.02] pointer-events-none group-hover:opacity-[0.05] transition-opacity duration-700" />
-
-                {/* Header Overlay for Postcards */}
+                {/* Header Background for Postcards */}
                 {isPostcard && (
-                    <div className="h-28 bg-gradient-to-br from-accent/20 via-background to-background border-b border-border/10 relative overflow-hidden">
-                        <div className="absolute top-4 right-4 text-accent/5">
-                            <Shield className="w-20 h-20" />
+                    <div className="h-20 bg-gradient-to-br from-accent/10 via-background to-background border-b border-border/10 relative overflow-hidden">
+                        <div className="absolute top-2 right-2 opacity-[0.03]">
+                            <Shield className="w-16 h-16" />
                         </div>
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,240,255,0.1),transparent)]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,240,255,0.05),transparent)]" />
                     </div>
                 )}
 
@@ -187,16 +184,25 @@ function EvidenceCard({ ev, getConfidenceColor }: { ev: any, getConfidenceColor:
                         </div>
                     </div>
 
-                    <h4 className={`font-black text-[15px] mb-5 text-text-primary/90 flex items-center gap-3 tracking-tight ${isPostcard ? '-mt-14 relative z-10' : ''}`}>
+                    <div className="flex items-start gap-4 mb-6">
                         {isPostcard ? (
-                            <div className="w-14 h-14 rounded-2xl bg-surface border-2 border-accent shadow-xl flex items-center justify-center text-accent text-xl font-bold animate-pulse">
+                            <div className="w-12 h-12 rounded-xl bg-surface border border-accent/40 shadow-xl flex items-center justify-center text-accent text-lg font-bold shrink-0">
                                 {meta.platform?.[0]?.toUpperCase() || '🪪'}
                             </div>
                         ) : (
-                            <div className={`w-2 h-2 rounded-full ${ev.confidenceLabel === 'HIGH' ? 'bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.5)]' : ev.confidenceLabel === 'MEDIUM' ? 'bg-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'bg-accent shadow-[0_0_10px_rgba(0,240,255,0.5)]'}`} />
+                            <div className={`mt-2 w-2 h-2 rounded-full shrink-0 ${ev.confidenceLabel === 'HIGH' ? 'bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.5)]' : ev.confidenceLabel === 'MEDIUM' ? 'bg-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'bg-accent shadow-[0_0_10px_rgba(0,240,255,0.5)]'}`} />
                         )}
-                        <span className={`${isPostcard ? 'mt-8' : ''} group-hover:text-text-primary transition-colors`}>{isPostcard ? (meta.name || ev.title) : ev.title}</span>
-                    </h4>
+                        <div className="min-w-0">
+                            <h4 className="font-black text-[14px] text-text-primary/90 leading-tight tracking-tight group-hover:text-text-primary transition-colors truncate">
+                                {isPostcard ? (meta.name || ev.title) : ev.title}
+                            </h4>
+                            {isPostcard && (
+                                <p className="text-[10px] text-accent font-mono font-bold uppercase tracking-widest mt-1 opacity-70">
+                                    Identified_{meta.platform || 'Asset'}
+                                </p>
+                            )}
+                        </div>
+                    </div>
 
                     {isPostcard ? (
                          <div className="flex-1 space-y-5">

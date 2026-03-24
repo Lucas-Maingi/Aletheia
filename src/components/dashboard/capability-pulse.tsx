@@ -27,42 +27,43 @@ const LAYER_ICONS: Record<CapabilityLayer, any> = {
 };
 
 export function CapabilityPulse({ activeLayers = [] }: { activeLayers?: CapabilityLayer[] }) {
-  const allLayers = Object.values(CapabilityLayer);
+  if (activeLayers.length === 0) return (
+    <div className="h-12 flex items-center px-4 bg-surface/20 border border-border/10 rounded-xl">
+      <span className="text-[10px] font-mono font-bold text-text-tertiary uppercase tracking-widest opacity-40 italic">Awaiting_Signal_Acquisition...</span>
+    </div>
+  );
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-      {allLayers.map((layer) => {
+    <div className="flex flex-wrap gap-2.5">
+      {activeLayers.map((layer) => {
         const Icon = LAYER_ICONS[layer];
-        const isActive = activeLayers.includes(layer);
         
         return (
           <motion.div
             key={layer}
-            initial={{ opacity: 0.5 }}
-            animate={{ 
-              opacity: isActive ? 1 : 0.4,
-              scale: isActive ? 1.05 : 1
-            }}
-            className={`p-3 rounded-xl border transition-all duration-500 flex items-center gap-3 ${
-              isActive 
-                ? 'bg-accent/10 border-accent shadow-[0_0_15px_rgba(0,240,255,0.1)]' 
-                : 'bg-surface/20 border-border/10'
-            }`}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="px-3 py-2 rounded-xl border bg-accent/5 border-accent/20 shadow-glow-cyan-sm flex items-center gap-2.5 group hover:bg-accent/10 transition-all duration-300"
           >
-            <div className={`p-2 rounded-lg ${isActive ? 'bg-accent/20 text-accent' : 'bg-foreground/5 text-text-tertiary'}`}>
-              <Icon className={`w-4 h-4 ${isActive ? 'animate-pulse' : ''}`} />
+            <div className="p-1.5 rounded-lg bg-accent/20 text-accent group-hover:scale-110 transition-transform">
+              <Icon className="w-3.5 h-3.5 animate-pulse" />
             </div>
             <div className="flex flex-col">
-              <span className={`text-[10px] font-black uppercase tracking-widest ${isActive ? 'text-text-primary' : 'text-text-tertiary'}`}>
+              <span className="text-[9px] font-black uppercase tracking-widest text-text-primary">
                 {layer}
               </span>
-              <span className={`text-[8px] font-bold uppercase tracking-tighter ${isActive ? 'text-success' : 'text-text-tertiary/40'}`}>
-                {isActive ? 'Active Node' : 'Standby'}
+              <span className="text-[7px] font-bold uppercase tracking-tighter text-success opacity-80">
+                Active_Node
               </span>
             </div>
           </motion.div>
         );
       })}
+      
+      <div className="px-3 py-2 rounded-xl border border-dashed border-border/10 flex items-center gap-2 opacity-30">
+        <Activity className="w-3.5 h-3.5" />
+        <span className="text-[9px] font-black uppercase tracking-widest">More_Pending</span>
+      </div>
     </div>
   );
 }
