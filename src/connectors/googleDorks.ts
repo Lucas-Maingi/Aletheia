@@ -207,20 +207,24 @@ export async function googleDorks({ name, username, email }: {
             const target = name || username || email || '';
             if (!target) return;
             
+            // Clean email for better searching (e.g. maingilucas0 from maingilucas0@gmail.com)
+            const cleanTarget = email ? email.split('@')[0] : target;
+            const searchTerms = email ? `"${email}" OR "${cleanTarget}"` : `"${target}"`;
+
             const platforms = [
-                { name: 'Truth Social', site: 'truthsocial.com' },
-                { name: 'Twitter/X', site: 'x.com OR site:twitter.com' },
                 { name: 'LinkedIn', site: 'linkedin.com/in' },
+                { name: 'Twitter/X', site: 'x.com OR site:twitter.com' },
                 { name: 'Instagram', site: 'instagram.com' },
                 { name: 'Facebook', site: 'facebook.com' },
+                { name: 'Truth Social', site: 'truthsocial.com' },
             ];
 
             for (const p of platforms) {
                 try {
-                    const dork = `site:${p.site} "${target}"`;
+                    const dork = `site:${p.site} ${searchTerms}`;
                     const res = await quickFetch(`https://search.yahoo.com/search?p=${encodeURIComponent(dork)}`, {
                         headers: {
-                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                            'User-Agent': getRandomUserAgent(),
                         },
                     });
                     if (!res.ok) continue;
@@ -243,30 +247,28 @@ export async function googleDorks({ name, username, email }: {
                             const snippetLower = snippet.toLowerCase();
                             const titleLower = title.toLowerCase();
                             const urlLower = url.toLowerCase();
-                            const targetLower = target.toLowerCase();
+                            const emailLower = email?.toLowerCase() || '';
+                            const cleanTargetLower = cleanTarget.toLowerCase();
                             
-                            // TOKENIZED RELEVANCE
-                            const targetTokens = targetLower.split(/[\s@._-]+/).filter((t: string) => t.length > 2);
-                            const hasRelevance = targetTokens.length > 0 
-                                ? targetTokens.some((t: string) => titleLower.includes(t) || snippetLower.includes(t) || urlLower.includes(t))
-                                : (titleLower.includes(targetLower) || snippetLower.includes(targetLower));
-
-                            const isGenericUrl = urlLower.includes('/login') || urlLower.includes('/signup') || urlLower.includes('password');
-                            const isGenericTitle = titleLower.includes('sign up') || titleLower.includes('log in') || (titleLower === p.name.toLowerCase() && snippetLower.length < 50);
-
-                            const isHighlyRelevant = !isGenericUrl && !isGenericTitle && hasRelevance && !url.includes('yahoo.com/search');
+                            // Check if either the full email or the handle appears in the result
+                            const isHighlyRelevant = 
+                                (urlLower.includes(cleanTargetLower) || titleLower.includes(cleanTargetLower) || (email && snippetLower.includes(emailLower))) &&
+                                !urlLower.includes('/login') && 
+                                !urlLower.includes('/signup') && 
+                                !urlLower.includes('password') &&
+                                !url.includes('yahoo.com/search');
 
                             if (isHighlyRelevant && !results.some(r => r.url === url)) {
                                 results.push({
-                                    title: `${p.name} — ${title}`,
+                                    title: `${p.name} Profile — ${title}`,
                                     url,
-                                    description: `### 🪪 Social Profile Postcard\n\n**Platform:** ${p.name}\n**Profile Name:** ${title}\n\n**Biography / Snippet:**\n> ${snippet}\n\n**Direct Link:** ${url}`,
+                                    description: `### 🪪 Social Identity Discovery\n\n**Platform:** ${p.name}\n**Profile Name:** ${title}\n\n**Biography / Snippet:**\n> ${snippet}\n\n**Direct Link:** ${url}`,
                                     category: 'social',
                                     platform: p.name,
-                                    confidenceScore: 0.90,
+                                    confidenceScore: 0.92,
                                     confidenceLabel: 'HIGH'
                                 });
-                                break; // Found the best match for this platform, move to next platform
+                                break; 
                             }
                         }
                     }

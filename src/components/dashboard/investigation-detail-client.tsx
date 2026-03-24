@@ -17,6 +17,7 @@ import { CapabilityLayer } from '@/lib/osint/registry';
 import { Card, CardContent } from '@/components/ui/card';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props {
     investigationId: string;
@@ -134,28 +135,41 @@ export function InvestigationDetailClient({
             </section>
 
             <Tabs defaultValue="summary" className="w-full">
-                <TabsList className="bg-surface/50 backdrop-blur-3xl border border-border/10 p-1.5 mb-8 rounded-2xl shadow-2xl h-12 flex items-center justify-start overflow-x-auto no-scrollbar gap-1">
-                    <TabsTrigger value="summary" className="gap-2.5 rounded-xl px-5 h-9 transition-all duration-300 data-[state=active]:bg-accent/10 data-[state=active]:text-accent data-[state=active]:border-accent/30 border border-transparent font-mono text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
-                        <LayoutGrid className="w-3.5 h-3.5" />
-                        Dossier
+                <TabsList className="bg-surface/50 backdrop-blur-3xl border border-border/10 p-1 mb-8 rounded-2xl shadow-2xl h-[52px] flex items-center justify-start overflow-x-auto no-scrollbar gap-1 relative">
+                    <TabsTrigger value="summary" className="relative group gap-3 rounded-xl px-6 h-11 transition-all duration-300 data-[state=active]:text-accent border border-transparent font-mono text-[11px] font-black uppercase tracking-widest whitespace-nowrap overflow-hidden">
+                        <LayoutGrid className="w-4 h-4 relative z-10" />
+                        <span className="relative z-10">Dossier</span>
+                        <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </TabsTrigger>
-                    <TabsTrigger value="evidence" className="gap-2.5 rounded-xl px-5 h-9 transition-all duration-300 data-[state=active]:bg-accent/10 data-[state=active]:text-accent data-[state=active]:border-accent/30 border border-transparent font-mono text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
-                        <Database className="w-3.5 h-3.5" />
-                        Artifacts
-                        <Badge variant="default" className="ml-1 px-1.5 py-0 text-[8px] bg-accent/20 text-accent border-accent/20 font-black">{evidenceCount + entitiesCount}</Badge>
+                    
+                    <TabsTrigger value="evidence" className="relative group gap-3 rounded-xl px-6 h-11 transition-all duration-300 data-[state=active]:text-accent border border-transparent font-mono text-[11px] font-black uppercase tracking-widest whitespace-nowrap overflow-hidden">
+                        <div className="flex items-center gap-3 relative z-10">
+                            <Database className="w-4 h-4" />
+                            <span>Artifacts</span>
+                            <Badge variant="default" className="px-1.5 py-0 text-[8px] bg-accent/20 text-accent border-accent/20 font-black shrink-0">{evidenceCount + entitiesCount}</Badge>
+                        </div>
+                        <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </TabsTrigger>
-                    <TabsTrigger value="graph" className="gap-2.5 rounded-xl px-5 h-9 transition-all duration-300 data-[state=active]:bg-accent/10 data-[state=active]:text-accent data-[state=active]:border-accent/30 border border-transparent font-mono text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
-                        <Globe className="w-3.5 h-3.5" />
-                        Network
+
+                    <TabsTrigger value="graph" className="relative group gap-3 rounded-xl px-6 h-11 transition-all duration-300 data-[state=active]:text-accent border border-transparent font-mono text-[11px] font-black uppercase tracking-widest whitespace-nowrap overflow-hidden">
+                        <Globe className="w-4 h-4 relative z-10" />
+                        <span className="relative z-10">Network</span>
+                        <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </TabsTrigger>
-                    <TabsTrigger value="visual" className="gap-2.5 rounded-xl px-5 h-9 transition-all duration-300 data-[state=active]:bg-accent/10 data-[state=active]:text-accent data-[state=active]:border-accent/30 border border-transparent font-mono text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
-                        <Eye className="w-3.5 h-3.5" />
-                        Recon
-                        <Badge variant="outline" className="ml-1 px-1.5 py-0 text-[8px] bg-accent/10 border-accent/20 text-accent font-black">AI</Badge>
+
+                    <TabsTrigger value="visual" className="relative group gap-3 rounded-xl px-6 h-11 transition-all duration-300 data-[state=active]:text-accent border border-transparent font-mono text-[11px] font-black uppercase tracking-widest whitespace-nowrap overflow-hidden">
+                        <div className="flex items-center gap-3 relative z-10">
+                            <Eye className="w-4 h-4" />
+                            <span>Recon</span>
+                            <Badge variant="outline" className="px-1.5 py-0 text-[8px] bg-accent/10 border-accent/20 text-accent font-black shrink-0">AI</Badge>
+                        </div>
+                        <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </TabsTrigger>
-                    <TabsTrigger value="audit" className="gap-2.5 rounded-xl px-5 h-9 transition-all duration-300 data-[state=active]:bg-accent/10 data-[state=active]:text-accent data-[state=active]:border-accent/30 border border-transparent font-mono text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
-                        <Shield className="w-3.5 h-3.5" />
-                        Audit
+
+                    <TabsTrigger value="audit" className="relative group gap-3 rounded-xl px-6 h-11 transition-all duration-300 data-[state=active]:text-accent border border-transparent font-mono text-[11px] font-black uppercase tracking-widest whitespace-nowrap overflow-hidden">
+                        <Shield className="w-4 h-4 relative z-10" />
+                        <span className="relative z-10">Audit</span>
+                        <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </TabsTrigger>
                 </TabsList>
 

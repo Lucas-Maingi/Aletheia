@@ -64,6 +64,8 @@ interface TabsTriggerProps extends HTMLAttributes<HTMLButtonElement> {
   value: string;
 }
 
+import { motion } from "framer-motion";
+
 export function TabsTrigger({
   value,
   className,
@@ -80,19 +82,25 @@ export function TabsTrigger({
       aria-selected={isSelected}
       onClick={() => onValueChange(value)}
       className={cn(
-        "relative px-4 py-3 text-sm font-medium transition-colors",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2",
+        "relative px-4 py-2 text-sm font-medium transition-all duration-200",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-1 focus-visible:ring-offset-background",
         isSelected
           ? "text-text-primary"
-          : "text-text-secondary hover:text-text-primary",
+          : "text-text-secondary hover:text-text-primary hover:bg-white/[0.01]",
         className
       )}
       {...props}
     >
-      {children}
       {isSelected && (
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
+        <motion.div
+          layoutId="active-tab"
+          className="absolute inset-0 bg-accent/10 border border-accent/20 rounded-xl z-0"
+          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+        />
       )}
+      <div className="relative z-10 flex items-center gap-2">
+        {children}
+      </div>
     </button>
   );
 }

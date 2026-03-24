@@ -54,14 +54,14 @@ export async function breachSearch(email: string): Promise<ConnectorResult> {
                             results.push({
                                 title: `Gravatar Profile — ${email}`,
                                 url: profileUrl,
-                                description: `VERIFIED ACCOUNT FOUND\nDisplay Name: ${displayName}\nLocation: ${location}\nBio: ${aboutMe}\nAvatar: ${gravatarUrl.replace('?d=404&s=200', '?s=200')}\nLinked Accounts:\n${accounts}`,
-                                category: 'identity',
+                                description: `### 🪪 Social Identity Profile\n\n**Platform:** Gravatar\n**Identity:** ${displayName}\n\n**Biography / Snippet:**\n> ${aboutMe}\n\n**Location:** ${location}\n**Avatar:** ${gravatarUrl.replace('?d=404&s=200', '?s=200')}\n**Direct Link:** ${profileUrl}\n\n### 🔗 Connected Ecosystems\n${accounts}`,
+                                category: 'social',
                                 platform: 'Gravatar',
                                 metadata: {
                                     avatarUrl: gravatarUrl.replace('?d=404&s=200', '?s=200'),
                                     profileUrl,
                                 },
-                                confidenceScore: 0.95,
+                                confidenceScore: 0.98,
                                 confidenceLabel: 'HIGH',
                             });
                         } else {
@@ -277,8 +277,8 @@ export async function breachSearch(email: string): Promise<ConnectorResult> {
                         results.push({
                             title: `Email Reputation Report — ${email}`,
                             url: `https://emailrep.io/${encodeURIComponent(email)}`,
-                            description: `LIVE EMAIL INTELLIGENCE:\n${details}`,
-                            category: 'identity',
+                            description: `### 🛡️ Live Intelligence Report\n\n**Email:** ${email}\n**Reputation:** ${data.reputation || 'unknown'}\n**Suspicious:** ${data.suspicious ? 'YES ⚠️' : 'No'}\n**Profiles Found:** ${data.details?.profiles?.join(', ') || 'None'}\n\n**Digital Footprint Context:**\n- Domain Age: ${data.details?.domain_reputation || 'unknown'}\n- Free Provider: ${data.details?.free_provider ? 'Yes' : 'No'}\n- Disposable: ${data.details?.disposable ? 'YES ⚠️' : 'No'}\n- Data Breach: ${data.details?.data_breach ? 'YES' : 'Not found'}\n- Spam: ${data.details?.spam ? 'YES' : 'No'}`,
+                            category: 'social',
                             platform: 'EmailRep',
                             confidenceScore: 0.95,
                             confidenceLabel: 'HIGH',

@@ -124,22 +124,32 @@ export function EvidenceTab({ evidence }: { evidence: any[] }) {
 
 function EvidenceCard({ ev, getConfidenceColor }: { ev: any, getConfidenceColor: (l: string) => string }) {
     const router = useRouter();
-    const isPostcard = ev.content?.includes('🪪') || ev.title?.includes('Profile Postcard');
+    const isPostcard = ev.content?.includes('🪪') || ev.title?.includes('Profile Postcard') || ev.title?.includes('Registered Account') || ev.title?.includes('Gravatar');
     
     // Extract metadata from markdown content if it's a postcard
-    const meta: Record<string, string> = {};
+    const meta: Record<string, string> = {
+        avatar: ev.metadata?.avatarUrl || null
+    };
     if (isPostcard) {
         const lines = ev.content.split('\n');
         lines.forEach((line: string) => {
             if (line.startsWith('**Platform:**')) meta.platform = line.replace('**Platform:**', '').trim();
             if (line.startsWith('**Profile Name:**')) meta.name = line.replace('**Profile Name:**', '').trim();
             if (line.startsWith('**Identity:**')) meta.name = line.replace('**Identity:**', '').trim();
+            if (line.startsWith('**Profile Identity:**')) meta.name = line.replace('**Profile Identity:**', '').trim();
             if (line.startsWith('**Direct Link:**')) meta.link = line.replace('**Direct Link:**', '').trim();
+            if (line.startsWith('Avatar:')) meta.avatar = line.replace('Avatar:', '').trim();
         });
         
         // Extract bio
         const bioMatch = ev.content.match(/> ([\s\S]*?)(?:\n\n|$)/);
         if (bioMatch) meta.bio = bioMatch[1].trim();
+        
+        // Secondary bio catch for Gravatar "Bio: ..."
+        if (!meta.bio) {
+            const gravatarBio = ev.content.match(/Bio: (.*)/);
+            if (gravatarBio) meta.bio = gravatarBio[1].trim();
+        }
     }
 
     return (
@@ -186,8 +196,13 @@ function EvidenceCard({ ev, getConfidenceColor }: { ev: any, getConfidenceColor:
 
                     <div className="flex items-start gap-4 mb-6">
                         {isPostcard ? (
-                            <div className="w-12 h-12 rounded-xl bg-surface border border-accent/40 shadow-xl flex items-center justify-center text-accent text-lg font-bold shrink-0">
-                                {meta.platform?.[0]?.toUpperCase() || '🪪'}
+                            <div className="w-12 h-12 rounded-xl bg-surface border border-accent/40 shadow-xl flex items-center justify-center text-accent text-lg font-bold shrink-0 overflow-hidden relative">
+                                {meta.avatar ? (
+                                    <img src={meta.avatar} alt="Profile" className="w-full h-full object-cover" />
+                                ) : (
+                                    <span className="relative z-10">{meta.platform?.[0]?.toUpperCase() || '🪪'}</span>
+                                )}
+                                <div className="absolute inset-0 bg-accent/10 mix-blend-overlay" />
                             </div>
                         ) : (
                             <div className={`mt-2 w-2 h-2 rounded-full shrink-0 ${ev.confidenceLabel === 'HIGH' ? 'bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.5)]' : ev.confidenceLabel === 'MEDIUM' ? 'bg-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'bg-accent shadow-[0_0_10px_rgba(0,240,255,0.5)]'}`} />

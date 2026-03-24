@@ -605,6 +605,20 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
         let pivotCount = 0;
         const PIVOT_CAP = 12;
 
+        // Visual Pivot: Identify discovered avatars and reverse-search them
+        const imagesToPivot = allEvidence
+            .filter(ev => ev.metadata?.avatarUrl || ev.content?.includes('Avatar:'))
+            .map(ev => {
+                const match = ev.content?.match(/Avatar:\s*(https?:\/\/[^\s\n]+)/);
+                return ev.metadata?.avatarUrl || (match ? match[1] : null);
+            })
+            .filter(Boolean);
+
+        imagesToPivot.slice(0, 2).forEach(img => {
+            phase2.push(safeRun(`Visual Intelligence Pivot`, () => reverseImageSearch(img as string)));
+            pivotCount++;
+        });
+
         const pivotQueue = [
             ...Array.from(correlatedIdentifiers.usernames).map(u => ({ label: `Pivot: @${u.value}`, task: () => usernameSearch(u.value), pivotId: u.sourceId, skip: u.value === investigation.subjectUsername || u.value === primaryTarget })),
             ...Array.from(correlatedIdentifiers.names).map(n => ({ label: `Pivot: ${n.value}`, task: () => googleDorks({ name: n.value }), pivotId: n.sourceId, skip: false })),
