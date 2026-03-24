@@ -42,11 +42,13 @@ export function InvestigationDetailClient({
         setEvidence, 
         entities, 
         setEntities,
+        reports,
+        setReports,
         facialMatches,
         setActiveInvestigationId,
         setScanStatus,
         scanStatus,
-        startScan // New: Get from context to trigger scan reliably
+        startScan
     } = useInvestigation();
 
     // Sync initial data to context on mount
@@ -58,12 +60,16 @@ export function InvestigationDetailClient({
         if (entities.length === 0 && initialEntities.length > 0) {
             setEntities(initialEntities);
         }
+        // Seed initial reports into context so Summary tab has data on first render
+        if (reports.length === 0 && initialReports.length > 0) {
+            setReports(initialReports);
+        }
         
         // CRITICAL: Trigger scan if we are in 'scanning' mode and status is idle
         if (isScanning && scanStatus === 'idle') {
             startScan(investigationId);
         }
-    }, [investigationId, initialEvidence, initialEntities, isScanning, startScan, scanStatus]);
+    }, [investigationId, initialEvidence, initialEntities, initialReports, isScanning, startScan, scanStatus]);
 
     const hasContextData = evidence.length > 0 || entities.length > 0;
     const isActuallyScanning = scanStatus === 'scanning' || isScanning;
@@ -171,11 +177,11 @@ export function InvestigationDetailClient({
                 </TabsContent>
 
                 <TabsContent value="heatmap" className="animate-in fade-in slide-in-from-bottom-2">
-                    <HeatmapTab reportContent={initialReports?.[0]?.content || ''} />
+                    <HeatmapTab reportContent={reports[0]?.content || initialReports?.[0]?.content || ''} />
                 </TabsContent>
 
                 <TabsContent value="associates" className="animate-in fade-in slide-in-from-bottom-2">
-                    <AssociatesTab reportContent={initialReports?.[0]?.content || ''} />
+                    <AssociatesTab reportContent={reports[0]?.content || initialReports?.[0]?.content || ''} />
                 </TabsContent>
 
                 <TabsContent value="evidence" className="animate-in fade-in slide-in-from-bottom-2">
@@ -202,10 +208,11 @@ export function InvestigationDetailClient({
                                 </div>
                             </div>
                             <div className="space-y-4 text-sm text-text-secondary leading-relaxed font-medium">
-                                {initialReports.length > 0 ? (
+                                {/* Use live context reports, fall back to SSR initial reports */}
+                                {(reports.length > 0 || initialReports.length > 0) ? (
                                     <div className="prose prose-sm max-w-none text-text-secondary prose-headings:text-text-primary prose-strong:text-text-primary prose-code:text-accent prose-pre:bg-foreground/[0.03] prose-pre:border-border/10">
                                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                            {initialReports[0].content}
+                                            {(reports[0]?.content || initialReports[0]?.content)}
                                         </ReactMarkdown>
                                     </div>
                                 ) : (

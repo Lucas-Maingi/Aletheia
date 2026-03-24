@@ -15,12 +15,21 @@ interface Evidence {
     createdAt: string;
 }
 
+interface Report {
+    id: string;
+    title: string;
+    content: string;
+    format: string;
+    createdAt: string;
+}
+
 interface InvestigationData {
     id: string;
     status: string;
     logs: SearchLog[];
     evidence: Evidence[];
     entities: any[];
+    reports: Report[];
     _count?: {
         evidence: number;
         entities: number;
@@ -81,7 +90,11 @@ export function formatTerminalLogs(data: InvestigationData): string[] {
 export async function pollInvestigation(id: string): Promise<InvestigationData | null> {
     try {
         const res = await fetch(`/api/investigations/${id}?t=${Date.now()}`, {
-            headers: { 'Cache-Control': 'no-cache' }
+            cache: 'no-store',
+            headers: { 
+                'Cache-Control': 'no-store, no-cache, must-revalidate',
+                'Pragma': 'no-cache'
+            }
         });
         if (!res.ok) {
             console.error(`Poll failed: ${res.status}`);

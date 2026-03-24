@@ -15,6 +15,8 @@ interface InvestigationContextType {
     setEvidence: (evidence: any[]) => void;
     entities: any[];
     setEntities: (entities: any[]) => void;
+    reports: any[];
+    setReports: (reports: any[]) => void;
     facialMatches: FacialMatch[];
     setFacialMatches: (matches: FacialMatch[]) => void;
     terminalLogs: string[];
@@ -31,6 +33,7 @@ export function InvestigationProvider({ children }: { children: React.ReactNode 
     const [evidenceCount, setEvidenceCount] = useState(0);
     const [evidence, setEvidence] = useState<any[]>([]);
     const [entities, setEntities] = useState<any[]>([]);
+    const [reports, setReports] = useState<any[]>([]);
     const [facialMatches, setFacialMatches] = useState<FacialMatch[]>([]);
     const [terminalLogs, setTerminalLogs] = useState<string[]>(["[SYS] Connecting to Aletheia Intelligence Nodes..."]);
 
@@ -48,12 +51,6 @@ export function InvestigationProvider({ children }: { children: React.ReactNode 
                 // If server is empty but we have local logs, don't wipe.
                 if (data.logs.length === 0 && prev.length > 1) return prev;
 
-                // SMART MERGE: 
-                // We want to keep all 'incoming' logs as the source of truth, 
-                // but preserve any local [SYS] heartbeats that haven't been "overtaken" by server logs Yet.
-                // However, since server logs are chronological (asc), we just need to ensure 
-                // that our final list contains all incoming stuff.
-                
                 // If they are exactly the same, don't trigger re-render
                 if (JSON.stringify(prev) === JSON.stringify(incoming)) return prev;
 
@@ -67,6 +64,11 @@ export function InvestigationProvider({ children }: { children: React.ReactNode 
             setEvidence(data.evidence || []);
             setEntities(data.entities || []);
             setEvidenceCount(data.evidence?.length || 0);
+            
+            // CRITICAL FIX: Update reports from poll so Summary tab stays live
+            if (data.reports && data.reports.length > 0) {
+                setReports(data.reports);
+            }
             
             if ((data as any).facialMatches) {
                 setFacialMatches((data as any).facialMatches);
@@ -250,6 +252,8 @@ export function InvestigationProvider({ children }: { children: React.ReactNode 
             setEvidence,
             entities,
             setEntities,
+            reports,
+            setReports,
             facialMatches,
             setFacialMatches,
             terminalLogs,

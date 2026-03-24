@@ -4,6 +4,8 @@ import { getEffectiveUserId, validateOwnership } from '@/lib/auth-utils';
 import { isValidUuid } from '@/lib/security';
 import { revalidatePath } from 'next/cache';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
@@ -31,13 +33,18 @@ export async function GET(
             return NextResponse.json({ error: 'Investigation not found' }, { status: 404 });
         }
 
-        // STRICT OWNERSHIP CHECK (Dossier v18)
+        // STRICT OWNERSHIP CHECK
         if (investigation.userId !== user.id) {
             console.warn(`[Security] Unauthorized access attempt by ${user.id} on ${id}`);
             return NextResponse.json({ error: 'Access denied' }, { status: 403 });
         }
 
-        return NextResponse.json(investigation);
+        return NextResponse.json(investigation, {
+            headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate',
+                'Pragma': 'no-cache',
+            }
+        });
     } catch (error) {
         console.error('[API] Investigation fetch failed:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
