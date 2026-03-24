@@ -109,19 +109,26 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
         const isStale = (Date.now() - new Date(investigation.updatedAt).getTime()) > STALE_THRESHOLD;
 
         if ((investigation.status === 'active' || investigation.status === 'scanning') && !isStale) {
-            console.log(`[SCAN] Scan already in progress for ${investigationId}. Returning telemetry channel.`);
+            console.log(`[SCAN] Scan status is active for ${investigationId}. Checking for telemetry...`);
             const existingLogs = await prisma.searchLog.findMany({
                 where: { investigationId, connectorType: 'system' },
                 take: 10,
                 orderBy: { createdAt: 'asc' }
             });
 
-            return NextResponse.json({ 
-                success: true, 
-                message: "Intelligence sweep already active", 
-                status: 'scanning',
-                initialLogs: existingLogs.map(l => `[SYS] ${l.query}`)
-            }, { status: 200 });
+            // Dossier v98: Only abort if we confirm the scan ACTUALLY started (has logs).
+            // A status glitch without logs means it crashed and needs a hard reboot.
+            if (existingLogs.length > 0) {
+                console.log(`[SCAN] Telemetry verified. Returning existing channel.`);
+                return NextResponse.json({ 
+                    success: true, 
+                    message: "Intelligence sweep already active", 
+                    status: 'scanning',
+                    initialLogs: existingLogs.map(l => `[SYS] ${l.query}`)
+                }, { status: 200 });
+            } else {
+                console.log(`[SCAN] False active state detected (0 logs). Overriding and forcing engine reboot.`);
+            }
         }
 
         if (isStale) {

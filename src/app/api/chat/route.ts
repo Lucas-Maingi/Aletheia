@@ -151,6 +151,7 @@ export async function POST(req: NextRequest) {
             data: {
                 title,
                 description: `Initiated via Aletheia Chat interface`,
+                status: 'pending', // Wait for scan to confirm active status
                 userId: user.id,
                 subjectName: detection?.parsed.subjectName ? sanitize(detection.parsed.subjectName) : null,
                 subjectEmail: detection?.parsed.subjectEmail ? sanitize(detection.parsed.subjectEmail) : null,

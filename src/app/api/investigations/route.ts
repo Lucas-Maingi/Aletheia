@@ -78,7 +78,10 @@ export async function POST(request: Request) {
 
         console.log(`[API] Persisting investigation: "${safeData.title}"`);
         const investigation = await prisma.investigation.create({
-            data: safeData,
+            data: {
+                ...safeData,
+                status: 'pending'
+            },
         });
         console.log(`[API] Investigation created as: ${investigation.id}`);
 
