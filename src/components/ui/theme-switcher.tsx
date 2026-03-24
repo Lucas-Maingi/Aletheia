@@ -45,7 +45,7 @@ export function ThemeSwitcher({
           <div className={cn(
             "absolute w-72 bg-surface/95 backdrop-blur-3xl border border-border/10 rounded-2xl shadow-2xl z-50 overflow-hidden animate-scale-in",
             align === "top" ? "bottom-full mb-3" : "top-full mt-3",
-            side === "left" ? "right-0" : "left-0"
+            side === "left" ? "left-0" : "right-0"
           )}>
             <div className="p-4 border-b border-border/5 bg-foreground/[0.02]">
               <h3 className="text-sm font-black text-text-primary uppercase tracking-widest mb-1">Select Theme</h3>
