@@ -1,21 +1,22 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
 export async function summarizeFindings(investigationTitle: string, evidenceItems: { title: string, content: string, confidenceLabel?: string, confidenceScore?: number }[], customApiKey?: string) {
     const apiKey = customApiKey || process.env.GEMINI_API_KEY;
 
-    // If no API key, return an explicit error instead of a silent simulation
-    if (!apiKey) {
-        return `### ⚠️ AI Synthesis Unavailable (API Key Missing)
+    const fallbackDossier = `### ⚠️ AI Synthesis Unavailable (API/Network Issue)
 
 Aletheia successfully completed the OSINT scan and gathered ${evidenceItems.length} evidence pieces, but the intelligence synthesis could not be generated.
 
-The Google Gemini API key is missing or invalid.
+The Google Gemini API connection failed, likely due to an invalid API key, network restriction, or model quota limits.
 
-**How to fix:**
-1. Check that you copied the key correctly from Google AI Studio.
-2. Ensure you went to Vercel -> Settings -> Environment Variables and saved it as \`GEMINI_API_KEY\`.
-3. **CRITICAL:** In Vercel, you must go to the **Deployments** tab and click **Redeploy** after adding a new environment variable, otherwise the production server won't see it.
-4. Once redeployed, hit **Retry Scan** to generate your dossier.`;
+**Raw Evidence Summary:**
+${evidenceItems.slice(0, 10).map((e, i) => `${i + 1}. **[${e.confidenceLabel || 'UNRATED'} - ${Math.round((e.confidenceScore || 0) * 100)}%]** ${e.title}`).join('\n')}
+
+Please review the **Artifacts** tab to view the extracted data manually.
+
+**Diagnostic Fix:**
+Go to Vercel -> Settings -> Environment Variables, ensure \`GEMINI_API_KEY\` is correct, and Redeploy your application to ensure it reaches the edge function.`;
+
+    if (!apiKey) {
+        return fallbackDossier;
     }
 
     try {
@@ -24,8 +25,6 @@ The Google Gemini API key is missing or invalid.
         }
 
         const evidenceStr = evidenceItems.slice(0, 30).map(e => `- [${e.confidenceLabel || 'UNRATED'} Confidence (${Math.round((e.confidenceScore || 0) * 100)}%)] ${e.title}: ${e.content}`).join("\n");
-
-        const genAI = new GoogleGenerativeAI(apiKey);
 
         const systemPrompt = `You are Aletheia — a high-fidelity intelligence orchestration engine. Your mission is to extract actionable signal from noise. 
 
@@ -69,44 +68,56 @@ Tone: Clinical, precise, and intelligence-grade.`;
         const prompt = `${systemPrompt}\nAnalyze the following OSINT findings for Operation "${investigationTitle}":\n\n${evidenceStr}\n\nGenerate the complete Threat Intelligence Dossier.`;
 
         const models = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"];
-        let result;
-        let lastError;
+        let resultText = "";
+        let lastError = null;
 
         for (const modelName of models) {
             try {
-                const model = genAI.getGenerativeModel({ model: modelName });
-                result = await model.generateContent({
-                    contents: [{ role: "user", parts: [{ text: prompt }] }],
-                    generationConfig: {
-                        temperature: 0.3,
-                    }
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+                
+                // Using raw native fetch to completely bypass buggy SDK fetch wrappers
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ role: "user", parts: [{ text: prompt }] }],
+                        generationConfig: { temperature: 0.3 }
+                    })
                 });
-                break; // Break loop if successful
-            } catch (err: any) {
-                console.warn(`Model ${modelName} failed:`, err.message);
-                lastError = err;
-                
-                const isNotFound = err?.status === 404 || err?.message?.includes('404') || err?.message?.includes('not found');
-                const isCapacityExhausted = err?.status === 503 || err?.message?.includes('503') || err?.message?.includes('MODEL_CAPACITY_EXHAUSTED') || err?.message?.includes('ResourceHasBeenExhausted');
-                const isRateLimited = err?.status === 429 || err?.message?.includes('429') || err?.message?.includes('quota');
 
-                // If the model is not found or overloaded, try the next one in the fallback list
-                if (isNotFound || isCapacityExhausted || isRateLimited) {
-                    continue;
+                if (!res.ok) {
+                    const errorText = await res.text();
+                    throw new Error(`API Error ${res.status}: ${errorText}`);
                 }
+
+                const data = await res.json();
                 
-                // If it's another hard error (like bad API key), throw immediately
-                throw err; 
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    resultText = data.candidates[0].content.parts[0].text;
+                    break; 
+                } else {
+                    throw new Error("Invalid response format from Gemini API");
+                }
+            } catch (err: any) {
+                console.warn(`Model ${modelName} REST fetch failed:`, err.message);
+                lastError = err;
+                // If the error is a definitive API Key rejection (400 Client Error for apiKey), 
+                // we should stop trying other models and just return the fallback.
+                if (err.message?.includes('API Error 400') && err.message?.includes('API key not valid')) {
+                    return fallbackDossier; 
+                }
+                continue;
             }
         }
 
-        if (!result) {
-            throw lastError || new Error("All Gemini models failed (Capacity/Quota Exhausted or Not Found).");
+        if (!resultText) {
+            console.error("All Gemini models failed. Returning fallback dossier.");
+            return fallbackDossier;
         }
 
-        return result.response.text();
+        return resultText;
     } catch (error: any) {
-        console.error("AI Synthesis failed:", error);
-        return `### AI Synthesis Failed\n\nAletheia attempted to generate the Intelligence Dossier, but the Gemini API rejected the request. Please verify your \`GEMINI_API_KEY\` environment variable in Vercel.\n\n**Error Details:**\n\`\`\`text\n${error?.message || String(error)}\n\`\`\``;
+        console.error("AI Synthesis critically failed:", error);
+        return fallbackDossier;
     }
 }

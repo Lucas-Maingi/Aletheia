@@ -278,8 +278,20 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
             const domains = text.match(/\b([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}\b/g) || [];
             domains.forEach(d => {
                 const domain = d.toLowerCase();
-                const ignored = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'github.com', 'medium.com', 'reddit.com', 'twitter.com', 'x.com', 'facebook.com', 'instagram.com', 'web.archive.org', 'vercel.app', 'google.com', 'bing.com', 'duckduckgo.com'];
-                if (!ignored.includes(domain)) {
+                const ignored = [
+                    // Email & Chat Providers
+                    'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'protonmail.com', 'mail.ru', 'icloud.com', 'aol.com',
+                    // Big Tech Infra
+                    'google.com', 'accounts.google.com', 'mail.google.com', 'myaccount.google.com', 'policies.google.com', 'support.google.com', 'youtube.com', 'youtu.be',
+                    'microsoft.com', 'login.microsoftonline.com', 'mcas.ms', 'bing.com',
+                    'apple.com', 'amazon.com', 'aws.amazon.com', 'cloudflare.com',
+                    // Social Media generic
+                    'github.com', 'medium.com', 'reddit.com', 'twitter.com', 'x.com', 'facebook.com', 'instagram.com', 'linkedin.com', 'tiktok.com', 'pinterest.com',
+                    // Utility / News / Info
+                    'web.archive.org', 'vercel.app', 'duckduckgo.com', 'wikipedia.org', 'en.wikipedia.org', 'wikihow.com', 'www.wikihow.com',
+                    'stackoverflow.com', 'quora.com', 'nytimes.com', 'cnn.com', 'bbc.com', 'forbes.com', 'bloomberg.com', 'reuters.com'
+                ];
+                if (!ignored.includes(domain) && !domain.endsWith('.google.com') && !domain.endsWith('.wikihow.com')) {
                     correlatedIdentifiers.domains.add({ value: domain, sourceId });
                     batch.push({ type: 'domain', value: domain });
                 }
