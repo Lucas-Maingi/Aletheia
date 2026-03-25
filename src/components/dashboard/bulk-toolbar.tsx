@@ -36,15 +36,15 @@ export function BulkToolbar({ selectedCount, onClear, onAction }: BulkToolbarPro
                     exit={{ y: 100, opacity: 0 }}
                     className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-2xl px-4"
                 >
-                    <div className="bg-[#0a0a0a]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-4 flex items-center justify-between gap-4 ring-1 ring-white/5">
+                    <div className="bg-surface/90 backdrop-blur-xl border border-border/20 rounded-2xl shadow-3xl p-4 flex items-center justify-between gap-4 ring-1 ring-white/5">
                         <div className="flex items-center gap-3">
-                            <div className="bg-accent/20 text-accent px-3 py-1.5 rounded-lg text-xs font-black font-mono flex items-center gap-2">
+                            <div className="bg-accent/10 text-accent px-3 py-1.5 rounded-lg text-xs font-black font-mono flex items-center gap-2 border border-accent/20">
                                 <CheckSquare className="w-3.5 h-3.5" />
                                 {selectedCount} SELECTED
                             </div>
                             <button 
                                 onClick={onClear} 
-                                className="text-text-tertiary hover:text-white transition-colors p-1"
+                                className="text-text-tertiary hover:text-accent transition-colors p-1"
                                 title="Clear Selection"
                             >
                                 <X className="w-4 h-4" />
@@ -57,9 +57,9 @@ export function BulkToolbar({ selectedCount, onClear, onAction }: BulkToolbarPro
                                 size="sm" 
                                 onClick={() => handleAction('archive')}
                                 disabled={!!loading}
-                                className="border-white/5 bg-white/5 hover:bg-white/10 h-9"
+                                className="border-border/10 bg-background/40 hover:bg-background/60 h-9"
                             >
-                                {loading === 'archive' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Archive className="w-3.5 h-3.5 mr-2 text-yellow-400" />}
+                                {loading === 'archive' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Archive className="w-3.5 h-3.5 mr-2 text-yellow-500" />}
                                 Archive
                             </Button>
 
@@ -68,19 +68,19 @@ export function BulkToolbar({ selectedCount, onClear, onAction }: BulkToolbarPro
                                 size="sm" 
                                 onClick={() => handleAction('delete')}
                                 disabled={!!loading}
-                                className="border-red-500/20 bg-red-500/5 hover:bg-red-500/10 h-9 text-red-400 hover:text-red-300"
+                                className="border-error/20 bg-error/5 hover:bg-error/10 h-9 text-error hover:text-error/80"
                             >
                                 {loading === 'delete' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5 mr-2" />}
                                 Delete
                             </Button>
 
-                            <div className="w-px h-6 bg-white/10 mx-1" />
+                            <div className="w-px h-6 bg-border/20 mx-1" />
 
                             <Button 
                                 variant="outline" 
                                 size="sm" 
                                 onClick={() => {}} // Sharing placeholder
-                                className="border-white/5 bg-white/5 hover:bg-white/10 h-9"
+                                className="border-border/10 bg-background/40 hover:bg-background/60 h-9"
                             >
                                 <Share2 className="w-3.5 h-3.5 mr-2 text-accent" />
                                 Share

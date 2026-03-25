@@ -68,12 +68,12 @@ export function InvestigationList({ investigations }: { investigations: Investig
                 <div className="flex items-center justify-between px-2 mb-2">
                     <button 
                         onClick={toggleSelectAll}
-                        className="flex items-center gap-2 text-[10px] font-bold text-text-tertiary uppercase tracking-widest hover:text-white transition-colors"
+                        className="flex items-center gap-2 text-[10px] font-bold text-text-tertiary uppercase tracking-widest hover:text-accent transition-colors py-2 group"
                     >
                         {selectedIds.size === investigations.length ? (
-                            <CheckSquare className="w-3.5 h-3.5 text-accent" />
+                            <CheckSquare className="w-4 h-4 text-accent" />
                         ) : (
-                            <Square className="w-3.5 h-3.5" />
+                            <Square className="w-4 h-4 group-hover:border-accent/50 transition-colors" />
                         )}
                         {selectedIds.size === investigations.length ? 'Deselect All' : 'Select All Investigations'}
                     </button>
@@ -121,10 +121,10 @@ export function InvestigationList({ investigations }: { investigations: Investig
                                             e.preventDefault();
                                             toggleSelect(inv.id);
                                         }}
-                                        className={`w-5 h-5 rounded cursor-pointer transition-all flex items-center justify-center border-2 ${
+                                        className={`w-5 h-5 rounded cursor-pointer transition-all flex items-center justify-center border-2 shadow-sm ${
                                             selectedIds.has(inv.id) 
-                                                ? 'bg-accent border-accent text-accent-foreground' 
-                                                : 'bg-white/5 border-white/10 hover:border-white/30'
+                                                ? 'bg-accent border-accent text-white shadow-accent/20' 
+                                                : 'bg-surface border-border-hover/30 hover:border-accent/40'
                                         }`}
                                     >
                                         {selectedIds.has(inv.id) && <CheckSquare className="w-4 h-4" />}
