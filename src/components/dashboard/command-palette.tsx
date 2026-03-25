@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Command } from "cmdk";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Search, Loader2, Shield, Plus, Globe, AtSign, Mail, FileText } from "lucide-react";
+import { Search, Loader2, Shield, Plus, Globe, AtSign, Mail, FileText, MessageSquare, Database } from "lucide-react";
 
 export function CommandPalette() {
     const [open, setOpen] = useState(false);
