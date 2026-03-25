@@ -60,7 +60,7 @@ export default function Landing() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-      router.push('/dashboard/investigations/new?target=' + encodeURIComponent(searchValue));
+      router.push('/dashboard/investigations/new?target=' + encodeURIComponent(searchValue) + '&autostart=true');
   };
 
   const trendingCases = [

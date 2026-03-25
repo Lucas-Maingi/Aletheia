@@ -23,12 +23,21 @@ export default function NewInvestigationPage() {
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const target = params.get('target');
+        const autostart = params.get('autostart');
+        
         if (target && !omniValue) {
             setOmniValue(target);
             setDetectedType(detectType(target));
-            // Removed aggressive auto-submit to prevent unwanted scans (and credit burning) from accidental pivot clicks.
+            
+            // Seamless auto-start if specifically requested (e.g., from landing page)
+            if (autostart === 'true') {
+                // We use a small timeout to ensure the omniValue is set before the form submits
+                setTimeout(() => {
+                    formRef.current?.requestSubmit();
+                }, 100);
+            }
         }
-    }, []);
+    }, [formRef]);
 
     const detectType = (val: string) => {
         const v = val.trim();
