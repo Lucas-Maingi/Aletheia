@@ -120,7 +120,7 @@ export default function NewInvestigationPage() {
             {/* Header */}
             <div className="mb-10">
                 <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent mb-3">New Investigation</p>
-                <h1 className="text-4xl font-black text-white tracking-tight mb-2">Who are you investigating?</h1>
+                <h1 className="text-4xl font-black text-text-primary tracking-tight mb-2">Who are you investigating?</h1>
                 <p className="text-sm text-text-secondary">Enter any identifier to start an AI-powered intelligence sweep.</p>
             </div>
 
@@ -135,7 +135,7 @@ export default function NewInvestigationPage() {
                             value={omniValue}
                             onChange={(e) => { setOmniValue(e.target.value); setDetectedType(detectType(e.target.value)); }}
                             placeholder="Email, username, full name, domain, phone..."
-                            className="bg-transparent flex-1 text-base text-white placeholder:text-text-tertiary/40 outline-none"
+                            className="bg-transparent flex-1 text-base text-text-primary placeholder:text-text-tertiary/40 outline-none"
                             autoFocus
                         />
                         {detectedBadge && (
@@ -147,7 +147,7 @@ export default function NewInvestigationPage() {
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
                             title="Upload image for facial search"
-                            className={`p-2 rounded-xl border transition-all ${imagePreview ? 'border-accent/40 bg-accent/10 text-accent' : 'border-border/10 text-text-tertiary hover:text-white'}`}
+                            className={`p-2 rounded-xl border transition-all ${imagePreview ? 'border-accent/40 bg-accent/10 text-accent' : 'border-border/10 text-text-tertiary hover:text-text-primary'}`}
                         >
                             <ImageIcon className="w-4 h-4" />
                         </button>
@@ -169,7 +169,7 @@ export default function NewInvestigationPage() {
                 <button
                     type="button"
                     onClick={() => setShowAdvanced(!showAdvanced)}
-                    className="text-[11px] text-text-tertiary hover:text-white transition-colors font-medium flex items-center gap-1.5"
+                    className="text-[11px] text-text-tertiary hover:text-text-primary transition-colors font-medium flex items-center gap-1.5"
                 >
                     <span className="text-accent">{showAdvanced ? '−' : '+'}</span>
                     {showAdvanced ? 'Hide advanced fields' : 'Add more details (name, phone, domain...)'}
@@ -230,7 +230,7 @@ export default function NewInvestigationPage() {
                                 key={ex}
                                 type="button"
                                 onClick={() => { setOmniValue(ex); setDetectedType(detectType(ex)); }}
-                                className="text-[11px] font-mono px-3 py-1.5 rounded-lg bg-surface/40 border border-border/10 text-text-secondary hover:text-white hover:border-border/30 transition-all"
+                                className="text-[11px] font-mono px-3 py-1.5 rounded-lg bg-surface/40 border border-border/10 text-text-secondary hover:text-text-primary hover:border-border/30 transition-all"
                             >
                                 {ex}
                             </button>

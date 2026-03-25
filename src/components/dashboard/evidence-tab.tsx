@@ -178,18 +178,6 @@ function EvidenceCard({ ev, getConfidenceColor }: { ev: any, getConfidenceColor:
                             )}
                         </div>
                         <div className="flex items-center gap-2 opacity-40 group-hover:opacity-100 transition-opacity duration-300">
-                             <Button
-                                size="icon"
-                                variant="ghost"
-                                className="h-7 w-7 text-accent hover:bg-accent/10 rounded-md"
-                                title="Pivot Investigation"
-                                onClick={() => {
-                                    const value = ev.sourceUrl || ev.title;
-                                    router.push(`/dashboard/new?target=${encodeURIComponent(value)}`);
-                                }}
-                             >
-                                <Target className="w-3.5 h-3.5" />
-                             </Button>
                              <CopyEvidenceButton content={ev.content} />
                         </div>
                     </div>
