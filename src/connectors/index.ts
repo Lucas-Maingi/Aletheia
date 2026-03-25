@@ -11,3 +11,4 @@ export * from './peopleSearch';
 export * from './whatsMyName';
 export * from './ipinfo';
 export * from './securityTrails';
+export * from './ecosystemSearch';

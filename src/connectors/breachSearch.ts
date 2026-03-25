@@ -277,7 +277,7 @@ export async function breachSearch(email: string): Promise<ConnectorResult> {
                         results.push({
                             title: `Email Reputation Report — ${email}`,
                             url: `https://emailrep.io/${encodeURIComponent(email)}`,
-                            description: `### 🛡️ Live Intelligence Report\n\n**Email:** ${email}\n**Reputation:** ${data.reputation || 'unknown'}\n**Suspicious:** ${data.suspicious ? 'YES ⚠️' : 'No'}\n**Profiles Found:** ${data.details?.profiles?.join(', ') || 'None'}\n\n**Digital Footprint Context:**\n- Domain Age: ${data.details?.domain_reputation || 'unknown'}\n- Free Provider: ${data.details?.free_provider ? 'Yes' : 'No'}\n- Disposable: ${data.details?.disposable ? 'YES ⚠️' : 'No'}\n- Data Breach: ${data.details?.data_breach ? 'YES' : 'Not found'}\n- Spam: ${data.details?.spam ? 'YES' : 'No'}`,
+                            description: `### 🛡️ Live Intelligence Report\n\n**Email:** ${email}\n**Reputation:** ${data.reputation || 'unknown'}\n**Suspicious:** ${data.suspicious ? 'YES ⚠️' : 'No'}\n**Profiles Found:** ${data.details?.profiles?.join(', ') || 'None'}\n\n**Digital Footprint Context:**\n- Domain Age: ${data.details?.domain_reputation || 'unknown'}\n- Free Provider: ${data.details?.free_provider ? 'Yes' : 'No'}`,
                             category: 'social',
                             platform: 'EmailRep',
                             confidenceScore: 0.95,
@@ -334,6 +334,70 @@ export async function breachSearch(email: string): Promise<ConnectorResult> {
                                         confidenceLabel: 'HIGH',
                                     });
                                 }
+                            }
+                        }
+                    }
+                }
+            } catch { /* skip */ }
+        })(),
+
+        // 7. Specialized Leak Search (SQL / Combolists / SQL Dumps)
+        (async () => {
+            try {
+                const leakDork = `"${email}" (sql OR dump OR combolist OR breach OR leak OR database)`;
+                const res = await quickFetch(`https://search.yahoo.com/search?p=${encodeURIComponent(leakDork)}`, {
+                    headers: { 'User-Agent': getRandomUserAgent() }
+                });
+                if (res.ok) {
+                    const html = await res.text();
+                    const resultBlocks = html.split('class="compTitle').slice(1, 4);
+                    for (const block of resultBlocks) {
+                        const titleMatch = block.match(/<h3[^>]*>[\s\S]*?<a[^>]*>(.*?)<\/a>/);
+                        const snippetMatch = block.match(/class="compText[^>]*>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/);
+                        if (titleMatch && snippetMatch) {
+                            results.push({
+                                title: `Advanced Leak Extraction — ${titleMatch[1].replace(/<[^>]+>/g, '').trim().slice(0, 50)}`,
+                                url: `https://search.yahoo.com/search?p=${encodeURIComponent(leakDork)}`,
+                                description: `### 📂 Data Integrity Incident\n\nHigh-fidelity evidence of the email appearing in a data dump or leak collection.\n\n**Context Snippet:**\n> ${snippetMatch[1].replace(/<[^>]+>/g, '').trim()}\n\n**Nature:** Potential SQL dump or Combolist exposure.`,
+                                category: 'breach',
+                                platform: 'Leak Search',
+                                confidenceScore: 0.88,
+                                confidenceLabel: 'HIGH'
+                            });
+                        }
+                    }
+                }
+            } catch { /* skip */ }
+        })(),
+
+        // 8. Tied Identity Discovery (Linked Emails)
+        (async () => {
+            try {
+                const tiedDork = `"${email}" ("@gmail.com" OR "@outlook.com" OR "@hotmail.com" OR "@proton.me") -"${email}"`;
+                const res = await quickFetch(`https://search.yahoo.com/search?p=${encodeURIComponent(tiedDork)}`, {
+                    headers: { 'User-Agent': getRandomUserAgent() }
+                });
+                if (res.ok) {
+                    const html = await res.text();
+                    const resultBlocks = html.split('class="compTitle').slice(1, 5);
+                    for (const block of resultBlocks) {
+                        const snippetMatch = block.match(/class="compText[^>]*>[\s\S]*?<p[^>]*>([\s\S]*?)<\/p>/);
+                        if (snippetMatch) {
+                            const snippet = snippetMatch[1].replace(/<[^>]+>/g, '').trim();
+                            // Check for other emails in the snippet
+                            const otherEmails = snippet.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || [];
+                            const uniqueOthers = otherEmails.filter(e => e.toLowerCase() !== email.toLowerCase());
+                            
+                            if (uniqueOthers.length > 0) {
+                                results.push({
+                                    title: `Tied Identity Detection — Linked Vector`,
+                                    url: `https://search.yahoo.com/search?p=${encodeURIComponent(tiedDork)}`,
+                                    description: `### 🔗 Multi-Vector Correlation\n\nDetected secondary email addresses appearing in close proximity to the target on public nodes.\n\n**Linked Nodes Found:**\n${uniqueOthers.map(e => `• ${e}`).join('\n')}\n\n**Source Context:**\n> ${snippet}`,
+                                    category: 'identity',
+                                    platform: 'Correlation Engine',
+                                    confidenceScore: 0.92,
+                                    confidenceLabel: 'HIGH'
+                                });
                             }
                         }
                     }

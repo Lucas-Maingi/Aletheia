@@ -17,7 +17,8 @@ import {
     peopleSearch,
     ipinfo,
     whatsMyName,
-    securityTrails
+    securityTrails,
+    ecosystemSearch
 } from '@/connectors';
 import { runFacialAI, FacialMatch } from '@/connectors/visualIntel';
 import { calculateConfidence, getConfidenceLabel } from '@/lib/osint/registry';
@@ -581,6 +582,11 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
             }));
         }
 
+        // NEW: Ecosystem Discovery (Sweeps 50+ platforms for account presence)
+        if (primaryTarget) {
+            phase1.push(safeRun('Ecosystem Discovery', () => ecosystemSearch(primaryTarget)));
+        }
+
         // CHUNKED EXECUTION: Limit concurrency to 3 nodes at a time to prevent DB pool exhaustion
         const p1Chunks = [];
         for (let i = 0; i < phase1.length; i += 3) p1Chunks.push(phase1.slice(i, i + 3));
@@ -615,7 +621,7 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
         // ========== PHASE 2: Intelligence Pivoting (Throttled & Limited) ==========
         const phase2: Promise<any>[] = [];
         let pivotCount = 0;
-        const PIVOT_CAP = 12;
+        const PIVOT_CAP = 20;
 
         // Visual Pivot: Identify discovered avatars and reverse-search them
         const imagesToPivot = allEvidence
