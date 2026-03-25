@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { LandingHeader } from "@/components/landing/landing-header";
+import { Card, CardContent } from "@/components/ui/card";
 
 const FloatingParticles = () => {
   const [particles, setParticles] = useState<{ id: number; x: number; y: number; scale: number; duration: number }[]>([]);
