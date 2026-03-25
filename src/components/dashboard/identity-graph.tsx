@@ -35,8 +35,8 @@ const getPlatformColor = (platform: string) => {
 export function IdentityGraph({ target, evidence }: { target: string, evidence: any[] }) {
     // Only map the most confident, distinct nodes to prevent clutter
     const nodes = evidence
-        .sort((a, b) => b.confidenceScore - a.confidenceScore)
-        .slice(0, 10);
+        .sort((a, b) => (b.confidenceScore || 0) - (a.confidenceScore || 0))
+        .slice(0, 25);
         
     const [hoveredNode, setHoveredNode] = useState<string | null>(null);
     const [mounted, setMounted] = useState(false);
