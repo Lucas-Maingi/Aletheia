@@ -26,10 +26,7 @@ export default function NewInvestigationPage() {
         if (target && !omniValue) {
             setOmniValue(target);
             setDetectedType(detectType(target));
-            const timer = setTimeout(() => {
-                formRef.current?.requestSubmit();
-            }, 300);
-            return () => clearTimeout(timer);
+            // Removed aggressive auto-submit to prevent unwanted scans (and credit burning) from accidental pivot clicks.
         }
     }, []);
 
