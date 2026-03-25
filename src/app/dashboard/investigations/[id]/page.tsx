@@ -147,37 +147,35 @@ export default async function InvestigationDetailPage({
                 </div>
             </div>
 
-            {/* Target Vectors Panel */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                <Card className="lg:col-span-1 bg-surface/50 backdrop-blur-xl border-border/10 h-fit shadow-2xl relative overflow-hidden group rounded-3xl">
-                    <div className="absolute inset-0 bg-gradient-to-b from-accent/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-                    <CardHeader className="pb-4 border-b border-border/10 mb-5 bg-foreground/[0.01]">
-                        <CardTitle className="text-[10px] font-mono text-text-tertiary uppercase tracking-[0.3em] flex items-center gap-3">
-                            <Activity className="w-4 h-4 text-accent animate-pulse" />
-                            Target Vectors
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6 relative z-10 px-6 pb-8">
-                        <VectorItem label="Identified Name" value={safeInvestigation.subjectName} icon={<User className="w-4 h-4 text-text-tertiary/40" />} />
-                        <VectorItem label="Handle / Alias" value={safeInvestigation.subjectUsername} icon={<AtSign className="w-4 h-4 text-accent/70" />} />
-                        <VectorItem label="Primary Email" value={safeInvestigation.subjectEmail} icon={<Mail className="w-4 h-4 text-success/60" />} />
-                        <VectorItem label="Phone Line" value={safeInvestigation.subjectPhone} icon={<Phone className="w-4 h-4 text-text-tertiary/40" />} />
-                        <VectorItem label="Infrastructure" value={(safeInvestigation as any).subjectDomain} icon={<Globe className="w-4 h-4 text-cyan-500/60" />} />
-                        <VectorItem label="Reference Identity" value={(safeInvestigation as any).subjectImageUrl} icon={<Search className="w-4 h-4 text-text-tertiary/40" />} />
-                    </CardContent>
-                </Card>
+            {/* Target Vectors Panel - Horizontal Top Bar */}
+            <Card className="bg-surface/50 backdrop-blur-xl border-border/10 shadow-lg relative overflow-hidden group rounded-2xl mb-8">
+                <div className="absolute inset-0 bg-gradient-to-r from-accent/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                <CardContent className="p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center gap-4 relative z-10">
+                    <div className="flex items-center gap-3 lg:pr-6 lg:border-r border-border/10">
+                        <Activity className="w-4 h-4 text-accent animate-pulse" />
+                        <span className="text-[10px] font-mono text-text-tertiary uppercase tracking-[0.3em] font-bold">Target Vectors</span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3 flex-1">
+                        <VectorItem label="Identified Name" value={safeInvestigation.subjectName} icon={<User className="w-3.5 h-3.5 text-text-tertiary/40" />} />
+                        <VectorItem label="Handle / Alias" value={safeInvestigation.subjectUsername} icon={<AtSign className="w-3.5 h-3.5 text-accent/70" />} />
+                        <VectorItem label="Primary Email" value={safeInvestigation.subjectEmail} icon={<Mail className="w-3.5 h-3.5 text-success/60" />} />
+                        <VectorItem label="Phone Line" value={safeInvestigation.subjectPhone} icon={<Phone className="w-3.5 h-3.5 text-text-tertiary/40" />} />
+                        <VectorItem label="Infrastructure" value={(safeInvestigation as any).subjectDomain} icon={<Globe className="w-3.5 h-3.5 text-cyan-500/60" />} />
+                        <VectorItem label="Reference Identity" value={(safeInvestigation as any).subjectImageUrl} icon={<Search className="w-3.5 h-3.5 text-text-tertiary/40" />} />
+                    </div>
+                </CardContent>
+            </Card>
 
-                {/* Content Tabs (Live Refreshed) */}
-                <InvestigationDetailClient 
-                    investigationId={id}
-                    initialEvidence={safeInvestigation.evidence}
-                    initialEntities={safeInvestigation.entities}
-                    initialReports={safeInvestigation.reports}
-                    initialCount={safeInvestigation._count}
-                    title={safeInvestigation.title}
-                    isScanning={isScanning}
-                />
-            </div >
+            {/* Content Tabs (Live Refreshed) - Now Full Width */}
+            <InvestigationDetailClient 
+                investigationId={id}
+                initialEvidence={safeInvestigation.evidence}
+                initialEntities={safeInvestigation.entities}
+                initialReports={safeInvestigation.reports}
+                initialCount={safeInvestigation._count}
+                title={safeInvestigation.title}
+                isScanning={isScanning}
+            />
         </div >
     );
 }
@@ -185,12 +183,11 @@ export default async function InvestigationDetailPage({
 function VectorItem({ label, value, icon }: { label: string, value: string | null, icon: React.ReactNode }) {
     if (!value) return null;
     return (
-        <div className="group/item">
-            <div className="flex items-center gap-2 mb-2 font-mono text-[9px] font-black uppercase tracking-[0.2em] text-text-tertiary opacity-70 group-hover/item:text-accent transition-colors duration-300">
+        <div className="group/item flex items-center bg-foreground/[0.03] border border-border/5 rounded-xl px-3 py-2 gap-3 hover:border-accent/30 transition-all duration-500">
+            <div className="flex items-center text-text-tertiary opacity-70 group-hover/item:text-accent transition-colors duration-300" title={label}>
                 {icon}
-                {label}
             </div>
-            <div className="text-[12px] font-mono font-bold text-text-primary px-4 py-3 bg-foreground/[0.03] border border-border/5 rounded-xl truncate hover:border-accent/30 transition-all duration-500" title={value || ''}>
+            <div className="text-[11px] font-mono font-bold text-text-primary truncate max-w-[150px]" title={value || ''}>
                 {value}
             </div>
         </div>

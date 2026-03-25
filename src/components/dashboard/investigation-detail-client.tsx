@@ -145,8 +145,17 @@ export function InvestigationDetailClient({
                     <TabsTrigger value="evidence" className="relative group gap-3 rounded-xl px-6 h-11 transition-all duration-300 data-[state=active]:text-accent border border-transparent font-mono text-[11px] font-black uppercase tracking-widest whitespace-nowrap overflow-hidden">
                         <div className="flex items-center gap-3 relative z-10">
                             <Database className="w-4 h-4" />
-                            <span>Artifacts</span>
-                            <Badge variant="default" className="px-1.5 py-0 text-[8px] bg-accent/20 text-accent border-accent/20 font-black shrink-0">{evidenceCount + entitiesCount}</Badge>
+                            <span>Evidence</span>
+                            <Badge variant="default" className="px-1.5 py-0 text-[8px] bg-accent/20 text-accent border-accent/20 font-black shrink-0">{evidenceCount}</Badge>
+                        </div>
+                        <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </TabsTrigger>
+
+                    <TabsTrigger value="entities" className="relative group gap-3 rounded-xl px-6 h-11 transition-all duration-300 data-[state=active]:text-accent border border-transparent font-mono text-[11px] font-black uppercase tracking-widest whitespace-nowrap overflow-hidden">
+                        <div className="flex items-center gap-3 relative z-10">
+                            <Users className="w-4 h-4" />
+                            <span>Entities</span>
+                            <Badge variant="default" className="px-1.5 py-0 text-[8px] bg-accent/20 text-accent border-accent/20 font-black shrink-0">{entitiesCount}</Badge>
                         </div>
                         <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </TabsTrigger>
@@ -178,9 +187,12 @@ export function InvestigationDetailClient({
                     <AssociatesTab reportContent={reports[0]?.content || initialReports?.[0]?.content || ''} />
                 </TabsContent>
 
-                <TabsContent value="evidence" className="animate-in fade-in slide-in-from-bottom-2 space-y-10">
-                    <EntitiesTab entities={displayEntities} investigationId={investigationId} />
+                <TabsContent value="evidence" className="animate-in fade-in slide-in-from-bottom-2">
                     <EvidenceTab evidence={displayEvidence} />
+                </TabsContent>
+
+                <TabsContent value="entities" className="animate-in fade-in slide-in-from-bottom-2">
+                    <EntitiesTab entities={displayEntities} investigationId={investigationId} />
                 </TabsContent>
 
                 <TabsContent value="summary" className="animate-in fade-in slide-in-from-bottom-2">
