@@ -68,129 +68,122 @@ export function CommandPalette() {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="p-0 overflow-hidden bg-surface-2/90 backdrop-blur-3xl border-white/10 shadow-2xl max-w-2xl sm:max-w-2xl ring-1 ring-white/5 !rounded-2xl">
+            <DialogContent className="p-0 overflow-hidden bg-surface-2/80 backdrop-blur-[40px] border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] max-w-2xl sm:max-w-2xl ring-1 ring-white/5 !rounded-2xl border-t-accent/20">
                     <Command 
                         className="w-full h-full bg-transparent flex flex-col" 
                         shouldFilter={false} 
                         loop
                     >
-                        <div className="flex items-center border-b border-white/5 px-4 h-14">
-                            <Search className="w-5 h-5 text-accent mr-3 shrink-0" />
+                        <div className="flex items-center border-b border-white/5 px-4 h-15">
+                            <Search className="w-5 h-5 text-accent mr-3 shrink-0 opacity-70" />
                             <Command.Input
                                 value={search}
                                 onValueChange={setSearch}
                                 autoFocus
-                                placeholder="Search investigations, site settings, or system tools..."
-                                className="flex-1 bg-transparent text-white placeholder:text-white/40 border-none outline-none text-sm h-full"
+                                placeholder="Search investigations, site protocols, or mission settings..."
+                                className="flex-1 bg-transparent text-white placeholder:text-white/20 border-none outline-none text-[15px] h-full font-medium"
                             />
-                            {loading && <Loader2 className="w-4 h-4 text-white/50 animate-spin shrink-0" />}
-                            <div className="flex items-center gap-1 shrink-0 ml-3">
-                                <kbd className="bg-white/10 px-1.5 py-0.5 rounded text-[10px] font-mono text-white/60">ESC</kbd>
+                            {loading && <Loader2 className="w-4 h-4 text-accent animate-spin shrink-0" />}
+                            <div className="flex items-center gap-2 shrink-0 ml-3">
+                                <kbd className="bg-white/5 border border-white/10 px-2 py-0.5 rounded text-[10px] font-bold font-mono text-white/40 uppercase tracking-tighter">ESC_CLOSE</kbd>
                             </div>
                         </div>
 
-                        <Command.List className="max-h-[60vh] overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-white/10 px-4 pb-4">
-                            <Command.Empty className="py-12 text-center text-sm text-white/50">
-                                No matching investigations or settings found.
-                                <div className="mt-4 flex items-center justify-center">
+                        <Command.List className="max-h-[70vh] overflow-y-auto scrollbar-thin scrollbar-thumb-accent/20 p-2 space-y-2">
+                            <Command.Empty className="py-20 text-center">
+                                <Search className="w-10 h-10 text-white/5 mx-auto mb-4" />
+                                <p className="text-sm text-white/30 font-medium">No matching intelligence found.</p>
+                                <div className="mt-6 flex items-center justify-center">
                                     <button
                                         onClick={() => runAction(() => router.push(`/dashboard/investigations/new?target=${encodeURIComponent(search)}`))}
-                                        className="flex items-center gap-2 px-4 py-2 bg-accent/10 hover:bg-accent/20 text-accent rounded-lg transition-colors border border-accent/20"
+                                        className="flex items-center gap-2 px-6 py-2.5 bg-accent text-background rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-white transition-all shadow-xl active:scale-95"
                                     >
                                         <Plus className="w-4 h-4" />
-                                        Initiate new target sweep for "{search}"
+                                        Launch new sweep for "{search}"
                                     </button>
                                 </div>
                             </Command.Empty>
 
-                        {/* Recent Actions (always show when empty search) */}
+                        {/* Quick Navigation (Always available or pinned) */}
                         {!search && (
-                            <Command.Group heading="Quick Intelligence Sweeps" className="text-[10px] font-mono text-white/40 uppercase tracking-widest mb-4 mt-2">
-                                <Command.Item
-                                    onSelect={() => runAction(() => router.push("/dashboard/investigations/new?type=username"))}
-                                    className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 cursor-pointer aria-selected:bg-white/10 text-sm text-text-secondary aria-selected:text-white transition-colors group mt-1"
-                                >
-                                    <div className="p-1.5 rounded-md bg-white/5 group-hover:bg-accent-blue/20 group-hover:text-accent-blue transition-colors">
-                                        <AtSign className="w-4 h-4" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="font-medium text-white">Username Correlation</span>
-                                        <span className="text-[11px] text-white/40 group-hover:text-white/60 transition-colors">Scan 300+ breached databases and forums</span>
-                                    </div>
-                                </Command.Item>
-
-                                <Command.Item
-                                    onSelect={() => runAction(() => router.push("/dashboard/investigations/new?type=domain"))}
-                                    className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 cursor-pointer aria-selected:bg-white/10 text-sm text-text-secondary aria-selected:text-white transition-colors group mt-1"
-                                >
-                                    <div className="p-1.5 rounded-md bg-white/5 group-hover:bg-accent/20 group-hover:text-accent transition-colors">
-                                        <Globe className="w-4 h-4" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="font-medium text-white">Domain Reconnaissance</span>
-                                        <span className="text-[11px] text-white/40 group-hover:text-white/60 transition-colors">Find subdomains, SSL certs, and open ports</span>
-                                    </div>
-                                </Command.Item>
-
-                                <Command.Item
-                                    onSelect={() => runAction(() => router.push("/dashboard/investigations/new"))}
-                                    className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 cursor-pointer aria-selected:bg-white/10 text-sm text-text-secondary aria-selected:text-white transition-colors group mt-1"
-                                >
-                                    <div className="p-1.5 rounded-md bg-white/5 group-hover:bg-white/20 transition-colors text-white">
-                                        <Plus className="w-4 h-4" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="font-medium text-white">Advanced Custom Target</span>
-                                        <span className="text-[11px] text-white/40 group-hover:text-white/60 transition-colors">Combine emails, phone numbers, and custom parameters</span>
-                                    </div>
-                                </Command.Item>
+                            <Command.Group heading="Mission_Navigation" className="px-3 pb-2 pt-1">
+                                <div className="grid grid-cols-2 gap-2 mt-2">
+                                    {[
+                                        { label: "Mission Dashboard", sub: "Operational Overview", icon: Shield, path: "/dashboard", color: "text-accent" },
+                                        { label: "Analyst Settings", sub: "System Configuration", icon: Search, path: "/dashboard/settings", color: "text-text-tertiary" },
+                                        { label: "AI Analyst Hub", sub: "Neural Briefing", icon: MessageSquare, path: "/dashboard/chat", color: "text-emerald-400" },
+                                        { label: "Case Archive", sub: "Stored Intelligence", icon: Database, path: "/dashboard/investigations", color: "text-accent" }
+                                    ].map((item) => (
+                                        <Command.Item
+                                            key={item.label}
+                                            onSelect={() => runAction(() => router.push(item.path))}
+                                            className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.08] hover:border-white/10 cursor-pointer aria-selected:bg-white/[0.1] aria-selected:border-accent/30 transition-all group"
+                                        >
+                                            <div className={`p-2 rounded-lg bg-background/40 border border-white/5 mt-0.5 ${item.color}`}>
+                                                <item.icon className="w-4 h-4" />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-bold text-white group-hover:text-accent transition-colors">{item.label}</span>
+                                                <span className="text-[10px] text-white/30 font-medium">{item.sub}</span>
+                                            </div>
+                                        </Command.Item>
+                                    ))}
+                                </div>
                             </Command.Group>
                         )}
 
-                        {/* Results with Risk Intelligence */}
-                        {results.length > 0 && (
-                            <Command.Group heading="Intelligence Matches" className="text-[10px] font-mono text-white/40 uppercase tracking-widest mt-2">
-                                {results.map((item) => (
+                        {/* Custom Search (Dynamic Results) */}
+                        {(search || results.length > 0) && (
+                            <Command.Group heading="Intelligence_Matches" className="px-3">
+                                {results.length > 0 ? results.map((item) => (
                                     <Command.Item
                                         key={item.id}
                                         onSelect={() => runAction(() => router.push(`/dashboard/investigations/${item.id}`))}
-                                        className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 cursor-pointer aria-selected:bg-white/10 text-sm text-white transition-colors mt-1 group"
+                                        className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 cursor-pointer aria-selected:bg-white/10 transition-all mb-1 border border-transparent aria-selected:border-white/5 group"
                                     >
-                                        <div className={`p-1.5 rounded-md border transition-colors ${
-                                            item.risk === 'critical' ? 'bg-danger/10 border-danger/20 text-danger' : 
-                                            item.risk === 'elevated' ? 'bg-warning/10 border-warning/20 text-warning' : 
+                                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-all ${
+                                            item.risk === 'critical' ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 
+                                            item.risk === 'elevated' ? 'bg-amber-500/10 border-amber-500/20 text-amber-500' : 
                                             'bg-accent/10 border-accent/20 text-accent'
                                         }`}>
-                                            <Shield className="w-4 h-4" />
+                                            <Shield className="w-5 h-5" />
                                         </div>
-                                        <div className="flex flex-col flex-1">
-                                            <span className="font-medium">{item.title}</span>
-                                            <span className="text-[10px] text-white/40 uppercase tracking-tight">{item.leads} Forensic Artifacts Identified</span>
-                                        </div>
-                                        <div className={`text-[10px] font-bold px-2 py-0.5 rounded border hidden sm:block ${
-                                            item.risk === 'critical' ? 'bg-danger/10 border-danger/30 text-danger' : 
-                                            item.risk === 'elevated' ? 'bg-warning/10 border-warning/30 text-warning' : 
-                                            'bg-success/10 border-success/30 text-success'
-                                        }`}>
-                                            {item.risk.toUpperCase()}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between mb-0.5">
+                                                <span className="text-sm font-bold text-white truncate">{item.title}</span>
+                                                <span className="text-[9px] font-mono font-bold text-white/20 uppercase">ID_{item.id.slice(0,6)}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[10px] text-white/40 font-medium truncate">{item.target}</span>
+                                                <div className="w-1 h-1 rounded-full bg-white/10" />
+                                                <span className="text-[9px] font-black text-accent/60 uppercase tracking-widest">{item.leads} Signal Artifacts</span>
+                                            </div>
                                         </div>
                                     </Command.Item>
-                                ))}
+                                )) : search.length > 2 && (
+                                    <div className="p-8 text-center border border-dashed border-white/5 rounded-2xl bg-white/[0.02]">
+                                        <Loader2 className="w-5 h-5 text-accent/50 animate-spin mx-auto mb-3" />
+                                        <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Searching Global Registry...</p>
+                                    </div>
+                                )}
                             </Command.Group>
                         )}
 
-                        {/* Global System Actions */}
-                        <Command.Group heading="System Protocols" className="text-[10px] font-mono text-white/40 uppercase tracking-widest mt-4">
+                        {/* System Protocols */}
+                        <Command.Group heading="System_Protocols" className="px-3 pb-2 pt-2 border-t border-white/5 mt-4">
                             <Command.Item
                                 onSelect={() => runAction(() => window.print())}
-                                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 cursor-pointer aria-selected:bg-white/10 text-sm text-text-secondary aria-selected:text-white transition-colors group mt-1"
+                                className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 cursor-pointer aria-selected:bg-white/10 transition-all group"
                             >
-                                <div className="p-1.5 rounded-md bg-white/5 group-hover:bg-accent-blue/20 group-hover:text-accent-blue transition-colors">
+                                <div className="p-2 rounded-lg bg-white/5 border border-white/5 group-hover:bg-accent-blue/10 group-hover:text-accent-blue transition-all">
                                     <FileText className="w-4 h-4" />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="font-medium text-white">Generate Intelligence PDF</span>
-                                    <span className="text-[11px] text-white/40 group-hover:text-white/60 transition-colors">Export current view as restricted intelligence dossier</span>
+                                    <span className="text-sm font-bold text-white group-aria-selected:text-accent transition-colors">Generate Intelligence PDF</span>
+                                    <span className="text-[10px] text-white/30 font-medium uppercase tracking-tight">Export restricted operational dossier</span>
+                                </div>
+                                <div className="ml-auto flex items-center gap-1 opacity-0 group-aria-selected:opacity-100 transition-opacity">
+                                    <kbd className="bg-white/10 px-1.5 py-0.5 rounded text-[9px] font-mono text-white/40">CTRL_P</kbd>
                                 </div>
                             </Command.Item>
                         </Command.Group>
