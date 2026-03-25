@@ -19,6 +19,17 @@ export async function ecosystemSearch(target: string): Promise<ConnectorResult> 
     const cleanTarget = target.trim().toLowerCase();
     const handle = cleanTarget.includes('@') ? cleanTarget.split('@')[0] : cleanTarget;
 
+    // FIDELITY: If the target is an email, do NOT run handle-guess dorking. 
+    // It leads to massive false positives (searching for email prefixes as usernames).
+    if (cleanTarget.includes('@')) {
+        return {
+            connectorType: 'ecosystem_discovery',
+            query: target,
+            results: [],
+            generatedAt: new Date().toISOString(),
+        };
+    }
+
     const platforms = [
         // Professional/Tech
         { name: 'GitHub', site: 'github.com' },

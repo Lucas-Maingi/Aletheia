@@ -268,10 +268,18 @@ function EvidenceCard({ ev, getConfidenceColor, compact }: { ev: any, getConfide
                                 .replace(/[\d\.,kKmM]+\s*Posts?\s*-?\s*/i, '')
                                 .replace(/A positive registration match was detected on.*?\.\s*/gi, '')
                                 .replace(/### 🎯 Ecosystem Discovery:.*?\s*/gi, '')
+                                .replace(/Yahoo (Scout|Search|Shopping|News|Finance|Mail|Weather|Search Results).*?\s*/gi, '')
+                                .replace(/We did not find results for.*?\.\s*/gi, '')
+                                .replace(/Suggestions:.*?\s*/gi, '')
+                                .replace(/Showing results for.*?\s*/gi, '')
                                 .trim();
              meta.bio = meta.bio.replace(/^.*?\([@a-zA-Z0-9_.-]+\)\s*on\s*[a-zA-Z]+:\s*(&quot;|"|')?/i, '')
                                 .replace(/(&quot;|"|')$/, '')
                                 .trim();
+             
+             if (!meta.bio || meta.bio.length < 5) {
+                meta.bio = isPostcard ? "Verified account existence confirmed via registry metadata." : "";
+             }
         }
         
         if (!meta.name) meta.name = ev.title?.split('|')[0]?.trim() || ev.title;

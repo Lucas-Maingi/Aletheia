@@ -603,7 +603,8 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
         }
 
         // NEW: Ecosystem Discovery (Sweeps 50+ platforms for account presence)
-        if (primaryTarget) {
+        // FIDELITY: Skip handle-dorking if target is an email address to avoid guessing false-positives.
+        if (primaryTarget && !primaryTarget.includes('@')) {
             phase1.push(safeRun('Ecosystem Discovery', () => ecosystemSearch(primaryTarget)));
         }
 
