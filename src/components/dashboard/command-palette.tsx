@@ -69,35 +69,45 @@ export function CommandPalette() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="p-0 overflow-hidden bg-surface-2/90 backdrop-blur-3xl border-white/10 shadow-2xl max-w-2xl sm:max-w-2xl ring-1 ring-white/5 !rounded-2xl">
-                <Command className="w-full h-full bg-transparent flex flex-col" shouldFilter={false} loop>
-                    <div className="flex items-center border-b border-white/5 px-4 h-14">
-                        <Search className="w-5 h-5 text-accent mr-3 shrink-0" />
-                        <Command.Input
-                            value={search}
-                            onValueChange={setSearch}
-                            autoFocus
-                            placeholder="Type a command, username, or IP address to scan..."
-                            className="flex-1 bg-transparent text-white placeholder:text-white/40 border-none outline-none text-sm h-full"
-                        />
-                        {loading && <Loader2 className="w-4 h-4 text-white/50 animate-spin shrink-0" />}
-                        <div className="flex items-center gap-1 shrink-0 ml-3">
-                            <kbd className="bg-white/10 px-1.5 py-0.5 rounded text-[10px] font-mono text-white/60">ESC</kbd>
-                        </div>
-                    </div>
-
-                    <Command.List className="max-h-[60vh] overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-white/10 px-4 pb-4">
-                        <Command.Empty className="py-12 text-center text-sm text-white/50">
-                            No active intelligence found.
-                            <div className="mt-4 flex items-center justify-center">
-                                <button
-                                    onClick={() => runAction(() => router.push(`/dashboard/investigations/new?type=username&q=${encodeURIComponent(search)}`))}
-                                    className="flex items-center gap-2 px-4 py-2 bg-accent/10 hover:bg-accent/20 text-accent rounded-lg transition-colors border border-accent/20"
-                                >
-                                    <Plus className="w-4 h-4" />
-                                    Launch new scan for "{search}"
-                                </button>
+                    <Command 
+                        className="w-full h-full bg-transparent flex flex-col" 
+                        shouldFilter={false} 
+                        loop
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && search) {
+                                e.preventDefault();
+                                runAction(() => router.push(`/dashboard/investigations/new?target=${encodeURIComponent(search)}&autostart=true`));
+                            }
+                        }}
+                    >
+                        <div className="flex items-center border-b border-white/5 px-4 h-14">
+                            <Search className="w-5 h-5 text-accent mr-3 shrink-0" />
+                            <Command.Input
+                                value={search}
+                                onValueChange={setSearch}
+                                autoFocus
+                                placeholder="Type a command, username, or IP address to scan..."
+                                className="flex-1 bg-transparent text-white placeholder:text-white/40 border-none outline-none text-sm h-full"
+                            />
+                            {loading && <Loader2 className="w-4 h-4 text-white/50 animate-spin shrink-0" />}
+                            <div className="flex items-center gap-1 shrink-0 ml-3">
+                                <kbd className="bg-white/10 px-1.5 py-0.5 rounded text-[10px] font-mono text-white/60">ESC</kbd>
                             </div>
-                        </Command.Empty>
+                        </div>
+
+                        <Command.List className="max-h-[60vh] overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-white/10 px-4 pb-4">
+                            <Command.Empty className="py-12 text-center text-sm text-white/50">
+                                No active intelligence found.
+                                <div className="mt-4 flex items-center justify-center">
+                                    <button
+                                        onClick={() => runAction(() => router.push(`/dashboard/investigations/new?target=${encodeURIComponent(search)}&autostart=true`))}
+                                        className="flex items-center gap-2 px-4 py-2 bg-accent/10 hover:bg-accent/20 text-accent rounded-lg transition-colors border border-accent/20"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                        Launch new scan for "{search}"
+                                    </button>
+                                </div>
+                            </Command.Empty>
 
                         {/* Recent Actions (always show when empty search) */}
                         {!search && (

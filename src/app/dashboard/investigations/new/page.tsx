@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
     Search, Mail, AtSign, Phone, Globe,
     Loader2, AlertCircle, ImageIcon, X,
@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 export default function NewInvestigationPage() {
+    const searchParams = useSearchParams();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showAdvanced, setShowAdvanced] = useState(false);
@@ -21,23 +22,21 @@ export default function NewInvestigationPage() {
     const router = useRouter();
 
     useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const target = params.get('target');
-        const autostart = params.get('autostart');
+        const target = searchParams.get('target');
+        const autostart = searchParams.get('autostart');
         
-        if (target && !omniValue) {
+        if (target) {
             setOmniValue(target);
             setDetectedType(detectType(target));
             
-            // Seamless auto-start if specifically requested (e.g., from landing page)
+            // Seamless auto-start if specifically requested (e.g., from landing page or dashboard)
             if (autostart === 'true') {
-                // We use a small timeout to ensure the omniValue is set before the form submits
                 setTimeout(() => {
                     formRef.current?.requestSubmit();
                 }, 100);
             }
         }
-    }, [formRef]);
+    }, [searchParams, formRef]);
 
     const detectType = (val: string) => {
         const v = val.trim();
