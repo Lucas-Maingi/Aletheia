@@ -209,10 +209,10 @@ export function EvidenceTab({ evidence }: { evidence: any[] }) {
 
 function EvidenceCard({ ev, getConfidenceColor, compact }: { ev: any, getConfidenceColor: (l: string) => string, compact?: boolean }) {
     const router = useRouter();
-    const isPostcard = ev.content?.includes('🪪') || ev.title?.includes('Profile Postcard') || ev.title?.includes('Registered Account') || ev.title?.includes('Gravatar') || ev.title?.includes('Social');
+    const isPostcard = ev.content?.includes('🪪') || ev.title?.includes('Profile Postcard') || ev.title?.includes('Registered Account') || ev.title?.includes('Gravatar') || ev.title?.includes('Social') || ev.content?.includes('**Platform:**');
     
     // Detect "Tied Identity" or "Pivot Hint"
-    const isTiedIdentity = ev.content?.includes('Tied Identity') || ev.content?.includes('[PIVOT_HINT]') || ev.tags?.includes('PIVOT');
+    const isTiedIdentity = ev.content?.includes('Tied Identity') || ev.content?.includes('[PIVOT_HINT]') || ev.tags?.includes('PIVOT') || ev.content?.includes('Ecosystem Discovery');
 
     // Extract metadata from markdown content if it's a postcard
     const meta: Record<string, string> = {
@@ -225,7 +225,9 @@ function EvidenceCard({ ev, getConfidenceColor, compact }: { ev: any, getConfide
         lines.forEach((line: string) => {
             if (line.startsWith('**Platform:**')) meta.platform = line.replace('**Platform:**', '').trim();
             if (line.startsWith('**Profile Name:**') || line.startsWith('**Identity:**') || line.startsWith('**Profile Identity:**')) {
-                meta.name = line.replace(/\*\*[^*]+\*\*/, '').trim();
+                const val = line.replace(/\*\*[^*]+\*\*/, '').trim().replace(/^[:\s-]+/, '');
+                if (line.startsWith('**Identity:**')) meta.username = val;
+                else meta.name = val;
             }
             if (line.startsWith('**Direct Link:**')) meta.link = line.replace('**Direct Link:**', '').trim();
             if (line.startsWith('Avatar:')) meta.avatar = line.replace('Avatar:', '').trim();
@@ -264,6 +266,8 @@ function EvidenceCard({ ev, getConfidenceColor, compact }: { ev: any, getConfide
              meta.bio = meta.bio.replace(/[\d\.,kKmM]+\s*Followers,?\s*/i, '')
                                 .replace(/[\d\.,kKmM]+\s*Following,?\s*/i, '')
                                 .replace(/[\d\.,kKmM]+\s*Posts?\s*-?\s*/i, '')
+                                .replace(/A positive registration match was detected on.*?\.\s*/gi, '')
+                                .replace(/### 🎯 Ecosystem Discovery:.*?\s*/gi, '')
                                 .trim();
              meta.bio = meta.bio.replace(/^.*?\([@a-zA-Z0-9_.-]+\)\s*on\s*[a-zA-Z]+:\s*(&quot;|"|')?/i, '')
                                 .replace(/(&quot;|"|')$/, '')
