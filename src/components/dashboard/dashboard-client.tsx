@@ -80,14 +80,14 @@ export function DashboardClient({
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter' && searchQuery) {
-                            router.push(`/dashboard/investigations/new?q=${encodeURIComponent(searchQuery)}`);
+                            router.push(`/dashboard/investigations/new?target=${encodeURIComponent(searchQuery)}&autostart=true`);
                         }
                     }}
                     placeholder="Search Identity, Domain, or Signal..."
                     className="w-full h-16 pl-14 pr-36 bg-surface/40 backdrop-blur-[40px] border border-border/20 rounded-2xl text-lg font-bold text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-accent/40 focus:ring-1 focus:ring-accent/10 transition-all shadow-2xl shadow-accent/5 focus:shadow-[0_0_30px_rgba(0,240,255,0.15)]"
                 />
                 <button 
-                   onClick={() => searchQuery && router.push(`/dashboard/investigations/new?q=${encodeURIComponent(searchQuery)}`)}
+                   onClick={() => searchQuery && router.push(`/dashboard/investigations/new?target=${encodeURIComponent(searchQuery)}&autostart=true`)}
                    className="absolute right-3 top-1/2 -translate-y-1/2 h-10 px-6 rounded-xl bg-accent text-background font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-accent transition-all shadow-lg active:scale-95 flex items-center gap-2 group/btn"
                 >
                     Target_Sweep
