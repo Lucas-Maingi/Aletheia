@@ -4,8 +4,19 @@ import { ConnectorResult, SearchResult } from './types';
  * Username Search — queries real public APIs AND uses DuckDuckGo HTML search
  * to find social profile data that direct scraping can't get (JS-rendered pages).
  */
+const SERVICE_BLOCKLIST = new Set(['gmail', 'outlook', 'hotmail', 'yahoo', 'apple', 'icloud', 'protonmail', 'proton', 'mail', 'live', 'me', 'msn', 'yandex', 'google', 'facebook', 'instagram', 'twitter', 'x', 'linkedin', 'github', 'reddit', 'medium', 'youtube', 'tiktok']);
+
 export async function usernameSearch(username: string): Promise<ConnectorResult> {
     const results: SearchResult[] = [];
+
+    if (SERVICE_BLOCKLIST.has(username.toLowerCase())) {
+        return {
+            connectorType: 'username_search',
+            query: username,
+            results: [],
+            generatedAt: new Date().toISOString(),
+        };
+    }
 
     // Helper: fetch with a 10-second timeout (improved resilience)
     const quickFetch = (url: string, opts: RequestInit = {}) => {

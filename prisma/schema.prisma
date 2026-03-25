@@ -126,6 +126,8 @@ model Evidence {
   investigation Investigation @relation(fields: [investigationId], references: [id], onDelete: Cascade)
 
   @@index([investigationId])
+  @@index([provenanceHash])
+  @@unique([investigationId, provenanceHash])
   @@map("evidence")
 }
 

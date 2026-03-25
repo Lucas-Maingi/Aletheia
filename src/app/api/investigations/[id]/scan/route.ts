@@ -236,6 +236,11 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
             names: new Set<{ value: string; sourceId?: string }>(),
         };
 
+        // FIDELITY & DE-DUPLICATION REGISTRY
+        const processedUrls = new Set<string>();
+        const processedHashes = new Set<string>();
+        const USERNAME_BLOCKLIST = new Set(['gmail', 'outlook', 'hotmail', 'yahoo', 'apple', 'icloud', 'protonmail', 'proton', 'mail', 'live', 'me', 'msn', 'yandex', 'google', 'facebook', 'instagram', 'twitter', 'x', 'linkedin', 'github', 'reddit', 'medium', 'youtube', 'tiktok', 'pinned', 'user', 'admin']);
+
         // SAFETY: If all subject fields are empty, use investigation title as fallback target
         let primaryTarget = 
             investigation.subjectEmail || 
@@ -265,11 +270,13 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
                 }
             });
 
-            // 2. Usernames / Handles
-            const handles = text.match(/@([a-zA-Z0-9_]{3,20})/g) || [];
+            // 2. Usernames / Handles (Refined to avoid matching domain in email)
+            // Use word boundary and negative lookbehind if possible (but simpler for JS):
+            // We match handles @name, but check they aren't preceded by [a-z0-9] (part of an email)
+            const handles = text.match(/(^|[^a-zA-Z0-9._])@([a-zA-Z0-9_]{3,20})/g) || [];
             handles.forEach(h => {
-                const value = h.replace('@', '').toLowerCase();
-                if (value.length > 2) {
+                const value = h.split('@')[1].toLowerCase();
+                if (value.length > 2 && !USERNAME_BLOCKLIST.has(value)) {
                     correlatedIdentifiers.usernames.add({ value, sourceId });
                     batch.push({ type: 'username', value });
                 }
@@ -400,10 +407,19 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
                 for (const res of result.results.slice(0, 30)) { 
                     if (res.category === 'system') continue;
                     
+                    // DE-DUPLICATION CHECK (URL & HASH)
+                    const provenanceHash = generateProvenanceHash(res.description || '');
+                    if (res.url && processedUrls.has(res.url)) {
+                        console.log(`[SCAN] Skipping duplicate URL: ${res.url}`);
+                        continue;
+                    }
+                    if (processedHashes.has(provenanceHash)) {
+                        console.log(`[SCAN] Skipping duplicate content hash from ${res.platform}`);
+                        continue;
+                    }
+
                     const extracted = extractIdentifiers(res.description || '', res.title, parentId);
                     entitiesToPersist.push(...extracted);
-
-                    const provenanceHash = generateProvenanceHash(res.description || '');
 
                     if (res.confidenceLabel === 'HIGH' && res.url && !res.url.startsWith('#')) {
                         archiveUrl(res.url).catch(() => {}); 
@@ -425,6 +441,10 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
                         provenanceHash: provenanceHash,
                         captureTimestamp: new Date(),
                     });
+
+                    // Update registry
+                    if (res.url) processedUrls.add(res.url);
+                    processedHashes.add(provenanceHash);
                 }
 
                 if (evidenceItems.length > 0) {
