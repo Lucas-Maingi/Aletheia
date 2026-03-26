@@ -207,9 +207,9 @@ export async function googleDorks({ name, username, email }: {
             const target = name || username || email || '';
             if (!target) return;
             
-            // Clean email for better searching (e.g. maingilucas0 from maingilucas0@gmail.com)
-            const cleanTarget = email ? email.split('@')[0] : target;
-            const searchTerms = email ? `"${email}" OR "${cleanTarget}"` : `"${target}"`;
+            // FIDELITY: Only search for the FULL email string. 
+            // Do NOT search for handles derived from the email prefix.
+            const searchTerms = email ? `"${email}"` : `"${target}"`;
 
             const platforms = [
                 { name: 'LinkedIn', site: 'linkedin.com/in' },

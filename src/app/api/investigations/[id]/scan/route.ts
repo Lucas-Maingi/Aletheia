@@ -18,7 +18,8 @@ import {
     ipinfo,
     whatsMyName,
     securityTrails,
-    ecosystemSearch
+    ecosystemSearch,
+    registrationScout
 } from '@/connectors';
 import { runFacialAI, FacialMatch } from '@/connectors/visualIntel';
 import { calculateConfidence, getConfidenceLabel } from '@/lib/osint/registry';
@@ -600,6 +601,11 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
                 facialMatches = results;
                 return { results: [] }; // Facial matches are tracked separately for UI
             }));
+        }
+
+        // NEW: Registration Scout (Holehe-style signup checks for 50+ sites)
+        if (primaryTarget && primaryTarget.includes('@')) {
+            phase1.push(safeRun('Registration Scout', () => registrationScout(primaryTarget)));
         }
 
         // NEW: Ecosystem Discovery (Sweeps 50+ platforms for account presence)
