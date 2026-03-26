@@ -241,6 +241,12 @@ export async function breachSearch(email: string): Promise<ConnectorResult> {
                             description: `FOUND in ${data.total_count} public code file(s) on GitHub.\nThis email appears in source code, configs, or public commits:\n\n${files}${extractionDetails}`,
                             category: 'social',
                             platform: 'GitHub',
+                            metadata: {
+                                username: repoOwner?.login || null,
+                                profileUrl: repoOwner?.html_url || null,
+                                provenanceSource: 'via GitHub Code Exposure',
+                                pivotable: !!repoOwner?.login,
+                            },
                             confidenceScore: 0.95,
                             confidenceLabel: 'HIGH',
                         });
@@ -280,6 +286,11 @@ export async function breachSearch(email: string): Promise<ConnectorResult> {
                             description: `### 🛡️ Live Intelligence Report\n\n**Email:** ${email}\n**Reputation:** ${data.reputation || 'unknown'}\n**Suspicious:** ${data.suspicious ? 'YES ⚠️' : 'No'}\n**Profiles Found:** ${data.details?.profiles?.join(', ') || 'None'}\n\n**Digital Footprint Context:**\n- Domain Age: ${data.details?.domain_reputation || 'unknown'}\n- Free Provider: ${data.details?.free_provider ? 'Yes' : 'No'}`,
                             category: 'social',
                             platform: 'EmailRep',
+                            metadata: {
+                                provenanceSource: 'via EmailRep Registry',
+                                registeredProfiles: data.details?.profiles || [],
+                                dataBreachDetected: data.details?.data_breach || false,
+                            },
                             confidenceScore: 0.95,
                             confidenceLabel: 'HIGH',
                         });
@@ -292,6 +303,10 @@ export async function breachSearch(email: string): Promise<ConnectorResult> {
                                     description: `Email is cryptographically verified to be registered on **${p.toUpperCase()}**.\n\nThis intelligence node confirms account existence via registry metadata analysis. No public biography is directly extracted to maintain high-fidelity results.`,
                                     category: 'social',
                                     platform: p,
+                                    metadata: {
+                                        provenanceSource: 'via EmailRep Registry',
+                                        pivotable: false,
+                                    },
                                     confidenceScore: 0.95,
                                     confidenceLabel: 'HIGH',
                                 });
