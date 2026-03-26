@@ -200,7 +200,6 @@ export async function registrationScout(email: string): Promise<ConnectorResult>
             name: 'Twitter/X',
             check: async () => {
                 // X (Twitter) has complex headers, using a fallback search mention if registration check fails
-                // But we can try the email available endpoint if it still works
                 const url = `https://api.twitter.com/i/users/email_available.json?email=${encodeURIComponent(cleanEmail)}`;
                 const res = await quickFetch(url);
                 if (res?.ok) {
@@ -256,7 +255,7 @@ export async function registrationScout(email: string): Promise<ConnectorResult>
                         category: 'social',
                         platform: p.name,
                         confidenceScore: 0.99,
-                        confidenceLabel: 'VERIFIED'
+                        confidenceLabel: 'HIGH'
                     });
                 }
             } catch (e) {

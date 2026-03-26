@@ -207,6 +207,7 @@ export async function googleDorks({ name, username, email }: {
             const target = name || username || email || '';
             if (!target) return;
             
+            const cleanTarget = (email ? email.split('@')[0] : target).toLowerCase();
             // FIDELITY: Only search for the FULL email string. 
             // Do NOT search for handles derived from the email prefix.
             const searchTerms = email ? `"${email}"` : `"${target}"`;
