@@ -34,15 +34,16 @@ export default function TermsPage() {
             )
         },
         {
-            id: "lifetime-access",
-            title: "2. Lifetime Access (LTD)",
+            id: "subscription-billing",
+            title: "2. Subscription & Billing",
             legalText: (
                 <>
-                    <p>Founding Analyst Lifetime Access grants you a perpetual license to use the Aletheia Pro SaaS platform as long as the service is commercially available. All future core updates are explicitly included without further taxation.</p>
+                    <p>Paid plans are billed on a monthly basis. You may cancel at any time from your account settings. Upon cancellation, you retain access until the end of your current billing period. No refunds are issued for partial months of service.</p>
+                    <p className="mt-3">A 7-day free trial is available on the Tactical Pro plan. You will not be charged until the trial period ends.</p>
                 </>
             ),
             summary: (
-                <>If you buy the Lifetime Deal, you get access forever (as long as Aletheia exists) without paying monthly fees.</>
+                <>You pay monthly. Cancel anytime. 7-day free trial on Pro. No partial refunds.</>
             )
         },
         {

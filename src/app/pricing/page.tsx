@@ -91,54 +91,57 @@ const plans = [
   {
     name: "Analyst",
     price: "0",
-    desc: "The ultimate free starting point for independent researchers.",
+    period: "",
+    desc: "The essential starting point for independent researchers and curious analysts.",
     features: [
-      "50 Concurrent Investigations",
-      "Full Identity Social Mapping",
+      "5 Investigations/month",
       "Email & Username Sweeps",
+      "Basic Identity Mapping",
       "Public Record Retrieval",
-      "1 Active Global Watchlist",
-      "Basic Neural Summary (Gemini)",
+      "Basic AI Summary (Gemini)",
       "Standard PDF Export"
     ],
-    cta: "Deploy Terminal",
+    cta: "Start Free",
     href: "/dashboard",
     popular: false
   },
   {
     name: "Tactical Pro",
     price: "99",
-    desc: "The professional standard for investigators and SOC operators.",
+    period: "/month",
+    desc: "The professional standard for investigators, HR teams, and security operators.",
     features: [
       "Unlimited Investigations",
+      "Registration Scout (50+ platforms)",
       "Darkweb & Onion Scraping",
       "Reverse Image Search (AI)",
-      "Web3 & Crypto Correlation",
       "30+ Premium API Data Sources",
       "10 Active Target Watchlists",
       "Deep Web Breach Retrieval",
-      "Autonomous Agent Clusters"
+      "Priority AI Report Generation",
+      "PDF Dossier Export"
     ],
-    cta: "Get Lifetime Access",
+    cta: "Start 7-Day Free Trial",
     gumroadLink: "https://lucas808.gumroad.com/l/aletheia-pro",
     popular: true
   },
   {
     name: "Elite Team",
     price: "299",
-    desc: "Team-wide surveillance and high-volume batch processing.",
+    period: "/month",
+    desc: "Team-wide surveillance and high-volume batch processing for agencies.",
     features: [
       "Everything in Tactical Pro",
       "Real-time Darkweb Monitoring",
-      "Batch Intelligence (1k Targets)",
-      "Reverse Image Search (Unlimited)",
-      "50 Active Watchlists",
+      "Batch Intelligence (1,000 Targets)",
       "5 Team Collaborator Seats",
       "API Webhook Integration",
+      "White-label PDF Reports",
+      "50 Active Watchlists",
       "Priority 24/7 Human Support"
     ],
-    cta: "Get Lifetime Access",
-    gumroadLink: "https://lucas808.gumroad.com/l/aletheia-team",
+    cta: "Contact Sales",
+    gumroadLink: "mailto:contact@aletheia.so?subject=Elite%20Team%20Inquiry",
     popular: false
   }
 ];
@@ -248,13 +251,13 @@ function PricingCard({ plan, index }: { plan: any, index: number }) {
         </h3>
         <div className="flex items-baseline gap-1 mb-1">
           <span className="text-5xl font-black text-text-primary tracking-tighter">${plan.price}</span>
-          {!isFree && <span className="text-text-tertiary font-bold uppercase tracking-widest text-[10px]">/lifetime</span>}
+          {!isFree && <span className="text-text-tertiary font-bold uppercase tracking-widest text-[10px]">{plan.period}</span>}
         </div>
         
         {/* Height preservation */}
         <div className="h-4 mb-4">
            {!isFree && (
-              <span className="text-success text-[10px] font-bold uppercase tracking-widest">One-time payment</span>
+              <span className="text-success text-[10px] font-bold uppercase tracking-widest">Cancel anytime</span>
            )}
         </div>
 
