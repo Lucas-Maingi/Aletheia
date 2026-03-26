@@ -2,6 +2,8 @@ import { prisma } from '@/lib/prisma';
 import { DashboardClient } from '@/components/dashboard/dashboard-client';
 import { getEffectiveUserId } from '@/lib/auth-utils';
 
+const FREE_INVESTIGATION_LIMIT = 5;
+
 export default async function DashboardPage() {
     const user = await getEffectiveUserId();
 
@@ -46,6 +48,15 @@ export default async function DashboardPage() {
 
     const [rawInvestigations, totalInvestigations, signalYield, activeOps, recentDiscoveries] = data;
 
+    // Determine Pro status
+    let isPro = user.isGuest; // guests get full access for demo purposes
+    if (!user.isGuest) {
+        try {
+            const profile = await prisma.user.findUnique({ where: { id: user.id }, select: { plan: true } });
+            isPro = profile?.plan === 'pro' || profile?.plan === 'lifetime' || profile?.plan === 'team';
+        } catch { /* plan defaults to free if lookup fails */ }
+    }
+
     // Map investigations with enhanced descriptors
     const investigations = rawInvestigations.map((inv: any) => ({
         id: inv.id,
@@ -67,6 +78,8 @@ export default async function DashboardPage() {
                 signalYield={signalYield}
                 activeOps={activeOps}
                 recentDiscoveries={recentDiscoveries}
+                isPro={isPro}
+                freeLimit={FREE_INVESTIGATION_LIMIT}
             />
         </div>
     );

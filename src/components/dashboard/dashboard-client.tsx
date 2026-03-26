@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { ProGateBanner } from "@/components/dashboard/pro-gate-banner";
 
 interface InvestigationProp {
     id: string;
@@ -28,13 +29,17 @@ export function DashboardClient({
     totalInvestigations,
     signalYield,
     activeOps,
-    recentDiscoveries = []
+    recentDiscoveries = [],
+    isPro = false,
+    freeLimit = 5,
 }: { 
     investigations: InvestigationProp[];
     totalInvestigations: number;
     signalYield: number;
     activeOps: number;
     recentDiscoveries?: any[];
+    isPro?: boolean;
+    freeLimit?: number;
 }) {
   const [expandedCase, setExpandedCase] = useState<string | null>(null);
   const [localInvestigations, setLocalInvestigations] = useState<InvestigationProp[]>(investigations);
@@ -135,6 +140,13 @@ export function DashboardClient({
           ))}
         </div>
       </section>
+
+      {/* Pro Gate Banner — shown only to free users */}
+      <ProGateBanner
+        currentCount={totalInvestigations}
+        freeLimit={freeLimit}
+        isPro={isPro}
+      />
 
       {/* Tactical Feed & Unified Activity */}
       <div className="flex flex-col lg:grid lg:grid-cols-[1fr_320px] gap-8 flex-1 min-h-0">
