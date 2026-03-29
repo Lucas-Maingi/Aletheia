@@ -60,7 +60,7 @@ export function DashboardClient({
   const chats = localInvestigations.filter(i => i.source === 'chat');
 
   const topStats = [
-    { label: "Signal Yield", value: signalYield.toLocaleString(), icon: Cpu, color: "text-accent", glow: "bg-accent/10", detail: "Total artifacts captured" },
+    { label: "Signal", value: signalYield.toLocaleString(), icon: Cpu, color: "text-accent", glow: "bg-accent/10", detail: "Total artifacts captured" },
     { label: "Active Operations", value: activeOps.toString(), icon: Activity, color: "text-emerald-400", glow: "bg-emerald-400/10", detail: "Scanning background data", active: activeOps > 0 },
     { label: "Mission Index", value: totalInvestigations.toString(), icon: Database, color: "text-text-tertiary", glow: "bg-white/5", detail: "Archived dossiers & briefings" }
   ];
@@ -207,15 +207,11 @@ export function DashboardClient({
                       </div>
                     </div>
                     
-                        <div className="flex items-center gap-4">
-                            <div className="hidden sm:block text-right pr-4 border-r border-border/10">
-                                <div className="text-[10px] font-black text-text-tertiary uppercase tracking-tighter mb-0.5">Yield</div>
-                                <div className="text-[11px] font-mono font-bold text-text-secondary">{inv.leads} pts</div>
+                            <div className="flex items-center gap-4">
+                                <div className={`p-1.5 rounded-md transition-all ${isExpanded ? 'rotate-180 bg-accent/20 text-accent' : 'text-text-tertiary opacity-60'}`}>
+                                    <ChevronDown className="w-4 h-4" />
+                                </div>
                             </div>
-                            <div className={`p-1.5 rounded-md transition-all ${isExpanded ? 'rotate-180 bg-accent/20 text-accent' : 'text-text-tertiary opacity-60'}`}>
-                                <ChevronDown className="w-4 h-4" />
-                            </div>
-                        </div>
                   </button>
 
                   <AnimatePresence>
@@ -237,7 +233,7 @@ export function DashboardClient({
                                 }`}>
                                    {isChat ? 'Briefing' : 'Discovery'}
                                 </Badge>
-                                 <span className="text-[10px] font-mono text-text-tertiary font-bold uppercase">Record_UID: {inv.id.slice(0,8)}</span>
+                                 <span className="text-[9px] font-mono text-text-tertiary font-black uppercase">Confirmed_Record</span>
                             </div>
                             
                             <div className="flex items-center gap-2">

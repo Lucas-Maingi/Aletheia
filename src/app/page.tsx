@@ -193,15 +193,15 @@ export default function Landing() {
         <div className="absolute inset-0 bg-gradient-to-b from-accent/[0.02] to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center max-w-2xl mx-auto mb-20">
-            <h2 className="text-4xl md:text-5xl font-black text-text-primary mb-6 tracking-tight uppercase italic">Autonomous Intel Agents.</h2>
-            <p className="text-text-secondary text-lg font-medium leading-relaxed">Deploy specialized clusters to recursively hunt, verify, and map target footprints across the global intelligence network.</p>
+            <h2 className="text-4xl font-black text-text-primary mb-6 tracking-tight uppercase italic">Autonomous Intel Agents</h2>
+            <p className="text-text-secondary text-base font-medium leading-relaxed">Specialized cluster nodes for recursive target discovery.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { title: "BioAgent", icon: Fingerprint, desc: "Surgically traces biographical data, familial links, and professional histories across 400+ secured registries.", color: "text-purple-500", bg: "bg-purple-500/10", border: 'border-purple-500/20' },
-              { title: "InfraAgent", icon: Database, desc: "Maps infrastructure footprints including DNS registrations, IP associations, and historical network correlations.", color: "text-accent", bg: "bg-accent/10", border: 'border-accent/20' },
-              { title: "BreachAgent", icon: Shield, desc: "Cross-references credential vulnerabilities against 10B+ records in secured dark-web intelligence vaults.", color: "text-indigo-500", bg: "bg-indigo-500/10", border: 'border-indigo-500/20' },
+              { title: "BioAgent", icon: Fingerprint, desc: "Traces biographical data, familial links, and professional history.", color: "text-purple-500", bg: "bg-purple-500/10", border: 'border-purple-500/20' },
+              { title: "InfraAgent", icon: Database, desc: "Maps infrastructure footprints and historical network correlations.", color: "text-accent", bg: "bg-accent/10", border: 'border-accent/20' },
+              { title: "BreachAgent", icon: Shield, desc: "Cross-references vulnerabilities against 10B+ Dark Web records.", color: "text-indigo-500", bg: "bg-indigo-500/10", border: 'border-indigo-500/20' },
             ].map((agent, i) => (
               <motion.div
                 key={agent.title}
