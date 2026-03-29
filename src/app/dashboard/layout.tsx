@@ -13,7 +13,6 @@ import { MobileNav, MobileSidebarToggle } from '@/components/dashboard/mobile-na
 import { InvestigationProvider } from '@/context/InvestigationContext';
 import { getEffectiveUserId } from '@/lib/auth-utils';
 import { SidebarNav } from '@/components/dashboard/sidebar-nav';
-import { SystemPulse } from '@/components/dashboard/system-pulse';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 
 export default async function DashboardLayout({

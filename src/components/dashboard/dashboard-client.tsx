@@ -60,9 +60,9 @@ export function DashboardClient({
   const chats = localInvestigations.filter(i => i.source === 'chat');
 
   const topStats = [
-    { label: "Global Signal Yield", value: signalYield.toLocaleString(), icon: Cpu, color: "text-accent", glow: "bg-accent/10", detail: "Intelligence artifacts captured" },
-    { label: "Active Operations", value: activeOps.toString(), icon: Activity, color: "text-emerald-400", glow: "bg-emerald-400/10", detail: "Background scanners running", active: activeOps > 0 },
-    { label: "Total Intelligence Missions", value: totalInvestigations.toString(), icon: Database, color: "text-text-tertiary", glow: "bg-white/5", detail: "Archived dossiers & briefings" }
+    { label: "Signal Yield", value: signalYield.toLocaleString(), icon: Cpu, color: "text-accent", glow: "bg-accent/10", detail: "Total artifacts captured" },
+    { label: "Active Operations", value: activeOps.toString(), icon: Activity, color: "text-emerald-400", glow: "bg-emerald-400/10", detail: "Scanning background data", active: activeOps > 0 },
+    { label: "Mission Index", value: totalInvestigations.toString(), icon: Database, color: "text-text-tertiary", glow: "bg-white/5", detail: "Archived dossiers & briefings" }
   ];
 
   return (
@@ -117,24 +117,21 @@ export function DashboardClient({
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="bg-surface/30 backdrop-blur-2xl border border-white/5 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-accent/30 hover:-translate-y-2 hover:shadow-[0_22px_45px_rgba(0,0,0,0.15)] transition-all duration-500 cursor-default active:scale-[0.98]"
+              className="bg-surface/30 backdrop-blur-2xl border border-white/5 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-accent/30 hover:-translate-y-1 transition-all duration-500 cursor-default"
             >
-              <div className={`absolute -right-6 -top-6 w-24 h-24 blur-[40px] opacity-10 transition-all duration-700 group-hover:opacity-60 ${stat.glow}`} />
-              
               <div className="flex items-center justify-between mb-4">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center border border-accent/20 bg-accent/5 ${stat.color}`}>
                     <stat.icon className={`w-5 h-5 ${(stat as any).active ? 'animate-pulse' : ''}`} />
                 </div>
-                <div className="text-[9px] font-bold text-text-tertiary uppercase tracking-widest opacity-70">System_Metric</div>
               </div>
 
               <div>
-                <h3 className="text-text-secondary font-black text-[9px] uppercase tracking-widest mb-1">{stat.label}</h3>
+                <h3 className="text-text-secondary font-black text-[9px] uppercase tracking-[0.2em] mb-1">{stat.label}</h3>
                 <div className="text-3xl font-black text-text-primary tracking-tighter flex items-baseline gap-2">
                     {stat.value}
-                    {stat.label === "Global Signal Yield" && <span className="text-[10px] text-accent opacity-60 uppercase tracking-widest font-black">Artifacts</span>}
+                    {stat.label.includes("Signal") && <span className="text-[10px] text-accent opacity-60 uppercase tracking-widest font-black">Artifacts</span>}
                 </div>
-                <p className="text-[10px] text-text-secondary mt-2 font-medium italic opacity-80">{stat.detail}</p>
+                <p className="text-[10px] text-text-secondary mt-2 font-medium opacity-60">{stat.detail}</p>
               </div>
             </motion.div>
           ))}
@@ -149,17 +146,17 @@ export function DashboardClient({
       />
 
       {/* Tactical Feed & Unified Activity */}
-      <div className="flex flex-col lg:grid lg:grid-cols-[1fr_320px] gap-8 flex-1 min-h-0">
+      <div className="flex flex-col gap-8 flex-1 min-h-0">
         
         {/* Main Activity Timeline */}
         <section className="flex flex-col min-h-0 bg-surface/10 border border-white/5 rounded-3xl p-6 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-[13px] font-bold text-text-secondary uppercase tracking-widest flex items-center gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-              Operational Chronology
-            </h2>
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_8px_var(--accent)]" />
+              <h2 className="text-[13px] font-bold text-text-secondary uppercase tracking-[0.2em]">Operational Chronology</h2>
+            </div>
             <Link href="/dashboard/investigations" className="text-[10px] font-bold text-text-tertiary uppercase tracking-[0.2em] hover:text-white transition-all">
-              Complete_Archive
+              Comprehensive_Archive
             </Link>
           </div>
 
@@ -268,62 +265,7 @@ export function DashboardClient({
             })}
           </div>
         </section>
-
-        {/* Real-Time Discovery Feed Sidebar */}
-        <aside className="hidden lg:flex flex-col bg-surface/20 border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
-            <div className="p-6 border-b border-border/10 bg-foreground/[0.03]">
-                <div className="flex items-center gap-2 mb-1">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                    <h2 className="text-[11px] font-black text-text-primary uppercase tracking-[0.2em]">Real-Time Signal Feed</h2>
-                </div>
-                <p className="text-[9px] text-text-secondary uppercase opacity-70 tracking-widest font-bold">Global Discovery Log</p>
-            </div>
-
-            <div className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-4">
-                {recentDiscoveries.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full text-center opacity-30 p-8 grayscale">
-                        <Activity className="w-8 h-8 mb-4 opacity-20" />
-                        <p className="text-[10px] font-mono uppercase tracking-widest leading-relaxed">Awaiting system handshake. Signal yield is currently idle.</p>
-                    </div>
-                ) : recentDiscoveries.map((discovery, i) => (
-                    <motion.div
-                        key={discovery.id}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                        className="p-3.5 bg-background/20 border border-white/[0.03] rounded-xl hover:border-emerald-500/10 transition-all group"
-                    >
-                        <div className="flex items-center gap-2.5 mb-2">
-                             <div className="p-1 rounded bg-accent/10 border border-accent/20 text-accent">
-                                <Cpu className="w-2.5 h-2.5" />
-                             </div>
-                             <span className="text-[9px] font-black text-accent uppercase tracking-tighter truncate max-w-[140px] opacity-90">
-                                {discovery.investigation?.title || 'System'}
-                             </span>
-                             <span className="text-[9px] text-text-secondary ml-auto font-mono font-bold">
-                                {new Date(discovery.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
-                             </span>
-                        </div>
-                        <h4 className="text-[11px] font-black text-text-primary mb-1 line-clamp-1 group-hover:text-emerald-500 transition-colors">
-                            {discovery.title}
-                        </h4>
-                        <div className="flex items-center gap-1.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_5px_var(--success)]" />
-                            <span className="text-[9px] text-text-secondary font-bold tracking-tight uppercase line-clamp-1">Intelligence Discovery</span>
-                        </div>
-                    </motion.div>
-                ))}
-            </div>
-
-            <div className="p-4 border-t border-white/5 bg-foreground/[0.01]">
-                <div className="flex items-center justify-between text-[8px] font-bold text-text-tertiary uppercase tracking-widest">
-                    <span>Signal Relay Status</span>
-                    <span className="text-emerald-400">UP_STREAM</span>
-                </div>
-            </div>
-        </aside>
       </div>
-      
     </div>
   );
 }

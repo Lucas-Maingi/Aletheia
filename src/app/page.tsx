@@ -114,18 +114,18 @@ export default function Landing() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
-            className="text-5xl md:text-7xl font-sans font-black text-text-primary tracking-tight leading-[1.1] mb-6 drop-shadow-2xl uppercase"
+            className="text-5xl md:text-8xl font-sans font-black text-text-primary tracking-tight leading-[1.0] mb-8 drop-shadow-2xl uppercase italic"
           >
-            Uncover the invisible.
+            Resolution. <span className="text-accent underline decoration-accent/20 underline-offset-8">Instantly.</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto mb-12 leading-relaxed font-sans"
+            className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto mb-16 leading-relaxed font-medium"
           >
-            Deploy autonomous AI agent clusters to map recursive identities, verify physical provenance, and resolve complex footprints instantly.
+            The world's most advanced autonomous OSINT engine. Deploy agent clusters to map recursive identities and resolve digital footprints in milliseconds.
           </motion.p>
 
           {/* Magical Search Bar */}
@@ -136,25 +136,25 @@ export default function Landing() {
             className="relative max-w-3xl mx-auto group z-20"
           >
             {/* Glowing Backdrop */}
-            <div className="absolute -inset-1.5 bg-gradient-to-r from-accent via-accent-blue to-success rounded-2xl blur-lg opacity-30 group-hover:opacity-60 transition duration-1000 group-hover:duration-300 pointer-events-none" />
+            <div className="absolute -inset-1.5 bg-gradient-to-r from-accent via-accent-blue to-accent rounded-2xl blur-lg opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-300 pointer-events-none" />
             
-            <form onSubmit={handleSearch} className="relative flex items-stretch bg-surface/80 backdrop-blur-2xl border border-border/20 rounded-2xl p-1.5 shadow-3xl overflow-hidden gap-1.5 ring-1 ring-white/5">
+            <form onSubmit={handleSearch} className="relative flex items-stretch bg-surface/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-2 shadow-3xl overflow-hidden gap-2">
               <div className="flex items-center flex-1 px-4 py-3 relative">
-                <Search className="w-6 h-6 text-text-secondary shrink-0" />
+                <Search className="w-5 h-5 text-text-tertiary shrink-0" />
                 <input
                   type="text"
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
-                  placeholder="Enter target alias, email, domain..."
-                  className="w-full bg-transparent border-none text-text-primary text-lg px-4 focus:outline-none focus:ring-0 placeholder:text-text-tertiary font-bold"
+                  placeholder="Target Identification (Alias, Email, Domain...)"
+                  className="w-full bg-transparent border-none text-text-primary text-base px-4 focus:outline-none focus:ring-0 placeholder:text-text-tertiary/50 font-bold"
                 />
               </div>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  title="Upload Image for AI Verification"
+                  title="Visual Intelligence Sweep"
                   onClick={() => fileInputRef.current?.click()}
-                  className="p-3 rounded-xl border border-border/10 text-text-tertiary hover:text-accent hover:border-accent/40 bg-background/20 transition-all flex items-center justify-center group/img"
+                  className="p-3.5 rounded-xl border border-white/5 text-text-tertiary hover:text-accent hover:border-accent/40 bg-white/5 transition-all flex items-center justify-center group/img"
                   disabled={isUploading}
                 >
                   {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <ImageIcon className="w-5 h-5 group-hover/img:scale-110 transition-transform" />}
@@ -168,41 +168,22 @@ export default function Landing() {
                 />
                 <button 
                   type="submit"
-                  className="flex items-center justify-center gap-3 bg-accent hover:bg-accent-hover text-white px-10 py-4 rounded-xl font-black transition-all transform hover:scale-[1.02] shadow-xl group/btn uppercase tracking-widest text-xs"
+                  className="flex items-center justify-center gap-3 bg-accent hover:bg-white hover:text-accent text-white px-8 py-4 rounded-xl font-black transition-all transform hover:scale-[1.02] shadow-xl group/btn uppercase tracking-widest text-[10px]"
                 >
-                  Initiate Global Sweep 
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  Initiate Sweep
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             </form>
-            <div className="mt-5 flex items-center justify-center gap-4 text-[11px] font-bold uppercase tracking-widest">
-                <span className="text-text-tertiary">Already an operative?</span>
-                <button onClick={() => router.push('/auth/login')} className="text-accent hover:text-accent-hover transition-colors underline decoration-accent/30 underline-offset-4">Sign In for Access</button>
-            </div>
-          </motion.div>
-
-          {/* Trending Cases */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.6 }}
-            className="mt-14 flex flex-col items-center gap-5"
-          >
-            <div className="text-xs font-mono text-slate-500 uppercase tracking-widest flex items-center gap-2">
-               <Activity className="w-3.5 h-3.5 text-slate-400" /> Trending Solved Cases
-            </div>
-            <div className="flex flex-wrap justify-center gap-4">
-              {trendingCases.map((tc, i) => (
-                <button
-                  key={tc.id}
-                  onClick={() => setSearchValue(tc.label)}
-                  className="flex items-center gap-3 px-5 py-2.5 rounded-xl bg-surface/50 border border-border/20 hover:border-accent/40 hover:bg-surface/80 transition-all text-sm group/badge cursor-pointer backdrop-blur-md shadow-xl"
-                >
-                  <tc.icon className={`w-4 h-4 ${i === 0 ? 'text-accent' : i === 1 ? 'text-error' : 'text-purple-500'}`} />
-                  <span className="text-text-secondary font-black uppercase tracking-widest text-[10px] group-hover:text-text-primary transition-colors">{tc.label}</span>
-                  <span className="text-[10px] font-mono text-text-tertiary ml-2 bg-background/50 px-2 py-0.5 rounded border border-border/10">{tc.id}</span>
-                </button>
-              ))}
+            <div className="mt-8 flex items-center justify-center gap-6 text-[10px] font-black uppercase tracking-[0.3em] text-text-tertiary">
+                <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_5px_var(--success)]" />
+                    Secure_Node_Active
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shadow-[0_0_5px_var(--accent)]" />
+                    99.9% Integrity
+                </div>
             </div>
           </motion.div>
         </div>
