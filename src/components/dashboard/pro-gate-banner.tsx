@@ -69,7 +69,7 @@ export function ProGateBanner({ currentCount, freeLimit, isPro }: ProGateBannerP
                         <div className="text-lg font-black text-text-primary">$99<span className="text-xs text-text-tertiary font-medium">/mo</span></div>
                         <div className="text-[9px] text-success font-bold">7-Day Free Trial</div>
                     </div>
-                    <Link href="/pricing" className="block">
+                    <Link href="/api/checkout/gumroad?plan=pro" className="block">
                         <motion.div
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}

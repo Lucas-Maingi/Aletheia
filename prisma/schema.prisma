@@ -23,6 +23,8 @@ model User {
   stripeCustomerId           String?  @unique
   lemonSqueezyCustomerId     String?  @unique
   lemonSqueezySubscriptionId String?  @unique
+  gumroadCustomerId          String?  @unique
+  gumroadSubscriptionId      String?  @unique
   facialAiCredits            Int      @default(5)
   investigationsCount        Int      @default(0)
   hasLifetimeAccess          Boolean  @default(false)

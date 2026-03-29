@@ -122,7 +122,7 @@ const plans = [
       "PDF Dossier Export"
     ],
     cta: "Start 7-Day Free Trial",
-    gumroadLink: "https://lucas808.gumroad.com/l/aletheia-pro",
+    gumroadLink: "/api/checkout/gumroad?plan=pro",
     popular: true
   },
   {
@@ -141,7 +141,7 @@ const plans = [
       "Priority 24/7 Human Support"
     ],
     cta: "Contact Sales",
-    gumroadLink: "mailto:contact@aletheia.so?subject=Elite%20Team%20Inquiry",
+    gumroadLink: "/api/checkout/gumroad?plan=elite",
     popular: false
   }
 ];
