@@ -8,9 +8,10 @@ import { NextResponse } from 'next/server';
  */
 export async function PATCH(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const user = await getEffectiveUserId();
         
         // Admin verification
