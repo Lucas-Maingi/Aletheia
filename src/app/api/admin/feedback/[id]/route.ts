@@ -28,7 +28,7 @@ export async function PATCH(
         const { replyContent, status } = body;
 
         const feedback = await prisma.feedback.update({
-            where: { id: params.id },
+            where: { id },
             data: {
                 replyContent,
                 status: status || 'replied',
