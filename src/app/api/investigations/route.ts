@@ -72,7 +72,9 @@ export async function POST(request: Request) {
             subjectEmail: subjectEmail ? sanitize(subjectEmail.trim()) : null,
             subjectPhone: subjectPhone ? sanitize(subjectPhone.trim()) : null,
             subjectDomain: subjectDomain ? sanitize(subjectDomain.trim()) : null,
-            subjectImageUrl: subjectImageUrl ? sanitize(subjectImageUrl.trim()) : null,
+            subjectImageUrl: subjectImageUrl && (subjectImageUrl.startsWith('data:') || subjectImageUrl.startsWith('http')) 
+                ? subjectImageUrl.trim() 
+                : (subjectImageUrl ? sanitize(subjectImageUrl.trim()) : null),
             userId: user.id,
         };
 

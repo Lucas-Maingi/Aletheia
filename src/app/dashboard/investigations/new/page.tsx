@@ -25,9 +25,18 @@ export default function NewInvestigationPage() {
         const target = searchParams.get('target');
         const autostart = searchParams.get('autostart');
         
-        if (target) {
-            setOmniValue(target);
-            setDetectedType(detectType(target));
+        // Check for pending image from landing page/command palette
+        const pendingImage = sessionStorage.getItem('aletheia_pending_image');
+        if (pendingImage) {
+            setImagePreview(pendingImage);
+            sessionStorage.removeItem('aletheia_pending_image');
+        }
+
+        if (target || pendingImage) {
+            if (target) {
+                setOmniValue(target);
+                setDetectedType(detectType(target));
+            }
             
             // Seamless auto-start if specifically requested (e.g., from landing page or dashboard)
             if (autostart === 'true') {
@@ -53,8 +62,18 @@ export default function NewInvestigationPage() {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            // Check for Vercel 4.5MB payload limit (base64 adds ~33% overhead)
+            // 3.5MB * 1.33 = 4.6MB
+            if (file.size > 3.5 * 1024 * 1024) {
+                setError("Image is too large (max 3.5MB). Please compress it or use a lower resolution.");
+                return;
+            }
+
             const reader = new FileReader();
-            reader.onload = (ev) => setImagePreview(ev.target?.result as string);
+            reader.onload = (ev) => {
+                setImagePreview(ev.target?.result as string);
+                setError(null);
+            };
             reader.readAsDataURL(file);
         }
     };

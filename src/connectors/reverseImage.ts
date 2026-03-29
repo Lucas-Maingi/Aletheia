@@ -19,6 +19,14 @@ interface FaceCheckItem {
  * Downloads an image from a public URL and returns its binary buffer + mime type.
  */
 async function fetchImageBuffer(imageUrl: string): Promise<{ buffer: Buffer; mimeType: string }> {
+    if (imageUrl.startsWith('data:')) {
+        const match = imageUrl.match(/^data:([^;]+);base64,(.+)$/);
+        if (!match) throw new Error('Invalid Data URL format');
+        const mimeType = match[1];
+        const base64Data = match[2];
+        return { buffer: Buffer.from(base64Data, 'base64'), mimeType };
+    }
+
     const timeout = AbortSignal.timeout(15000);
     const res = await fetch(imageUrl, { signal: timeout });
     if (!res.ok) throw new Error(`Failed to fetch image: ${res.status} ${res.statusText}`);

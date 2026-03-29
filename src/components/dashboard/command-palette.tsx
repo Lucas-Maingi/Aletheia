@@ -1,17 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Command } from "cmdk";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Search, Loader2, Shield, Plus, Globe, AtSign, Mail, FileText, MessageSquare, Database } from "lucide-react";
+import { Search, Loader2, Shield, Plus, Globe, AtSign, Mail, FileText, MessageSquare, Database, ImageIcon } from "lucide-react";
 
 export function CommandPalette() {
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState("");
     const [results, setResults] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
+    
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const base64 = ev.target?.result as string;
+                sessionStorage.setItem('aletheia_pending_image', base64);
+                setOpen(false);
+                router.push('/dashboard/investigations/new?autostart=true');
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     // Toggle the menu when ⌘K is pressed or via custom event
     useEffect(() => {
@@ -129,6 +144,30 @@ export function CommandPalette() {
                                         </Command.Item>
                                     ))}
                                 </div>
+                            </Command.Group>
+                        )}
+                        
+                        {!search && (
+                            <Command.Group heading="Quick_Actions" className="px-3 pb-2">
+                                <Command.Item
+                                    onSelect={() => fileInputRef.current?.click()}
+                                    className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 cursor-pointer aria-selected:bg-white/10 transition-all border border-transparent aria-selected:border-accent/30 group"
+                                >
+                                    <div className="p-2 rounded-lg bg-accent/10 border border-accent/20 text-accent group-hover:scale-110 transition-transform">
+                                        <ImageIcon className="w-5 h-5" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-bold text-white group-hover:text-accent transition-colors">Visual Intelligence Sweep</span>
+                                        <span className="text-[10px] text-white/30 font-medium uppercase tracking-tight">Upload face or document for biometric verification</span>
+                                    </div>
+                                    <input 
+                                        type="file" 
+                                        ref={fileInputRef} 
+                                        className="hidden" 
+                                        accept="image/*" 
+                                        onChange={handleFileChange} 
+                                    />
+                                </Command.Item>
                             </Command.Group>
                         )}
 

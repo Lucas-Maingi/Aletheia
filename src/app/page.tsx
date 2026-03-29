@@ -2,10 +2,11 @@
 
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { 
   Hexagon, CheckCircle2, Zap, Shield, Search, Database, Fingerprint, 
-  Eye, GitCommit, ChevronRight, Activity, Terminal, Sparkles, ArrowRight, Flame
+  Eye, GitCommit, ChevronRight, Activity, Terminal, Sparkles, ArrowRight, Flame,
+  ImageIcon, Loader2
 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -56,7 +57,24 @@ const FloatingParticles = () => {
 
 export default function Landing() {
   const [searchValue, setSearchValue] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsUploading(true);
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const base64 = ev.target?.result as string;
+        // Pre-fill investigation from Landing to New Investigation page
+        sessionStorage.setItem('aletheia_pending_image', base64);
+        router.push('/dashboard/investigations/new?autostart=true');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,13 +149,31 @@ export default function Landing() {
                   className="w-full bg-transparent border-none text-text-primary text-lg px-4 focus:outline-none focus:ring-0 placeholder:text-text-tertiary font-bold"
                 />
               </div>
-              <button 
-                type="submit"
-                className="flex items-center justify-center gap-3 bg-accent hover:bg-accent-hover text-white px-10 py-4 rounded-xl font-black transition-all transform hover:scale-[1.02] shadow-xl group/btn uppercase tracking-widest text-xs"
-              >
-                Initiate Global Sweep 
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  title="Upload Image for AI Verification"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="p-3 rounded-xl border border-border/10 text-text-tertiary hover:text-accent hover:border-accent/40 bg-background/20 transition-all flex items-center justify-center group/img"
+                  disabled={isUploading}
+                >
+                  {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <ImageIcon className="w-5 h-5 group-hover/img:scale-110 transition-transform" />}
+                </button>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  className="hidden" 
+                  accept="image/*" 
+                  onChange={handleFileChange} 
+                />
+                <button 
+                  type="submit"
+                  className="flex items-center justify-center gap-3 bg-accent hover:bg-accent-hover text-white px-10 py-4 rounded-xl font-black transition-all transform hover:scale-[1.02] shadow-xl group/btn uppercase tracking-widest text-xs"
+                >
+                  Initiate Global Sweep 
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
             </form>
             <div className="mt-5 flex items-center justify-center gap-4 text-[11px] font-bold uppercase tracking-widest">
                 <span className="text-text-tertiary">Already an operative?</span>
