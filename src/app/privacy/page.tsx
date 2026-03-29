@@ -1,97 +1,62 @@
-import { LegalPageLayout, LegalSection } from "@/components/landing/legal-page-layout";
-import { Shield } from "lucide-react";
+import { LandingHeader } from "@/components/landing/landing-header";
+import { Footer } from "@/components/footer";
 
-export default function PrivacyPage() {
-    const sections: LegalSection[] = [
-        {
-            id: "introduction",
-            title: "Introduction",
-            legalText: (
-                <>
-                    <p>At Aletheia, we take your privacy and the security of your investigative data seriously. This Privacy Policy describes how we collect, use, and protect your information when you use our services.</p>
-                    <p className="mt-4">By accessing or using our services, you agree to this Privacy Policy. If you do not agree with this policy, please do not use our services.</p>
-                </>
-            ),
-            summary: (
-                <>We care about your privacy. This document explains what data we collect, why we collect it, and how we keep it safe. If you use Aletheia, you agree to these terms.</>
-            )
-        },
-        {
-            id: "data-collection",
-            title: "1. Data Collection",
-            legalText: (
-                <>
-                    <p>We collect information you provide directly to us, such as when you create an account, initiate an investigation, or communicate with us. This comprises:</p>
-                    <ul className="list-disc pl-6 space-y-2 mt-4 text-slate-400">
-                        <li><strong className="text-slate-200">Account Information:</strong> Name, email address, and authentication credentials.</li>
-                        <li><strong className="text-slate-200">Investigation Data:</strong> Information about subjects you are investigating, including usernames, emails, and images.</li>
-                        <li><strong className="text-slate-200">Payment Information:</strong> Processed securely through our payment provider (Lemon Squeezy); we do not arbitrarily store your full credit card details.</li>
-                    </ul>
-                </>
-            ),
-            summary: (
-                <>We only collect what we need to run the service: your account details to log you in, the targets you explicitly ask us to investigate, and payment records via our secure payment processor.</>
-            )
-        },
-        {
-            id: "data-use",
-            title: "2. Use of Information",
-            legalText: (
-                <>
-                    <p>We use the collected information for the purpose of operating the agentic intelligence platform, including to:</p>
-                    <ul className="list-disc pl-6 space-y-2 mt-4 text-slate-400">
-                        <li>Provide, maintain, and improve our intelligence services.</li>
-                        <li>Process your transactions and manage your lifetime access.</li>
-                        <li>Send technical notices, updates, and administrative messages.</li>
-                        <li>Monitor and analyze trends, usage, and activities in connection with our services.</li>
-                    </ul>
-                </>
-            ),
-            summary: (
-                <>We use your data strictly to make the Aletheia engine work for you, process your payments, and send you important updates. We do not sell your data to marketers.</>
-            )
-        },
-        {
-            id: "data-security",
-            title: "3. Data Security",
-            legalText: (
-                <>
-                    <p>Aletheia implements industry-standard security measures, including 256-bit AES encryption at rest, to protect your data. Investigative data is strictly associated with your account and is highly compartmentalized. It is not shared with third parties, except as cryptographically required to provide the service (e.g., querying public OSINT APIs through obfuscated exit nodes).</p>
-                </>
-            ),
-            summary: (
-                <>Your data is secured with high-grade encryption. We don't share your private intelligence dossiers with anyone else.</>
-            )
-        },
-        {
-            id: "open-source",
-            title: "4. Open Source Core",
-            legalText: (
-                <>
-                    <p>The core engine of Aletheia is open-source software. When self-hosting the Open Source version on your own bare-metal servers, data processing occurs entirely within your own infrastructure. Aletheia Intelligence LLC does not have any programmatic access to data processed, stored, or transmitted through self-hosted community instances.</p>
-                </>
-            ),
-            summary: (
-                <>If you choose to self-host Aletheia on your own servers instead of using our cloud platform, we have absolutely zero access to your data.</>
-            )
-        },
-        {
-            id: "contact",
-            title: "5. Contact Us",
-            legalText: (
-                <p>If you have any questions about this Privacy Policy, please contact our Data Protection Officer at <a href="mailto:contact@aletheia.intel" className="text-purple-400 hover:text-purple-300 transition-colors">contact@aletheia.intel</a>.</p>
-            ),
-            summary: (
-                <>Questions? Email us.</>
-            )
-        }
-    ];
+export default function PrivacyPolicyPage() {
+  return (
+    <div className="w-full bg-background min-h-screen">
+      <LandingHeader />
+      
+      <main className="max-w-4xl mx-auto px-6 pt-32 pb-24 prose prose-invert prose-slate">
+        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-[1.1] mb-8 uppercase italic">
+          Privacy Policy
+        </h1>
+        <p className="text-sm text-text-tertiary">Last Updated: March 2026</p>
 
-    return (
-        <LegalPageLayout 
-            title="Privacy Policy"
-            lastUpdated="March 3, 2026"
-            sections={sections}
-        />
-    );
+        <section className="mt-12 space-y-8 text-text-secondary leading-relaxed">
+          <div>
+            <h2 className="text-2xl font-bold text-white mt-12 mb-4">1. Data We Collect</h2>
+            <p>
+              When you interact with Aletheia Intelligence, whether via our web application or API, we collect specific data points to deliver our open-source intelligence services:
+            </p>
+            <ul className="list-disc pl-6 mt-4 space-y-2">
+              <li><strong>Account Information:</strong> We store the email addresses, passwords, and IDs used to authenticate and safeguard your account via Supabase.</li>
+              <li><strong>Billing Information:</strong> Payments and subscriptions are collected securely by authorized Merchants of Record (e.g. Gumroad). We do not directly store complete credit card information on our servers; we only store metadata identifying subscription states.</li>
+              <li><strong>Search Telemetry:</strong> To provide you with your history and dashboard features, we log the parameters (emails, usernames, IP addresses, domains) you submit for investigation alongside the resulting reports.</li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 className="text-2xl font-bold text-white mt-12 mb-4">2. How We Use and Protect Your Data</h2>
+            <p>
+              Your search targets and investigation data belong strictly to you. We employ your queries solely to aggregate signals across integrated public sources and specialized APIs to orchestrate your report. We do not sell your investigation queries, targets, or analytical outputs to third-party data brokers, marketing firms, or advertising networks.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="text-2xl font-bold text-white mt-12 mb-4">3. Data Retention and Deletion</h2>
+            <p>
+              Aletheia stores your investigations in your dashboard for your convenience. You may choose to permanently delete an investigation from your account at any time. Upon deletion, the target entity data and associated generated reports are purged from our database. If you wish to completely close your account, contact our support pipeline and all linked records will be scrubbed.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="text-2xl font-bold text-white mt-12 mb-4">4. Third-Party API Partners</h2>
+            <p>
+              Aletheia acts as an aggregator for specialized security vendors, including FaceCheck.id, HaveIBeenPwned, and various public registration endpoints. When you run an investigation, target identifiers (like a hash of an email, or an image file) are transmitted via encrypted pipelines to these partners to assess risk. Our partners operate under their own privacy protocols, typically bound by transient lookup agreements.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="text-2xl font-bold text-white mt-12 mb-4">5. Security Infrastructure</h2>
+            <p>
+              Aletheia Intelligence uses modern cloud providers (Vercel) and enterprise-grade posture (Supabase RLS) to protect our environment from unauthorized intrusion. We enforce strict transport layer encryption (TLS 1.3) across our external and internal networking vectors.
+            </p>
+          </div>
+
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  );
 }
