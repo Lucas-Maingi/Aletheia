@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { CopyEvidenceButton } from '@/components/dashboard/copy-evidence-button';
+import { useInvestigation } from '@/context/InvestigationContext';
 
 const ECOSYSTEMS = [
     { id: 'social', name: 'Social', icon: Users, color: 'text-pink-400', keywords: ['instagram', 'twitter', 'facebook', 'tiktok', 'snapchat', 'reddit', 'mastodon', 'bluesky'] },
@@ -93,12 +94,28 @@ export function EvidenceTab({ evidence }: { evidence: any[] }) {
         }
     };
 
+    const { scanStatus } = useInvestigation();
+
     if (evidence.length === 0) {
+        // If the scan is complete and we still have 0 evidence
+        if (scanStatus === 'complete') {
+            return (
+                <Card className="border-dashed border-border/20 bg-transparent rounded-3xl">
+                    <CardContent className="h-64 flex flex-col items-center justify-center text-text-tertiary p-8 text-center bg-surface/20">
+                        <div className="opacity-20 mb-4"><Search className="w-10 h-10" /></div>
+                        <p className="text-sm font-mono uppercase tracking-widest leading-relaxed mb-2 text-text-secondary">No Verified Accounts Found</p>
+                        <p className="text-xs max-w-sm text-center">We scoured the surface and deep web but found no actionable footprint for this target. Try adjusting parameters or executing a username search instead.</p>
+                    </CardContent>
+                </Card>
+            );
+        }
+
+        // If scanning or idle but no evidence yet
         return (
             <Card className="border-dashed border-border/20 bg-transparent rounded-3xl">
                 <CardContent className="h-64 flex flex-col items-center justify-center text-text-tertiary p-8 text-center bg-surface/20">
                     <div className="opacity-20 mb-4 animate-pulse"><Search className="w-10 h-10" /></div>
-                    <p className="text-sm font-mono uppercase tracking-widest max-w-xs leading-relaxed">Intelligence Grid Empty</p>
+                    <p className="text-sm font-mono uppercase tracking-widest leading-relaxed">Intelligence Grid Awaiting Target</p>
                 </CardContent>
             </Card>
         );

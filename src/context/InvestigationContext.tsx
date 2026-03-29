@@ -185,9 +185,8 @@ export function InvestigationProvider({ children }: { children: React.ReactNode 
     }, [activeInvestigationId, scanStatus, refresh, terminalLogs.length, forceSync]);
 
     const startScan = useCallback(async (id: string) => {
-        // Keep logs if we're just hitting "Re-Scan" on the same ID
         if (id !== activeInvestigationId) {
-            setTerminalLogs(["🚀 Initializing Aletheia Intelligence Engine v2.5.0..."]);
+            setTerminalLogs(["🚀 Initializing Aletheia Intelligence Engine v2.5.0...", "🔐 Validating execution matrix..."]);
             setFacialMatches([]);
         }
         
@@ -199,44 +198,45 @@ export function InvestigationProvider({ children }: { children: React.ReactNode 
             const headers: Record<string, string> = { "Content-Type": "application/json" };
             if (geminiKey) headers['x-gemini-key'] = geminiKey;
 
-            // DOSSIER v28: Scan is synchronous (30-50s)
-            // The browser runs this fetch non-blockingly — polling continues in parallel.
-            const res = await fetch(`/api/investigations/${id}/scan`, {
-                method: "POST",
-                headers,
-            });
+            // Phase 1: Core OSINT Sweep
+            console.log(`[Context] Initiating Core Sweep...`);
+            const coreRes = await fetch(`/api/investigations/${id}/scan/core`, { method: "POST", headers });
+            if (!coreRes.ok) throw new Error("Core sweep failed to initialize");
+            
+            setTerminalLogs(prev => [...prev, "[SYS] Transitioning to Visual Analysis Processor..."]);
 
-            if (res.ok) {
-                const data = await res.json();
-                console.log(`[Context] Scan handshake successful. Server status: ${data.status}`);
-                
-                if (data.facialMatches) {
-                    setFacialMatches(data.facialMatches);
+            // Phase 2: Visual/Biometric Sweep
+            // The route itself will instantly return if there's no subjectImageUrl
+            console.log(`[Context] Initiating Visual Sweep...`);
+            const visualRes = await fetch(`/api/investigations/${id}/scan/visual`, { method: "POST", headers });
+            if (visualRes.ok) {
+                const visualData = await visualRes.json();
+                if (visualData.facialMatches && visualData.facialMatches.length > 0) {
+                    setFacialMatches(visualData.facialMatches);
                 }
+            }
 
-                // Dossier v87: Intelligent Status Sync
-                // If the engine says it's still scanning (already active), stay in scanning mode.
-                if (data.status === 'scanning' || data.status === 'active') {
-                   setScanStatus('scanning');
-                } else {
-                   setScanStatus('complete');
-                   setTerminalLogs(prev => [...prev, "✔ Scan complete. Disconnecting from secure circuit."]);
+            setTerminalLogs(prev => [...prev, "[SYS] Synthesizing Final Intelligence Dossier..."]);
+
+            // Phase 3: AI Report Synthesis
+            console.log(`[Context] Initiating AI Synthesis...`);
+            const synthRes = await fetch(`/api/investigations/${id}/scan/synthesis`, { method: "POST", headers });
+
+            if (synthRes.ok) {
+                const data = await synthRes.json();
+                if (data.status === 'complete') {
+                    setScanStatus('complete');
+                    setTerminalLogs(prev => [...prev, "✔ Scan complete. Intelligence isolated securely."]);
                 }
-                
-                // Force immediate data refresh to populate Evidence & Entities
-                await refresh();
+                await refresh(); // Load everything
+            } else {
+                const errData = await synthRes.json().catch(() => ({}));
+                throw new Error(errData.error || "Synthesis node collapsed");
             }
- else {
-                const errData = await res.json().catch(() => ({}));
-                const errText = errData.error || "Scan initiation failed";
-                console.error("Scan Failed:", errText);
-                setTerminalLogs(prev => [...prev, `[ERR] ${errText}`]);
-                setScanStatus('error');
-            }
-        } catch (err) {
+        } catch (err: any) {
             console.error("Context Scan Error:", err);
             setScanStatus('error');
-            setTerminalLogs(prev => [...prev, `[ERR] Critical engine failure: ${String(err)}`]);
+            setTerminalLogs(prev => [...prev, `[ERR] Critical engine progression failure: ${err.message || String(err)}`]);
         }
     }, [activeInvestigationId, refresh]);
 
