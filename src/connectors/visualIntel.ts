@@ -1,48 +1,43 @@
 
 export interface FacialMatch {
   platform: string;
-  confidence: number;
+  confidence: number;  // 0.0 – 1.0
+  score: number;       // 0 – 100 raw FaceCheck score
   url: string;
-  imageUrl: string;
+  thumbnailBase64?: string;  // base64 webp from FaceCheck
   timestamp: string;
 }
 
 /**
- * FacialRecognitionAgent
- * Automates visual identity correlation across indexed archival nodes.
- * Simulated for initial Phase 53 launch to demonstrate UI/UX flow.
+ * Maps raw FaceCheck.id API items (from the reverseImageSearch connector results)
+ * into the FacialMatch interface consumed by the UI.
+ *
+ * This is NOT a data-fetching function — the actual API call happens in
+ * src/connectors/reverseImage.ts during the scan phase. This module is
+ * responsible only for the in-memory data shape used by dashboard components.
  */
-export async function runFacialAI(target: string): Promise<FacialMatch[]> {
-  // Simulate network latency for "Biometric Calculation"
-  await new Promise(r => setTimeout(r, 2500));
+export function mapFaceCheckResults(connectorResults: any[]): FacialMatch[] {
+  return connectorResults
+    .filter(r => r.category === 'image_search' && r.metadata?.source === 'facecheck_id')
+    .map(r => ({
+      platform: r.platform || 'Unknown',
+      confidence: r.confidenceScore || 0,
+      score: r.metadata?.faceMatchScore || Math.round((r.confidenceScore || 0) * 100),
+      url: r.url,
+      thumbnailBase64: r.metadata?.thumbnailBase64,
+      timestamp: new Date().toISOString(),
+    }))
+    .sort((a, b) => b.score - a.score);
+}
 
-  // If the target is an email or username, we "find" some probabilistic matches
-  if (!target) return [];
-
-  const matches: FacialMatch[] = [
-    {
-      platform: "LinkedIn Archival",
-      confidence: 0.98,
-      url: `https://linkedin.com/in/${target.split('@')[0]}`,
-      imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
-      timestamp: new Date().toISOString()
-    },
-    {
-      platform: "GitHub Artifacts",
-      confidence: 0.85,
-      url: `https://github.com/avatar/${target.split('@')[0]}`,
-      imageUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop",
-      timestamp: new Date().toISOString()
-    },
-    {
-      platform: "Breach Registry (Visual)",
-      confidence: 0.72,
-      url: "#",
-      imageUrl: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop",
-      timestamp: "2023-11-12T10:00:00Z"
-    }
-  ];
-
-  // Randomly filter to simulate real search variability
-  return matches.filter(() => Math.random() > 0.2);
+/**
+ * Legacy stub — kept for backwards compatibility with any component
+ * that still calls runFacialAI() directly. Returns empty array so
+ * the UI falls back to showing 0 matches rather than fake data.
+ *
+ * @deprecated Use reverseImageSearch() connector + mapFaceCheckResults() instead.
+ */
+export async function runFacialAI(_target: string): Promise<FacialMatch[]> {
+  console.warn('[visualIntel] runFacialAI() is deprecated. Use the reverseImage connector.');
+  return [];
 }

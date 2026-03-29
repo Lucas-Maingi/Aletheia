@@ -115,8 +115,12 @@ export function FacialAnalysis({
             <div className="p-5">
               <div className="flex items-start justify-between mb-5">
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 shadow-inner bg-slate-900">
-                    <img src={match.imageUrl} alt="Visual Match" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 shadow-inner bg-slate-900 flex items-center justify-center">
+                    {match.thumbnailBase64 ? (
+                      <img src={match.thumbnailBase64} alt="Facial Match Thumbnail" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                    ) : (
+                      <User className="w-8 h-8 text-text-tertiary/20" />
+                    )}
                   </div>
                   <div className="absolute -bottom-2 -right-2 p-1.5 rounded-lg bg-accent text-text-secondary border border-white/20 shadow-xl">
                     <User className="w-3.5 h-3.5" />

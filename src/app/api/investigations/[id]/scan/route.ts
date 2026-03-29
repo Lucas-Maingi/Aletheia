@@ -21,7 +21,7 @@ import {
     ecosystemSearch,
     registrationScout
 } from '@/connectors';
-import { runFacialAI, FacialMatch } from '@/connectors/visualIntel';
+import { FacialMatch } from '@/connectors/visualIntel';
 import { calculateConfidence, getConfidenceLabel } from '@/lib/osint/registry';
 import { createHash } from 'crypto';
 
@@ -593,15 +593,6 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
             phase1.push(safeRun('WhatsMyName', () => whatsMyName(investigation.subjectUsername || primaryTarget)));
         }
 
-        // BIOMETRIC PIVOT: Automated Facial AI
-        if (primaryTarget || investigation.subjectUsername) {
-            const facialTarget = primaryTarget || investigation.subjectUsername;
-            phase1.push(safeRun('Biometric Correlation', async () => {
-                const results = await runFacialAI(facialTarget);
-                facialMatches = results;
-                return { results: [] }; // Facial matches are tracked separately for UI
-            }));
-        }
 
         // NEW: Registration Scout (Holehe-style signup checks for 50+ sites)
         if (primaryTarget && primaryTarget.includes('@')) {
