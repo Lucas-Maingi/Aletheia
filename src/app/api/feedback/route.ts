@@ -23,6 +23,23 @@ export async function POST(req: Request) {
             },
         });
 
+        // Notify Admins about new feedback
+        const admins = await prisma.user.findMany({
+            where: { role: 'admin' },
+            select: { id: true }
+        });
+
+        if (admins.length > 0) {
+            await prisma.notification.createMany({
+                data: admins.map(admin => ({
+                    userId: admin.id,
+                    title: 'New Feedback Received',
+                    message: `New ${type || 'general'} feedback from ${user?.email || 'Anonymous'}: "${content.substring(0, 50)}..."`,
+                    type: 'info'
+                }))
+            });
+        }
+
         return NextResponse.json({ success: true, feedback });
     } catch (error) {
         console.error('Feedback Submission Error:', error);

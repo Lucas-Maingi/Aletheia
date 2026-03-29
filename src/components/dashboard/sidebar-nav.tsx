@@ -51,7 +51,7 @@ function NavLink({ href, label, icon, badge, isPrimary }: NavLinkProps) {
     );
 }
 
-export function SidebarNav({ isGuest }: { isGuest?: boolean }) {
+export function SidebarNav({ isGuest, isAdmin }: { isGuest?: boolean; isAdmin?: boolean }) {
     return (
         <div className="space-y-1 flex flex-col h-full">
             <div className="text-[9px] font-bold text-text-tertiary uppercase tracking-[0.4em] mb-2 mt-2 px-4 border-l-2 border-accent/10 ml-1">
@@ -59,6 +59,14 @@ export function SidebarNav({ isGuest }: { isGuest?: boolean }) {
             </div>
 
             <div className="space-y-0.5">
+                {isAdmin && (
+                    <NavLink 
+                        href="/dashboard/admin/feedback" 
+                        label="Admin Terminal" 
+                        icon={<Activity className="w-4 h-4" />} 
+                        isPrimary
+                    />
+                )}
                 <NavLink 
                     href="/dashboard" 
                     label="Dashboard Overview" 

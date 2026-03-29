@@ -166,14 +166,18 @@ model SearchLog {
 }
 
 model Feedback {
-  id        String   @id @default(uuid())
-  userId    String?
-  content   String
-  type      String   @default("general") // bug, feature, general
-  version   String?
-  createdAt DateTime @default(now())
+  id           String   @id @default(uuid())
+  userId       String?
+  content      String
+  type         String   @default("general") // bug, feature, general
+  version      String?
+  status       String   @default("pending") // pending, reviewed, replied
+  replyContent String?
+  adminId      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
 
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user  User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@map("feedback")
