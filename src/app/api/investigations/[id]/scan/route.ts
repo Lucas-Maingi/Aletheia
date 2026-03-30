@@ -656,8 +656,8 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
             if (darkWebT) phase2.push(safeRun('Dark Web Sweep', () => darkWebSearch(darkWebT)));
             
             // NEW: Infra pivot via SecurityTrails
-            if (domainMatch) {
-               phase2.push(safeRun('SecurityTrails', () => securityTrails(domainMatch)));
+            if (domainTarget) {
+               phase2.push(safeRun('SecurityTrails', () => securityTrails(domainTarget)));
             }
 
             Array.from(correlatedIdentifiers.crypto).slice(0, 2).forEach(c => 
