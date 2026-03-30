@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import {
     Search, Mail, AtSign, Phone, Globe,
     Loader2, AlertCircle, ImageIcon, X,
-    ArrowRight, Scan, User
+    ArrowRight, Scan, User, Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
