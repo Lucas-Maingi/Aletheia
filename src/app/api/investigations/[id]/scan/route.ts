@@ -21,6 +21,7 @@ import {
     ecosystemSearch,
     registrationScout
 } from '@/connectors';
+import { extractExif } from '@/connectors/exifMetadata';
 import { FacialMatch } from '@/connectors/visualIntel';
 import { calculateConfidence, getConfidenceLabel } from '@/lib/osint/registry';
 import { createHash } from 'crypto';
@@ -530,84 +531,66 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
         // ========== PHASE 1: Primary Intelligence Sweep ==========
         const phase1: Promise<any>[] = [];
 
-        // Username Search - use primaryTarget if it looks like a username
-        if (primaryTarget) {
-            const isEmail = primaryTarget.includes('@');
-            const isDomain = primaryTarget.includes('.') && !isEmail;
-            
-            if (!isEmail && !isDomain) {
-                phase1.push(safeRun('Username Search', () => usernameSearch(primaryTarget)));
-            }
+        // 1. Username Sweep (Handle + whatsMyName + Ecosystem)
+        const usernameTarget = investigation.subjectUsername || (!primaryTarget.includes('@') && !primaryTarget.includes('.') ? primaryTarget : null);
+        if (usernameTarget) {
+            phase1.push(safeRun('Username Search', () => usernameSearch(usernameTarget)));
+            phase1.push(safeRun('WhatsMyName', () => whatsMyName(usernameTarget)));
+            phase1.push(safeRun('Ecosystem Discovery', () => ecosystemSearch(usernameTarget)));
         }
 
-        // Google Dorks + Wikipedia
-        if (primaryTarget) {
+        // 2. Email Sweep (Breach + Registration Scout + Reputation)
+        const emailTarget = investigation.subjectEmail || (primaryTarget.includes('@') ? primaryTarget : null);
+        if (emailTarget) {
+            phase1.push(safeRun('Breach Search', () => breachSearch(emailTarget)));
+            phase1.push(safeRun('Registration Scout', () => registrationScout(emailTarget)));
+        }
+
+        // 3. Name & Identity Sweep (Google Dorks + People Search + Interpol)
+        const nameTarget = investigation.subjectName || (usernameTarget && !investigation.subjectUsername ? usernameTarget : null);
+        if (nameTarget) {
             phase1.push(safeRun('Intelligence Dork', () => googleDorks({
-                name: investigation.subjectName || primaryTarget,
-                username: investigation.subjectUsername || primaryTarget,
-                email: investigation.subjectEmail || (primaryTarget.includes('@') ? primaryTarget : undefined)
+                name: nameTarget,
+                username: usernameTarget || undefined,
+                email: emailTarget || undefined
             })));
-        }
-
-        // Domain
-        const domainMatch = investigation.subjectDomain || (primaryTarget.includes('.') && !primaryTarget.includes('@') ? primaryTarget : undefined) || investigation.subjectEmail?.split('@')[1];
-        if (domainMatch && !['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'].includes(domainMatch)) {
-            phase1.push(safeRun('Domain Search', () => domainSearch(domainMatch)));
-        }
-
-        // Breach
-        const breachMatch = investigation.subjectEmail || (primaryTarget.includes('@') ? primaryTarget : undefined);
-        if (breachMatch) {
-            phase1.push(safeRun('Breach Search', () => breachSearch(breachMatch)));
-        }
-
-        // People Search (Pro Feature)
-        if (isPro && (investigation.subjectName || investigation.subjectUsername)) {
-            const peopleQuery = investigation.subjectName || investigation.subjectUsername;
-            if (peopleQuery) {
-                phase1.push(safeRun('People Search', () => peopleSearch(peopleQuery)));
+            
+            if (isPro) {
+                phase1.push(safeRun('People Search', () => peopleSearch(nameTarget)));
             }
-        }
 
-        // Interpol
-        const interpolQuery = investigation.subjectName || investigation.subjectUsername;
-        if (interpolQuery) {
             phase1.push(safeRun('Interpol', () => interpolSearch({
-                name: investigation.subjectName || undefined,
-                username: investigation.subjectUsername || undefined
+                name: nameTarget,
+                username: usernameTarget || undefined
             })));
         }
 
-        // Image
-        if (investigation.subjectImageUrl) {
-            phase1.push(safeRun('Image Search', () => reverseImageSearch(investigation.subjectImageUrl)));
+        // 4. Infrastructure & Domain Sweep
+        const domainTarget = investigation.subjectDomain || (primaryTarget.includes('.') && !primaryTarget.includes('@') ? primaryTarget : null) || emailTarget?.split('@')[1];
+        if (domainTarget && !['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'proton.me', 'protonmail.com'].includes(domainTarget)) {
+            phase1.push(safeRun('Domain Search', () => domainSearch(domainTarget)));
         }
 
-        // NEW: IP/Geo Intelligence
+        // 5. Visual Intelligence Swep (Image + Biometrics + EXIF)
+        if (investigation.subjectImageUrl) {
+            phase1.push(safeRun('Visual Intelligence', () => reverseImageSearch(investigation.subjectImageUrl)));
+            phase1.push(safeRun('EXIF Extraction', () => extractExif(investigation.subjectImageUrl)));
+        }
+
+        // 6. Technical Vectors (IP, Phone)
+        const phoneTarget = investigation.subjectPhone;
+        if (phoneTarget) {
+            // Add phone specialized connector if exists, or use dorks
+            phase1.push(safeRun('Phone Intelligence', () => googleDorks({ name: phoneTarget })));
+        }
+
         if (primaryTarget && primaryTarget.match(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/)) {
             phase1.push(safeRun('IPinfo', () => ipinfo(primaryTarget)));
         }
-        
-        // NEW: Social scouting via WhatsMyName
-        if (investigation.subjectUsername || (primaryTarget && !primaryTarget.includes('@') && !primaryTarget.includes('.'))) {
-            phase1.push(safeRun('WhatsMyName', () => whatsMyName(investigation.subjectUsername || primaryTarget)));
-        }
 
-
-        // NEW: Registration Scout (Holehe-style signup checks for 50+ sites)
-        if (primaryTarget && primaryTarget.includes('@')) {
-            phase1.push(safeRun('Registration Scout', () => registrationScout(primaryTarget)));
-        }
-
-        // NEW: Ecosystem Discovery (Sweeps 50+ platforms for account presence)
-        // FIDELITY: Skip handle-dorking if target is an email address to avoid guessing false-positives.
-        if (primaryTarget && !primaryTarget.includes('@')) {
-            phase1.push(safeRun('Ecosystem Discovery', () => ecosystemSearch(primaryTarget)));
-        }
-
-        // CHUNKED EXECUTION: Limit concurrency to 3 nodes at a time to prevent DB pool exhaustion
+        // CHUNKED EXECUTION: Limit concurrency to 4 nodes at a time for high-speed parallel throughput
         const p1Chunks = [];
-        for (let i = 0; i < phase1.length; i += 3) p1Chunks.push(phase1.slice(i, i + 3));
+        for (let i = 0; i < phase1.length; i += 4) p1Chunks.push(phase1.slice(i, i + 4));
 
         for (const chunk of p1Chunks) {
             if (Date.now() - startTime > HOBBY_LIMIT) break;

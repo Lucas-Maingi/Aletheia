@@ -60,7 +60,13 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                             <div className="p-1 px-2.5 bg-accent/10 rounded-lg border border-accent/30 shadow-lg shadow-accent/5 group-hover/header-brand:scale-110 transition-all duration-500">
                                 <AletheiaLogo className="w-5 h-5 text-accent" />
                             </div>
-                            <span className="font-black tracking-[0.2em] text-lg text-gradient-vibrant uppercase hidden sm:block">Aletheia</span>
+                            <div className="flex flex-col">
+                                <span className="font-black tracking-[0.2em] text-lg text-gradient-vibrant uppercase hidden sm:block">Aletheia</span>
+                                <div className="flex items-center gap-1.5 opacity-60">
+                                    <div className="w-1 h-1 rounded-full bg-accent animate-pulse" />
+                                    <span className="text-[8px] font-black tracking-widest text-accent uppercase">Stealth_LTD_Active</span>
+                                </div>
+                            </div>
                         </Link>
                     </div>
 

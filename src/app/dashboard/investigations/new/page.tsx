@@ -143,23 +143,27 @@ export default function NewInvestigationPage() {
 
             {/* Header */}
             <div className="mb-10">
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent mb-3">New Investigation</p>
-                <h1 className="text-4xl font-black text-text-primary tracking-tight mb-2">Who are you investigating?</h1>
-                <p className="text-sm text-text-secondary">Enter any identifier to start an AI-powered intelligence sweep.</p>
+                <div className="flex items-center gap-2 mb-3">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-accent">Strategic Reconnaissance</p>
+                    <Badge variant="outline" className="bg-accent/10 border-accent/20 text-accent text-[8px] uppercase tracking-widest font-black px-2 py-0.5">LTD_CORE_ENGINE</Badge>
+                </div>
+                <h1 className="text-4xl font-black text-text-primary tracking-tight mb-2 italic uppercase">Initiate Sweep</h1>
+                <p className="text-sm text-text-secondary font-medium">Combine multiple identifiers (Name + Email + Image) for the most accurate recursive expansion.</p>
             </div>
 
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
 
                 {/* Omni search bar */}
-                <div className="relative">
-                    <div className="flex items-center gap-3 bg-surface/60 border border-border/20 rounded-2xl px-5 py-4 focus-within:border-accent/50 transition-all duration-300 shadow-lg">
-                        <Search className="w-5 h-5 text-text-tertiary shrink-0" />
+                <div className="relative group">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-accent/20 to-purple-500/20 rounded-2xl blur-lg opacity-0 group-focus-within:opacity-100 transition-all duration-500 pointer-events-none" />
+                    <div className="relative flex items-center gap-3 bg-surface border border-border/20 rounded-2xl px-5 py-5 focus-within:border-accent/50 transition-all duration-300 shadow-2xl backdrop-blur-3xl">
+                        <Scan className="w-5 h-5 text-accent shrink-0" />
                         <input
                             name="omniInput"
                             value={omniValue}
                             onChange={(e) => { setOmniValue(e.target.value); setDetectedType(detectType(e.target.value)); }}
-                            placeholder="Email, username, full name, domain, phone..."
-                            className="bg-transparent flex-1 text-base text-text-primary placeholder:text-text-tertiary/40 outline-none"
+                            placeholder="Primary Target (Email, Alias, or Full Name)"
+                            className="bg-transparent flex-1 text-base text-text-primary placeholder:text-text-tertiary/40 outline-none font-bold italic uppercase tracking-tight"
                             autoFocus
                         />
                         {detectedBadge && (
@@ -170,111 +174,148 @@ export default function NewInvestigationPage() {
                         <button
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
-                            title="Upload image for facial search"
-                            className={`p-2 rounded-xl border transition-all ${imagePreview ? 'border-accent/40 bg-accent/10 text-accent' : 'border-border/10 text-text-tertiary hover:text-text-primary'}`}
+                            title="Upload image for biometric search"
+                            className={`p-2.5 rounded-xl border transition-all transform hover:scale-105 active:scale-95 ${imagePreview ? 'border-accent/40 bg-accent/10 text-accent ring-2 ring-accent/20' : 'border-border/10 text-text-tertiary hover:text-accent hover:border-accent/20'}`}
                         >
-                            <ImageIcon className="w-4 h-4" />
+                            <ImageIcon className="w-5 h-5" />
                         </button>
                         <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
                     </div>
 
                     {imagePreview && (
-                        <div className="mt-3 flex items-center gap-3 bg-surface/40 border border-border/10 rounded-xl px-4 py-3">
-                            <img src={imagePreview} className="w-10 h-10 object-cover rounded-lg" alt="Preview" />
-                            <span className="text-xs text-text-secondary flex-1">Image attached for visual search</span>
-                            <button type="button" onClick={() => setImagePreview(null)} className="text-text-tertiary hover:text-red-400 transition-colors">
-                                <X className="w-4 h-4" />
+                        <motion.div 
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="mt-3 flex items-center gap-4 bg-surface/80 border border-accent/20 rounded-2xl px-5 py-4 shadow-xl backdrop-blur-xl"
+                        >
+                            <div className="relative group/thumb">
+                                <img src={imagePreview} className="w-14 h-14 object-cover rounded-xl border border-border/10 shadow-lg" alt="Preview" />
+                                <div className="absolute inset-0 bg-accent/20 opacity-0 group-hover/thumb:opacity-100 rounded-xl transition-opacity flex items-center justify-center">
+                                    <Scan className="w-6 h-6 text-white" />
+                                </div>
+                            </div>
+                            <div className="flex-1">
+                                <div className="text-[10px] font-black text-accent uppercase tracking-widest mb-1">Visual Vector Attached</div>
+                                <div className="text-xs text-text-secondary font-medium">AI will run biometric cross-referencing on this target.</div>
+                            </div>
+                            <button type="button" onClick={() => setImagePreview(null)} className="p-2 text-text-tertiary hover:text-red-400 transition-colors">
+                                <X className="w-5 h-5" />
                             </button>
-                        </div>
+                        </motion.div>
                     )}
+                </div>
+
+                {/* Info Card about Multi-input */}
+                <div className="bg-surface-elevated/40 border border-border/5 rounded-2xl p-5 flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent shrink-0">
+                        <Activity className="w-5 h-5" />
+                    </div>
+                    <div>
+                        <div className="text-[11px] font-black text-text-primary uppercase tracking-wider mb-1">General Vector Reconnaissance</div>
+                        <p className="text-xs text-text-secondary leading-relaxed font-medium">Providing multiple identifiers allows the engine to bridge disconnected footprints and verify identity with mathematical certainty.</p>
+                    </div>
                 </div>
 
                 {/* Advanced toggle */}
                 <button
                     type="button"
                     onClick={() => setShowAdvanced(!showAdvanced)}
-                    className="text-[11px] text-text-tertiary hover:text-text-primary transition-colors font-medium flex items-center gap-1.5"
+                    className="w-full py-4 text-[11px] text-text-tertiary hover:text-accent transition-all font-black uppercase tracking-[0.2em] flex items-center justify-center gap-3 border border-border/5 rounded-2xl hover:bg-surface-elevated/30"
                 >
-                    <span className="text-accent">{showAdvanced ? '−' : '+'}</span>
-                    {showAdvanced ? 'Hide advanced fields' : 'Add more details (name, phone, domain...)'}
+                    <div className={`w-1.5 h-1.5 rounded-full ${showAdvanced ? 'bg-accent' : 'bg-text-tertiary'} animate-pulse`} />
+                    {showAdvanced ? 'Collapse Vector Details' : 'Expand Vector Details (Multi-Input Search)'}
                 </button>
 
                 {showAdvanced && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-5 bg-surface/30 border border-border/10 rounded-2xl">
+                    <motion.div 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6 bg-surface/20 border border-border/10 rounded-3xl backdrop-blur-2xl"
+                    >
                         <Field name="subjectName" label="Full Name" icon={<User className="w-3.5 h-3.5" />} placeholder="John Doe" />
-                        <Field name="subjectEmail" label="Email" icon={<Mail className="w-3.5 h-3.5" />} placeholder="user@domain.com" />
-                        <Field name="subjectUsername" label="Username / Handle" icon={<AtSign className="w-3.5 h-3.5" />} placeholder="@handle" />
-                        <Field name="subjectPhone" label="Phone" icon={<Phone className="w-3.5 h-3.5" />} placeholder="+1..." />
-                        <Field name="subjectDomain" label="Domain" icon={<Globe className="w-3.5 h-3.5" />} placeholder="example.com" />
-                        <Field name="title" label="Case Name (optional)" icon={<Scan className="w-3.5 h-3.5" />} placeholder="Operation: ..." />
-                        <div className="sm:col-span-2">
-                            <Field name="subjectImageUrl" label="Image URL (alternative to upload)" icon={<ImageIcon className="w-3.5 h-3.5" />} placeholder="https://..." />
-                        </div>
-                        <div className="sm:col-span-2 space-y-1.5">
+                        <Field name="subjectEmail" label="Email Address" icon={<Mail className="w-3.5 h-3.5" />} placeholder="user@domain.com" />
+                        <Field name="subjectUsername" label="Network Handle" icon={<AtSign className="w-3.5 h-3.5" />} placeholder="@handle" />
+                        <Field name="subjectPhone" label="Contact Number" icon={<Phone className="w-3.5 h-3.5" />} placeholder="+1..." />
+                        <Field name="subjectDomain" label="Infrastructure Vector" icon={<Globe className="w-3.5 h-3.5" />} placeholder="example.com" />
+                        <motion.div 
+                            whileHover={{ scale: 1.02 }}
+                            className="bg-accent/5 border border-accent/20 rounded-2xl p-4 flex flex-col justify-center"
+                        >
+                            <label className="text-[9px] font-black uppercase tracking-[.2em] text-accent mb-2">Premium Expansion</label>
+                            <p className="text-[10px] text-accent/80 font-bold leading-relaxed italic">All fields above will be used as simultaneous pivots for the recursive AI hunter agents.</p>
+                        </motion.div>
+                        <div className="sm:col-span-2 space-y-1.5 pt-2">
                             <label className="text-[10px] font-bold uppercase tracking-widest text-text-tertiary flex items-center gap-1.5">
-                                <Search className="w-3.5 h-3.5" /> Case Objectives
+                                <Search className="w-3.5 h-3.5" /> Intelligence Objectives
                             </label>
                             <textarea
                                 name="description"
                                 rows={2}
-                                className="w-full bg-foreground/[0.03] border border-border/10 rounded-xl px-4 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary/30 focus:border-accent/40 outline-none transition-all resize-none"
-                                placeholder="Any specific intelligence objectives for the AI agent..."
+                                className="w-full bg-surface/80 border border-border/10 rounded-2xl px-5 py-4 text-sm text-text-primary placeholder:text-text-tertiary/30 focus:border-accent/40 outline-none transition-all resize-none shadow-inner"
+                                placeholder="Any specific reconnaissance goals for the autonomous clusters..."
                             />
                         </div>
-                    </div>
+                    </motion.div>
                 )}
 
                 {error && (
-                    <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3 rounded-xl">
-                        <AlertCircle className="w-4 h-4 shrink-0" />
-                        {error}
-                    </div>
+                    <motion.div 
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="flex items-center gap-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-5 py-4 rounded-2xl shadow-lg"
+                    >
+                        <AlertCircle className="w-5 h-5 shrink-0" />
+                        <span className="font-semibold">{error}</span>
+                    </motion.div>
                 )}
 
                 <Button
                     type="submit"
                     disabled={loading || (!omniValue && !imagePreview && !showAdvanced)}
-                    className="w-full h-14 rounded-2xl bg-accent hover:bg-accent/90 text-white font-black uppercase tracking-widest text-sm shadow-lg shadow-accent/20 transition-all disabled:opacity-40"
+                    className="w-full h-16 rounded-3xl bg-accent hover:bg-accent-hover text-white font-black uppercase tracking-widest text-sm shadow-2xl shadow-accent/20 transition-all transform hover:scale-[1.01] active:scale-95 disabled:opacity-40 group"
                 >
                     {loading ? (
-                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Creating investigation...</>
+                        <><Loader2 className="w-5 h-5 mr-3 animate-spin" /> Deploying Agents...</>
                     ) : (
-                        <><ArrowRight className="w-4 h-4 mr-2" /> Start Intelligence Sweep</>
+                        <><Zap className="w-5 h-5 mr-3 group-hover:scale-125 transition-transform" /> Initiate Global Sweep</>
                     )}
                 </Button>
             </form>
 
             {/* Quick examples */}
-            {!omniValue && (
-                <div className="mt-10 space-y-3">
-                    <p className="text-[10px] uppercase tracking-widest text-text-tertiary font-bold">Try an example</p>
-                    <div className="flex flex-wrap gap-2">
-                        {["elonmusk", "user@example.com", "bitcoin.org", "+1 555 0100"].map(ex => (
-                            <button
-                                key={ex}
-                                type="button"
-                                onClick={() => { setOmniValue(ex); setDetectedType(detectType(ex)); }}
-                                className="text-[11px] font-mono px-3 py-1.5 rounded-lg bg-surface/40 border border-border/10 text-text-secondary hover:text-text-primary hover:border-border/30 transition-all"
-                            >
-                                {ex}
-                            </button>
-                        ))}
-                    </div>
+            <div className="mt-12 space-y-4">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-text-tertiary font-black text-center">Operational Examples</p>
+                <div className="flex flex-wrap justify-center gap-3">
+                    {["elonmusk", "user@example.com", "bitcoin.org", "+1 555 0100"].map(ex => (
+                        <button
+                            key={ex}
+                            type="button"
+                            onClick={() => { setOmniValue(ex); setDetectedType(detectType(ex)); }}
+                            className="text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl bg-surface/30 border border-border/10 text-text-secondary hover:text-accent hover:border-accent/30 hover:bg-accent/5 transition-all duration-300"
+                        >
+                            {ex}
+                        </button>
+                    ))}
                 </div>
-            )}
+            </div>
         </div>
     );
 }
 
+import { Activity } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
+
 function Field({ name, label, icon, placeholder }: { name: string; label: string; icon: React.ReactNode; placeholder: string }) {
     return (
-        <div className="space-y-1.5">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-text-tertiary flex items-center gap-1.5">
+        <div className="space-y-2">
+            <label className="text-[9px] font-black uppercase tracking-[.2em] text-text-tertiary flex items-center gap-2">
                 {icon} {label}
             </label>
             <input
                 name={name}
-                className="w-full bg-foreground/[0.03] border border-border/10 rounded-xl px-4 py-2.5 text-sm text-text-primary placeholder:text-text-tertiary/30 focus:border-accent/40 outline-none transition-all"
+                autoComplete="off"
+                className="w-full bg-surface/80 border border-border/10 rounded-2xl px-5 py-3.5 text-sm text-text-primary placeholder:text-text-tertiary/20 focus:border-accent/40 outline-none transition-all shadow-inner font-semibold italic"
                 placeholder={placeholder}
             />
         </div>

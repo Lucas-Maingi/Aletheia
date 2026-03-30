@@ -224,9 +224,14 @@ export default function PricingPage() {
   );
 }
 
+import { isLaunchDay, LAUNCH_CONFIG } from "@/lib/launch-config";
+
+// ... existing code ...
+
 function PricingCard({ plan, index }: { plan: any, index: number }) {
   const isFree = plan.price === "0";
   const mainCheckout = isFree ? plan.href : plan.gumroadLink;
+  const launchActive = isLaunchDay();
 
   return (
     <motion.div
@@ -241,7 +246,7 @@ function PricingCard({ plan, index }: { plan: any, index: number }) {
     >
       {plan.popular && (
         <div className="absolute top-0 right-0 px-4 py-1.5 bg-accent text-white text-[10px] font-black uppercase tracking-widest rounded-bl-xl shadow-lg">
-          Most Requested
+          {launchActive ? 'Most Requested' : 'LTD Priority'}
         </div>
       )}
 
@@ -249,15 +254,26 @@ function PricingCard({ plan, index }: { plan: any, index: number }) {
         <h3 className="text-xl font-black text-white uppercase tracking-tight mb-2 italic">
           {plan.name}
         </h3>
-        <div className="flex items-baseline gap-1 mb-1">
-          <span className="text-5xl font-black text-text-primary tracking-tighter">${plan.price}</span>
-          {!isFree && <span className="text-text-tertiary font-bold uppercase tracking-widest text-[10px]">{plan.period}</span>}
-        </div>
+        
+        {launchActive || isFree ? (
+           <div className="flex items-baseline gap-1 mb-1">
+             <span className="text-5xl font-black text-text-primary tracking-tighter">${plan.price}</span>
+             {!isFree && <span className="text-text-tertiary font-bold uppercase tracking-widest text-[10px]">{plan.period}</span>}
+           </div>
+        ) : (
+           <div className="mb-1">
+             <div className="text-4xl font-black text-accent tracking-tighter italic uppercase">Reveal at Launch</div>
+             <div className="text-text-tertiary font-bold uppercase tracking-widest text-[10px] mt-1">Monday, April 6</div>
+           </div>
+        )}
         
         {/* Height preservation */}
         <div className="h-4 mb-4">
-           {!isFree && (
+           {(!isFree && launchActive) && (
               <span className="text-success text-[10px] font-bold uppercase tracking-widest">Cancel anytime</span>
+           )}
+           {(!isFree && !launchActive) && (
+              <span className="text-accent text-[10px] font-bold uppercase tracking-widest animate-pulse">Waitlist Active</span>
            )}
         </div>
 
@@ -278,7 +294,7 @@ function PricingCard({ plan, index }: { plan: any, index: number }) {
       </div>
 
       <div className="mt-auto space-y-3 relative z-20">
-        <a href={mainCheckout} className="block w-full text-center">
+        <a href={launchActive || isFree ? mainCheckout : "#waitlist"} className="block w-full text-center">
           <Button
             size="lg"
             className={`w-full font-black uppercase tracking-widest text-xs h-14 rounded-2xl shadow-2xl transition-all transform hover:scale-[1.02] ${
@@ -287,7 +303,7 @@ function PricingCard({ plan, index }: { plan: any, index: number }) {
                 : 'bg-surface-elevated hover:bg-white hover:text-background text-text-primary border border-border/10'
             }`}
           >
-            {plan.cta}
+            {launchActive || isFree ? plan.cta : "Reserve My LTD Slot"}
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </a>

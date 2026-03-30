@@ -104,10 +104,10 @@ export default function Landing() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface border border-border/10 text-text-secondary text-sm font-mono mb-8 shadow-2xl backdrop-blur-md"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface border border-accent/30 text-accent text-sm font-mono mb-8 shadow-[0_0_20px_rgba(168,85,247,0.2)] backdrop-blur-md animate-pulse"
           >
             <Sparkles className="w-4 h-4 text-accent" />
-            <span className="text-accent font-bold">Aletheia OSINT v2.4</span> Engine Online
+            <span className="font-bold">Monday, April 6:</span> The LTD Reveal. 50 Slots Available.
           </motion.div>
 
           <motion.h1
@@ -359,37 +359,79 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="pricing" className="py-32 bg-surface/5 border-t border-border/10 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-accent/[0.03] to-transparent pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
-          <div className="max-w-3xl mx-auto">
-            <Badge variant="outline" className="text-accent border-accent/20 bg-accent/5 mb-8 px-5 py-2 uppercase font-black text-[10px] tracking-[.4em]">
-              THE INTELLIGENCE MARKETPLACE
-            </Badge>
-            <h2 className="text-5xl md:text-7xl font-black text-text-primary mb-10 tracking-tighter uppercase italic leading-[0.9]">
-              Elite Tools.<br/>Zero Friction.
+      <section id="waitlist" className="py-32 bg-surface/20 border-t border-border/10 relative overflow-hidden backdrop-blur-3xl">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-accent/5 via-transparent to-transparent pointer-events-none" />
+        <div className="max-w-4xl mx-auto px-6 relative z-10 text-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent text-white text-[10px] font-black uppercase tracking-widest mb-8 shadow-glow-sm">
+                <Shield className="w-3.5 h-3.5" /> Operations: Limited Slots
+            </div>
+            <h2 className="text-4xl md:text-6xl font-black text-white mb-6 uppercase italic tracking-tighter">
+                Secure Your <br/><span className="text-accent underline decoration-accent/20 underline-offset-8">LTD Priority</span> Slot.
             </h2>
-            <p className="text-xl text-text-secondary leading-relaxed mb-16 font-medium">
-              From individual target expansions to enterprise-grade cluster deployment. Select your operational tier and secure your edge today.
+            <p className="text-lg text-text-secondary mb-12 font-medium max-w-2xl mx-auto leading-relaxed">
+                Joining the waitlist grants you 2-hour early access on Monday. Limited to the first 50 investigators. No commitment required until reveal.
             </p>
+
+            {(() => {
+              const [submitted, setSubmitted] = useState(false);
+              const [emailToken, setEmailToken] = useState("");
+
+              return !submitted ? (
+                <form 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setSubmitted(true);
+                  }}
+                  className="relative max-w-md mx-auto group"
+                >
+                    <div className="absolute -inset-1 bg-gradient-to-r from-accent to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000" />
+                    <div className="relative flex p-1.5 bg-surface border border-border/20 rounded-2xl shadow-2xl">
+                        <input 
+                            type="email" 
+                            required 
+                            placeholder="agency-email@domain.com" 
+                            className="flex-1 bg-transparent px-5 py-3 text-sm text-text-primary placeholder:text-text-tertiary/40 outline-none font-bold"
+                            value={emailToken}
+                            onChange={(e) => setEmailToken(e.target.value)}
+                        />
+                        <button 
+                            type="submit" 
+                            className="bg-accent hover:bg-white hover:text-accent text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all transform active:scale-95 shadow-xl"
+                        >
+                            Join Waitlist
+                        </button>
+                    </div>
+                </form>
+              ) : (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="p-8 rounded-2xl bg-surface border-2 border-accent/30 max-w-sm mx-auto shadow-glow-sm"
+                >
+                  <CheckCircle2 className="w-10 h-10 text-accent mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-white uppercase italic tracking-tighter mb-2">Priority Secured.</h3>
+                  <p className="text-[10px] font-mono text-text-tertiary uppercase tracking-widest">A confirmation packet has been dispatched to {emailToken}. See you Monday.</p>
+                </motion.div>
+              );
+            })()}
             
-            <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto mb-20">
-               <div className="p-8 rounded-3xl bg-surface border border-border/20 text-left backdrop-blur-3xl shadow-2xl hover:border-accent/40 transition-all duration-500 group/tier">
-                  <div className="text-accent font-black text-2xl mb-3 uppercase italic tracking-tighter group-hover/tier:translate-x-1 transition-transform">Tactical Pro</div>
-                  <p className="text-sm text-text-secondary font-semibold leading-relaxed">Full recursive search, priority agent clusters, and forensic report generation.</p>
+            <div className="mt-12 flex items-center justify-center gap-8 grayscale opacity-40">
+               <div className="text-[10px] font-black text-text-tertiary uppercase tracking-widest flex items-center gap-2">
+                 <Database className="w-4 h-4" /> 10B+ Records
                </div>
-               <div className="p-8 rounded-3xl bg-surface border border-border/20 text-left backdrop-blur-3xl shadow-2xl hover:border-success/40 transition-all duration-500 group/tier">
-                  <div className="text-success font-black text-2xl mb-3 uppercase italic tracking-tighter group-hover/tier:translate-x-1 transition-transform">Lifetime Elite</div>
-                  <p className="text-sm text-text-secondary font-semibold leading-relaxed">Permanent infrastructure access. No monthly fees. Unlimited recursive depth.</p>
+               <div className="text-[10px] font-black text-text-tertiary uppercase tracking-widest flex items-center gap-2">
+                 <Zap className="w-4 h-4" /> &lt; 1s Resolution
+               </div>
+               <div className="text-[10px] font-black text-text-tertiary uppercase tracking-widest flex items-center gap-2">
+                 <Shield className="w-4 h-4" /> Zero-Trust Auth
                </div>
             </div>
-
-            <Link href="/pricing" className="inline-flex items-center justify-center gap-4 bg-accent hover:bg-accent-hover text-white px-16 py-6 rounded-2xl font-black uppercase tracking-widest text-sm shadow-glow transition-all transform hover:scale-[1.05] active:scale-95 group">
-               View All Operations & Tiers <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
         </div>
       </section>
+
+      <footer className="py-12 border-t border-border/10 text-center text-[10px] font-black uppercase tracking-[0.3em] text-text-tertiary bg-background">
+        © 2026 Aletheia Intelligence Systems • [System_Authorized]
+      </footer>
     </div>
   );
 }

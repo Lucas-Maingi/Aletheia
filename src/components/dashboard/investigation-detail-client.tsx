@@ -167,6 +167,7 @@ export function InvestigationDetailClient({
                         matches={facialMatches} 
                         isScanning={isActuallyScanning} 
                         audit={vitalityAudit}
+                        exifData={displayEvidence.filter(e => e.type === 'metadata')}
                     />
                     <IdentityGraph target={title} evidence={displayEvidence} />
                     <AssociatesTab reportContent={reports[0]?.content || initialReports?.[0]?.content || ''} />

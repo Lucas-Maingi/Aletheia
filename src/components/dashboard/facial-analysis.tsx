@@ -1,11 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Shield, ExternalLink, User, Calendar, Info, CheckCircle2, AlertTriangle, XCircle, ChevronDown } from "lucide-react";
+import { 
+  Shield, ExternalLink, User, Calendar, Info, 
+  CheckCircle2, AlertTriangle, XCircle, ChevronDown,
+  MapPin, Globe
+} from "lucide-react";
 import { FacialMatch } from "@/connectors/visualIntel";
 import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface VitalityAudit {
   verdict: "Real" | "Synthetic" | "Suspicious";
@@ -16,27 +22,66 @@ interface VitalityAudit {
 export function FacialAnalysis({ 
   matches, 
   isScanning, 
-  audit 
+  audit,
+  exifData = []
 }: { 
   matches: FacialMatch[], 
   isScanning: boolean,
-  audit?: VitalityAudit | null
+  audit?: VitalityAudit | null,
+  exifData?: any[]
 }) {
   const [showMarkers, setShowMarkers] = useState(false);
 
-  if (!isScanning && matches.length === 0) {
+  if (!isScanning && matches.length === 0 && exifData.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 bg-slate-950/20 rounded-2xl border border-white/5 border-dashed">
         <div className="p-4 rounded-full bg-white/5 border border-white/10 mb-4">
           <Shield className="w-8 h-8 text-text-primary/10" />
         </div>
-        <p className="text-[10px] text-text-tertiary font-mono uppercase tracking-[0.2em]">No Biometric Matches Identified</p>
+        <p className="text-[10px] text-text-tertiary font-mono uppercase tracking-[0.2em]">No Visual Intelligence Identified</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* EXIF / Metadata Section */}
+      {exifData.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
+              <MapPin className="w-4 h-4 text-accent" />
+            </div>
+            <h3 className="text-sm font-black uppercase tracking-[0.3em] text-text-primary/90 italic">Forensic_Metadata_Extraction</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {exifData.map((exif, idx) => (
+              <motion.div 
+                key={idx}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                className="p-6 bg-surface/30 border border-border/10 rounded-2xl backdrop-blur-xl relative overflow-hidden group"
+              >
+                <div className="absolute top-0 right-0 p-3 opacity-5 group-hover:opacity-20 transition-opacity">
+                  <Globe className="w-12 h-12 text-accent" />
+                </div>
+                <div className="relative z-10">
+                   <div className="text-[10px] font-black text-accent uppercase tracking-widest mb-3 flex items-center gap-2">
+                     <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                     {exif.title}
+                   </div>
+                   <div className="prose prose-invert prose-xs max-w-none text-text-secondary font-medium">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{exif.description}</ReactMarkdown>
+                   </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Global Vitality Audit Header */}
       {audit && (
         <div className="p-6 bg-surface-elevated border-border/20 shadow-xl relative overflow-hidden group">
