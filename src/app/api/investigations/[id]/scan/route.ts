@@ -242,6 +242,7 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
         const processedUrls = new Set<string>();
         const processedHashes = new Set<string>();
         const USERNAME_BLOCKLIST = new Set(['gmail', 'outlook', 'hotmail', 'yahoo', 'apple', 'icloud', 'protonmail', 'proton', 'mail', 'live', 'me', 'msn', 'yandex', 'google', 'facebook', 'instagram', 'twitter', 'x', 'linkedin', 'github', 'reddit', 'medium', 'youtube', 'tiktok', 'pinned', 'user', 'admin']);
+        const GENERIC_TARGETS = new Set(['new target', 'untitled', 'unknown', 'investigation', 'target', 'subject', 'search', 'placeholder']);
 
         // SAFETY: If all subject fields are empty, use investigation title as fallback target
         let primaryTarget = 
@@ -540,7 +541,9 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
 
         // 1. Username Sweep (Handle + whatsMyName + Ecosystem)
         const usernameTarget = investigation.subjectUsername || (!primaryTarget.includes('@') && !primaryTarget.includes('.') ? primaryTarget : null);
-        if (usernameTarget) {
+        const usernameIsGeneric = usernameTarget && GENERIC_TARGETS.has(usernameTarget.toLowerCase());
+
+        if (usernameTarget && !usernameIsGeneric) {
             phase1.push(safeRun('Username Search', () => usernameSearch(usernameTarget)));
             phase1.push(safeRun('WhatsMyName', () => whatsMyName(usernameTarget)));
             phase1.push(safeRun('Ecosystem Discovery', () => ecosystemSearch(usernameTarget)));
@@ -555,7 +558,9 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
 
         // 3. Name & Identity Sweep (Google Dorks + People Search + Interpol)
         const nameTarget = investigation.subjectName || (usernameTarget && !investigation.subjectUsername ? usernameTarget : null);
-        if (nameTarget) {
+        const nameIsGeneric = nameTarget && GENERIC_TARGETS.has(nameTarget.toLowerCase());
+
+        if (nameTarget && !nameIsGeneric) {
             phase1.push(safeRun('Intelligence Dork', () => googleDorks({
                 name: nameTarget,
                 username: usernameTarget || undefined,
@@ -627,6 +632,14 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
         }
 
         // ========== PHASE 2: Intelligence Pivoting (Throttled & Limited) ==========
+        
+        // RECOVERY: If Phase 1 found a high-confidence facial identity, promote it to primary focus
+        const highConfidenceFace = allEvidence.find(e => e.title.includes('Identity Match') && e.confidenceScore > 0.9);
+        if (highConfidenceFace?.metadata?.extractedIdentity && nameIsGeneric) {
+            console.log(`[SCAN] Elevating facial identity "${highConfidenceFace.metadata.extractedIdentity}" as primary search focus.`);
+            primaryTarget = highConfidenceFace.metadata.extractedIdentity;
+        }
+
         const phase2: Promise<any>[] = [];
         let pivotCount = 0;
         const PIVOT_CAP = 20;

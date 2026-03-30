@@ -151,9 +151,6 @@ function inferPlatform(url: string): string {
     }
 }
 
-/**
- * Filter out low-quality or dead results that provide zero value to investigators.
- */
 function isHighRelevance(url: string, score: number): boolean {
     const isJunk = JUNK_DOMAINS.some(d => url.includes(d));
     if (isJunk && score < 95) return false;
@@ -163,6 +160,36 @@ function isHighRelevance(url: string, score: number): boolean {
     if (url.includes('search?') || url.includes('/tags/')) return false;
     
     return true;
+}
+
+/**
+ * Perform a real-time HEAD request to verify that a URL is alive and accessible.
+ * We use a short timeout to prevent the scan from hanging on slow domains.
+ */
+async function verifyUrlLive(url: string): Promise<boolean> {
+    try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3500); // 3.5s timeout for liveness
+        
+        const res = await fetch(url, { 
+            method: 'HEAD', 
+            signal: controller.signal,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
+        });
+        
+        clearTimeout(timeout);
+        
+        // 404 (Not Found) or 410 (Gone) are definitive "Dead" signals.
+        // We allow 403 (Forbidden) because some CDNs block HEAD requests but the page might still exist.
+        if (res.status === 404 || res.status === 410) return false;
+        
+        return true;
+    } catch {
+        // If the request fails (timeout or DNS), we assume it's untrustworthy or dead for real-time intel.
+        return false;
+    }
 }
 
 /**
@@ -257,13 +284,31 @@ export async function reverseImageSearch(imageUrl?: string): Promise<ConnectorRe
                 confidenceLabel: 'LOW',
             });
         } else {
-            for (const item of items) {
+            // Sort by score and take top 20 for parallel verification
+            const candidates = items
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 20)
+                .filter(item => isHighRelevance(item.url, item.score));
+
+            console.log(`[FaceCheck] Verifying liveness for ${candidates.length} high-potential matches...`);
+            
+            const verificationResults = await Promise.all(
+                candidates.map(async (item) => ({
+                    item,
+                    isLive: await verifyUrlLive(item.url)
+                }))
+            );
+
+            for (const { item, isLive } of verificationResults) {
+                if (!isLive) {
+                    console.log(`[FaceCheck] Pruning dead/404 link: ${item.url}`);
+                    continue;
+                }
+
                 const score = item.score; // 0–100
                 const platform = inferPlatform(item.url);
                 const normalizedScore = score / 100;
                 const confidenceLabel = score >= 85 ? 'HIGH' : score >= 60 ? 'MEDIUM' : 'LOW';
-                
-                if (!isHighRelevance(item.url, score)) continue;
                 
                 // Attempt to extract identity name from URL (common for social profiles)
                 let extractedName = null;
