@@ -30,8 +30,9 @@ export interface IntelligenceSource {
 export const SOURCE_REGISTRY: IntelligenceSource[] = [
   // CATEGORY 1: IDENTITY / BREACH
   { id: 'hibp', name: 'HaveIBeenPwned', layer: CapabilityLayer.IDENTITY, tier: 'LITE', confidenceWeight: 0.95, description: 'Gold-standard breach verification.' },
-  { id: 'dehashed', name: 'DeHashed', layer: CapabilityLayer.IDENTITY, tier: 'PRO', confidenceWeight: 0.90, description: 'Deep-web credential auditing.' },
-  { id: 'hudsonrock', name: 'HudsonRock', layer: CapabilityLayer.IDENTITY, tier: 'ENTERPRISE', confidenceWeight: 0.98, description: 'Infra-level breach intelligence.' },
+  { id: 'breach_search', name: 'Dark Web Search', layer: CapabilityLayer.IDENTITY, tier: 'PRO', confidenceWeight: 0.90, description: 'Deep-web credential auditing.' },
+  { id: 'whatsmyname', name: 'Social Registry', layer: CapabilityLayer.SOCIAL, tier: 'LITE', confidenceWeight: 0.88, description: 'Direct social media profile verification.' },
+  { id: 'reverse_image', name: 'Visual Intel', layer: CapabilityLayer.IMAGE, tier: 'PRO', confidenceWeight: 0.95, description: 'Facial recognition identity verification.' },
   
   // CATEGORY 2: INFRASTRUCTURE
   { id: 'shodan', name: 'Shodan', layer: CapabilityLayer.INFRA, tier: 'PRO', confidenceWeight: 0.92, description: 'Internet-of-Things search engine.' },
@@ -47,7 +48,7 @@ export const SOURCE_REGISTRY: IntelligenceSource[] = [
   { id: 'facial_ai', name: 'FaceSync AI', layer: CapabilityLayer.IMAGE, tier: 'PRO', confidenceWeight: 0.85, description: 'Biometric cross-referencing engine.' },
 
   // CATEGORY 10: RELATIONSHIP / ENRICHMENT
-  { id: 'openai', name: 'OpenAI (Reasoning)', layer: CapabilityLayer.GRAPH, tier: 'LITE', confidenceWeight: 0.70, description: 'AI-driven entity correlation.' },
+  { id: 'openai', name: 'Aletheia AI Reasoner', layer: CapabilityLayer.GRAPH, tier: 'LITE', confidenceWeight: 0.75, description: 'AI-driven entity correlation.' },
   { id: 'wikidata', name: 'Wikidata Graph', layer: CapabilityLayer.GRAPH, tier: 'LITE', confidenceWeight: 0.80, description: 'Public entity relationship mapping.' }
 ];
 
@@ -62,20 +63,21 @@ export function calculateConfidence(sourceId: string, crossConfirmed: boolean = 
   const weight = source?.confidenceWeight || 0.5;
   const rawScore = baseScore ?? weight;
   
-  // Boost score if cross-confirmed
+  // Boost score significantly if cross-confirmed (Indisputable proof)
   const finalScore = crossConfirmed 
-    ? Math.min(1.0, rawScore + 0.15) 
+    ? Math.min(1.0, rawScore + 0.25) 
     : rawScore;
 
   return Math.round(finalScore * 100);
 }
 
 /**
- * Returns the human-readable label for a confidence score.
+ * Returns the human-readable label for a high-fidelity confidence score.
+ * Raised floor (50+) and raised ceiling (95+) for elite resolution.
  */
 export function getConfidenceLabel(score: number): 'LOW' | 'MEDIUM' | 'HIGH' | 'VERIFIED' {
-  if (score >= 90) return 'VERIFIED';
-  if (score >= 70) return 'HIGH';
-  if (score >= 40) return 'MEDIUM';
+  if (score >= 95) return 'VERIFIED';
+  if (score >= 75) return 'HIGH';
+  if (score >= 50) return 'MEDIUM';
   return 'LOW';
 }

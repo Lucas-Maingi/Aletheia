@@ -435,9 +435,14 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
                         archiveUrl(res.url).catch(() => {}); 
                     }
 
-                    // DOSSIER v85: Dynamic Confidence Scoring via Registry
                     const confidenceScore = calculateConfidence(label.toLowerCase().replace(/\s+/g, '_'), false, res.confidenceScore);
                     const confidenceLabel = getConfidenceLabel(confidenceScore);
+
+                    // SIGNAL FLOOR: Prune any "hallucinations" or low-certainty results
+                    if (confidenceScore < 55) {
+                        console.log(`[FIDELITY] Pruning low-signal result from ${label}: ${res.title} (${confidenceScore}%)`);
+                        continue;
+                    }
 
                     evidenceItems.push({
                         investigationId,
