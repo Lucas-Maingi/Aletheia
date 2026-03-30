@@ -153,21 +153,27 @@ export function FacialAnalysis({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: i * 0.1 }}
-            className="group relative bg-slate-950/20 border border-white/5 rounded-2xl overflow-hidden hover:border-accent/40 transition-all shadow-2xl hover:shadow-accent/5 backdrop-blur-sm"
+            className={`group relative bg-slate-950/20 border rounded-2xl overflow-hidden hover:border-accent/40 transition-all shadow-2xl hover:shadow-accent/5 backdrop-blur-sm ${
+                match.isVerified ? 'border-accent/30 ring-1 ring-accent/10' : 'border-white/5'
+            }`}
           >
             <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${getConfidenceColor(match.confidence)}`} />
 
             <div className="p-5">
               <div className="flex items-start justify-between mb-5">
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 shadow-inner bg-slate-900 flex items-center justify-center">
+                  <div className={`w-20 h-20 rounded-2xl overflow-hidden border shadow-inner bg-slate-900 flex items-center justify-center ${
+                      match.isVerified ? 'border-accent/40' : 'border-white/10'
+                  }`}>
                     {match.thumbnailBase64 ? (
                       <img src={match.thumbnailBase64} alt="Facial Match Thumbnail" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                     ) : (
                       <User className="w-8 h-8 text-text-tertiary/20" />
                     )}
                   </div>
-                  <div className="absolute -bottom-2 -right-2 p-1.5 rounded-lg bg-accent text-text-secondary border border-white/20 shadow-xl">
+                  <div className={`absolute -bottom-2 -right-2 p-1.5 rounded-lg border shadow-xl ${
+                      match.isVerified ? 'bg-accent text-background border-white/20' : 'bg-surface border-white/5 text-accent'
+                  }`}>
                     <User className="w-3.5 h-3.5" />
                   </div>
                 </div>
@@ -177,11 +183,22 @@ export function FacialAnalysis({
                     {(match.confidence * 100).toFixed(0)}<span className="text-[10px] ml-0.5">%</span>
                   </div>
                   <div className="text-[9px] text-text-primary/20 uppercase tracking-[0.1em] font-black">Bio_Match</div>
+                  {match.isVerified && (
+                    <div className="flex items-center gap-1 justify-end mt-1">
+                        <CheckCircle2 className="w-3 h-3 text-accent" />
+                        <span className="text-[8px] font-black text-accent uppercase tracking-widest">Verified</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
               <div className="mb-5">
                 <div className="text-sm font-black text-text-primary/90 mb-1 truncate tracking-tight">{match.platform}</div>
+                {match.extractedIdentity && (
+                    <div className="text-[10px] font-black text-accent uppercase tracking-widest mb-1 italic">
+                        ID: {match.extractedIdentity}
+                    </div>
+                )}
                 <div className="flex items-center gap-2 text-[10px] text-text-primary/30 font-mono tracking-tighter">
                   <Calendar className="w-3 h-3" />
                   ARCHIVE_PULSE: {new Date(match.timestamp).toLocaleDateString()}

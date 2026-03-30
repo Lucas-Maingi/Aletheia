@@ -315,9 +315,16 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
                 batch.push({ type: 'crypto', value: c });
             });
 
-            // 5. Names (from high-fidelity sources)
-            if (title && (title.includes('Wikipedia') || title.includes('Profile'))) {
-                const cleanName = title.split(' — ')[1]?.replace(/\([^)]*\)/g, '').trim();
+            // 5. Names (from high-fidelity sources & Visual Intel)
+            const identityMatch = title && (title.includes('Identity Match') || title.includes('Facial Match'));
+            if (title && (title.includes('Wikipedia') || title.includes('Profile') || identityMatch)) {
+                let cleanName = title.split(' — ')[1]?.replace(/\([^)]*\)/g, '').trim();
+                
+                // Fallback for Visual Intel specific titles
+                if (!cleanName && identityMatch && title.includes(' — ')) {
+                    cleanName = title.split(' — ')[1].trim();
+                }
+
                 if (cleanName && cleanName.length > 3 && cleanName.length < 50 && cleanName !== investigation.subjectName) {
                     correlatedIdentifiers.names.add({ value: cleanName, sourceId });
                     batch.push({ type: 'name', value: cleanName });
@@ -639,6 +646,11 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
         });
 
         const pivotQueue = [
+            // Specialized Visual Identity Pivots (High Fidelity)
+            ...Array.from(correlatedIdentifiers.names)
+                .filter(n => allEvidence.some(e => e.title.includes('Identity Match') && e.title.includes(n.value)))
+                .map(n => ({ label: `Focus Sweep: ${n.value}`, task: () => whatsMyName(n.value), pivotId: n.sourceId, skip: false })),
+
             ...Array.from(correlatedIdentifiers.usernames).map(u => ({ label: `Pivot: @${u.value}`, task: () => usernameSearch(u.value), pivotId: u.sourceId, skip: u.value === investigation.subjectUsername || u.value === primaryTarget })),
             ...Array.from(correlatedIdentifiers.names).map(n => ({ label: `Pivot: ${n.value}`, task: () => googleDorks({ name: n.value }), pivotId: n.sourceId, skip: false })),
             ...Array.from(correlatedIdentifiers.emails).map(e => ({ label: `Pivot: ${e.value}`, task: () => breachSearch(e.value), pivotId: e.sourceId, skip: e.value === investigation.subjectEmail }))

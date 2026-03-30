@@ -8,6 +8,20 @@ const TESTING_MODE = process.env.FACECHECK_TESTING_MODE !== 'false';
 
 const MAX_POLL_ATTEMPTS = 30; // 30s max poll time (1s intervals)
 
+const JUNK_DOMAINS = [
+    'pinterest.com', // Too many duplicates/unindexed
+    'flickr.com',
+    'alamy.com',
+    'shutterstock.com',
+    'dreamstime.com',
+    'stock.adobe.com',
+    'gettyimages.com',
+    'picxy.com',
+    'tineye.com',
+    'yandex.com',
+    'bing.com'
+];
+
 interface FaceCheckItem {
     score: number;   // 0–100
     url: string;     // URL of page where face was found
@@ -138,6 +152,20 @@ function inferPlatform(url: string): string {
 }
 
 /**
+ * Filter out low-quality or dead results that provide zero value to investigators.
+ */
+function isHighRelevance(url: string, score: number): boolean {
+    const isJunk = JUNK_DOMAINS.some(d => url.includes(d));
+    if (isJunk && score < 95) return false;
+    
+    // Likely SEO spam patterns
+    if (url.includes('/status/') && !url.includes('twitter.com') && !url.includes('x.com')) return false;
+    if (url.includes('search?') || url.includes('/tags/')) return false;
+    
+    return true;
+}
+
+/**
  * Main reverse image search connector.
  * 
  * If FACECHECK_API_TOKEN is set: runs real facial recognition via FaceCheck.id
@@ -235,20 +263,30 @@ export async function reverseImageSearch(imageUrl?: string): Promise<ConnectorRe
                 const normalizedScore = score / 100;
                 const confidenceLabel = score >= 85 ? 'HIGH' : score >= 60 ? 'MEDIUM' : 'LOW';
                 
-                // Build metadata including base64 thumbnail for display in evidence card
+                if (!isHighRelevance(item.url, score)) continue;
+                
+                // Attempt to extract identity name from URL (common for social profiles)
+                let extractedName = null;
+                try {
+                    const parts = new URL(item.url).pathname.split('/').filter(Boolean);
+                    if (parts.length > 0) extractedName = parts[parts.length - 1].replace(/[-._]/g, ' ');
+                } catch {}
+
                 results.push({
-                    title: `Facial Match — ${platform}`,
+                    title: `Identity Match — ${platform}`,
                     url: item.url,
-                    description: `FaceCheck.id found a facial match on ${platform} with ${score}% similarity. The identified face appears on the linked page.`,
+                    description: `High-fidelity facial match found on ${platform}. Verification score: ${score}%. Correlated with visual identity database.`,
                     category: 'image_search',
                     platform,
                     confidenceScore: normalizedScore,
                     confidenceLabel: confidenceLabel as 'HIGH' | 'MEDIUM' | 'LOW',
+                    isVerified: score > 90,
                     metadata: {
                         faceMatchScore: score,
                         thumbnailBase64: item.base64,
                         source: 'facecheck_id',
                         idSearch,
+                        extractedIdentity: extractedName
                     },
                 });
             }

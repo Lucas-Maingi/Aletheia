@@ -6,6 +6,8 @@ export interface FacialMatch {
   url: string;
   thumbnailBase64?: string;  // base64 webp from FaceCheck
   timestamp: string;
+  isVerified?: boolean;
+  extractedIdentity?: string | null;
 }
 
 /**
@@ -26,8 +28,10 @@ export function mapFaceCheckResults(connectorResults: any[]): FacialMatch[] {
       url: r.url,
       thumbnailBase64: r.metadata?.thumbnailBase64,
       timestamp: new Date().toISOString(),
+      isVerified: !!r.isVerified,
+      extractedIdentity: r.metadata?.extractedIdentity
     }))
-    .sort((a, b) => b.score - a.score);
+    .sort((a, b) => (b.isVerified ? 1 : 0) - (a.isVerified ? 1 : 0) || b.score - a.score);
 }
 
 /**
