@@ -6,7 +6,8 @@ import { useState, useEffect, useRef } from "react";
 import { 
   Hexagon, CheckCircle2, Zap, Shield, Search, Database, Fingerprint, 
   Eye, GitCommit, ChevronRight, Activity, Terminal, Sparkles, ArrowRight, Flame,
-  ImageIcon, Loader2
+  ImageIcon, Loader2, Coins, BellRing, Layers, ShieldAlert, UserSearch, Globe,
+  ShieldCheck, MapPin, Share2, Target
 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -116,17 +117,37 @@ export default function Landing() {
             transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
             className="text-5xl md:text-8xl font-sans font-black text-text-primary tracking-tight leading-[1.0] mb-8 drop-shadow-2xl uppercase italic"
           >
-            Resolution. <span className="text-accent underline decoration-accent/20 underline-offset-8">Instantly.</span>
+            Find Anyone. <br/><span className="text-accent underline decoration-accent/20 underline-offset-8">Trace Anything.</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto mb-16 leading-relaxed font-medium"
+            className="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto mb-10 leading-relaxed font-medium"
           >
-            The world's most advanced autonomous OSINT engine. Deploy agent clusters to map recursive identities and resolve digital footprints in milliseconds.
+            The world's most powerful autonomous OSINT engine. Input a name, email, or face to map a target's entire digital footprint in seconds.
           </motion.p>
+
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="flex items-center justify-center gap-8 mb-12 grayscale opacity-50 hover:grayscale-0 transition-all duration-700"
+          >
+            {[
+              { icon: UserSearch, label: "Face" },
+              { icon: Search, label: "Name" },
+              { icon: Globe, label: "Domain" },
+              { icon: Coins, label: "Crypto" },
+              { icon: ShieldAlert, label: "DarkWeb" }
+            ].map((item, i) => (
+              <div key={i} className="flex flex-col items-center gap-2">
+                <item.icon className="w-5 h-5 text-accent" />
+                <span className="text-[8px] font-black uppercase tracking-widest text-text-tertiary">{item.label}</span>
+              </div>
+            ))}
+          </motion.div>
 
           {/* Magical Search Bar */}
           <motion.div
@@ -189,40 +210,43 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="agents" className="py-24 bg-surface/5 relative border-t border-border/10 backdrop-blur-3xl overflow-hidden">
+      <section id="features" className="py-24 bg-surface/5 relative border-t border-border/10 backdrop-blur-3xl overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-accent/[0.02] to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center max-w-2xl mx-auto mb-20">
-            <h2 className="text-4xl font-black text-text-primary mb-6 tracking-tight uppercase italic">Autonomous Intel Agents</h2>
-            <p className="text-text-secondary text-base font-medium leading-relaxed">Specialized cluster nodes for recursive target discovery.</p>
+            <Badge variant="outline" className="mb-6 px-4 py-1.5 border-accent/20 bg-accent/5 text-accent uppercase font-black tracking-widest text-[10px]">Premium Intelligence Suite</Badge>
+            <h2 className="text-4xl md:text-5xl font-black text-text-primary mb-6 tracking-tight uppercase italic">Elite Operational Capabilities</h2>
+            <p className="text-text-secondary text-base font-medium leading-relaxed">Specialized intelligence modules for deep signal discovery and target resolution.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { title: "BioAgent", icon: Fingerprint, desc: "Traces biographical data, familial links, and professional history.", color: "text-purple-500", bg: "bg-purple-500/10", border: 'border-purple-500/20' },
-              { title: "InfraAgent", icon: Database, desc: "Maps infrastructure footprints and historical network correlations.", color: "text-accent", bg: "bg-accent/10", border: 'border-accent/20' },
-              { title: "BreachAgent", icon: Shield, desc: "Cross-references vulnerabilities against 10B+ Dark Web records.", color: "text-indigo-500", bg: "bg-indigo-500/10", border: 'border-indigo-500/20' },
-            ].map((agent, i) => (
+              { title: "Visual Biometrics", icon: UserSearch, desc: "Identify targets by face and consolidate their entire active social media footprint instantly.", color: "text-purple-500", bg: "bg-purple-500/10", border: 'border-purple-500/20' },
+              { title: "Deep Web Intelligence", icon: ShieldAlert, desc: "Query 10B+ leaked records for credentials, passwords, and compromised private PII.", color: "text-indigo-500", bg: "bg-indigo-500/10", border: 'border-indigo-500/20' },
+              { title: "Crypto Investigation", icon: Coins, desc: "Trace wallet addresses, transaction history, and exchange linkages across 15+ chains.", color: "text-accent", bg: "bg-accent/10", border: 'border-accent/20' },
+              { title: "Batch Operations", icon: Layers, desc: "Deploy automated agent clusters for mass target discovery and multi-vector analysis.", color: "text-pink-500", bg: "bg-pink-500/10", border: 'border-pink-500/20' },
+              { title: "Persistent Watchlists", icon: BellRing, desc: "Automated monitoring of high-value targets with real-time alerting on footprint changes.", color: "text-orange-500", bg: "bg-orange-500/10", border: 'border-orange-500/20' },
+              { title: "Multi-Vector Recon", icon: Search, desc: "Synchronous search by name, email, username, and domain for 100% signal coverage.", color: "text-emerald-500", bg: "bg-emerald-500/10", border: 'border-emerald-500/20' },
+            ].map((feature, i) => (
               <motion.div
-                key={agent.title}
+                key={feature.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className={`group relative p-10 rounded-3xl bg-surface/40 border ${agent.border} hover:border-accent/40 shadow-2xl transition-all duration-700 overflow-hidden backdrop-blur-xl`}
+                className={`group relative p-10 rounded-3xl bg-surface/40 border ${feature.border} hover:border-accent/40 shadow-2xl transition-all duration-700 overflow-hidden backdrop-blur-xl`}
               >
                 <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-accent/10 to-transparent blur-3xl rounded-bl-full`} />
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 ${agent.bg} ${agent.color} shadow-inner border border-border/10 group-hover:scale-110 transition-transform duration-500`}>
-                  <agent.icon className="w-7 h-7" />
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 ${feature.bg} ${feature.color} shadow-inner border border-border/10 group-hover:scale-110 transition-transform duration-500`}>
+                  <feature.icon className="w-7 h-7" />
                 </div>
                 <h3 className="text-2xl font-black text-text-primary mb-4 flex items-center gap-3 uppercase tracking-tighter italic">
-                  {agent.title}
-                  <Badge variant="outline" className="text-[9px] uppercase tracking-widest bg-background/5 border-border/10 text-text-tertiary">Active_Node</Badge>
+                  {feature.title}
                 </h3>
-                <p className="text-text-secondary text-sm font-medium leading-relaxed mb-8">{agent.desc}</p>
-                <div className="pt-6 border-t border-border/10 flex items-center justify-between text-[10px] font-black text-text-tertiary uppercase tracking-[0.2em]">
-                  <span className="flex items-center gap-2"><Activity className="w-4 h-4 text-accent" /> 99.9% Integrity</span>
-                  <span className="flex items-center gap-2 tracking-[0.1em] text-accent/80 font-mono">RECURSION_ON</span>
+                <p className="text-text-secondary text-sm font-medium leading-relaxed">{feature.desc}</p>
+                <div className="pt-6 mt-8 border-t border-border/10 flex items-center justify-between text-[10px] font-black text-text-tertiary uppercase tracking-[0.2em]">
+                  <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-accent" /> Premium_Asset</span>
+                  <span className="text-accent/80 font-mono">READY</span>
                 </div>
               </motion.div>
             ))}
@@ -243,9 +267,9 @@ export default function Landing() {
 
               <div className="space-y-6">
                  {[
-                   { step: "01", title: "Target Identification", desc: "Input any known vector—alias, email, or domain—to trigger initial cluster activation." },
-                   { step: "02", title: "Recursive Expansion", desc: "Autonomous agents trace secondary and tertiary links across 1000+ secured data nodes." },
-                   { step: "03", title: "Evidence Synthesis", desc: "Findings are hashed, verified, and compiled into a court-ready intelligence dossier." }
+                   { step: "01", title: "Target Identification", desc: "Input any vector—alias, email, domain, or biometric portrait—to trigger initial activation." },
+                   { step: "02", title: "Zero-Noise Correlation", desc: "Our heuristic layer prunes SEO spam and junk archives to isolate verified social footprints." },
+                   { step: "03", title: "Forensic Synthesis", desc: "Findings are hashed with SHA-256 and verified for court-ready evidence provenance." }
                  ].map((w, idx) => (
                    <div key={idx} className="flex gap-6 group">
                       <div className="text-2xl font-black text-accent/20 group-hover:text-accent transition-colors duration-500 font-mono italic">{w.step}</div>
