@@ -249,13 +249,13 @@ export async function registrationScout(email: string): Promise<ConnectorResult>
                 const isRegistered = await p.check();
                 if (isRegistered) {
                     results.push({
-                        title: p.name,
+                        title: `${p.name} — Potential Registry Presence`,
                         url: `https://${p.name.toLowerCase()}.com`,
-                        description: `**Platform:** ${p.name}\n**Status:** Verified Registration\n\nIntelligence node confirms this email address is registered on **${p.name}**. Registration confirmed via real-time signup API handshake.\n\n> This discovery is 100% accurate as it queries the platform's account availability registry directly.`,
+                        description: `**Platform:** ${p.name}\n**Status:** Registry Presence Detected\n\nIntelligence node confirms this identity handle or email is registered on **${p.name}**. \n\n> This discovery represents a **Registry Signal** only. Direct ownership by the target is unconfirmed without secondary behavioral or visual correlation.`,
                         category: 'social',
                         platform: p.name,
-                        confidenceScore: 0.99,
-                        confidenceLabel: 'HIGH'
+                        confidenceScore: 0.40,
+                        confidenceLabel: 'MEDIUM'
                     });
                 }
             } catch (e) {

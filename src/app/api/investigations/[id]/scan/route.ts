@@ -638,11 +638,23 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
 
         // ========== PHASE 2: Intelligence Pivoting (Throttled & Limited) ==========
         
-        // RECOVERY: If Phase 1 found a high-confidence facial identity, promote it to primary focus
+        // RECOVERY: If Phase 1 found a high-confidence facial identity, anchor the investigation
         const highConfidenceFace = allEvidence.find(e => e.title.includes('Identity Match') && e.confidenceScore > 0.9);
-        if (highConfidenceFace?.metadata?.extractedIdentity && nameIsGeneric) {
-            console.log(`[SCAN] Elevating facial identity "${highConfidenceFace.metadata.extractedIdentity}" as primary search focus.`);
-            primaryTarget = highConfidenceFace.metadata.extractedIdentity;
+        if (highConfidenceFace?.metadata?.extractedIdentity) {
+            const identifiedName = highConfidenceFace.metadata.extractedIdentity;
+            console.log(`[SCAN] Elite Fidelity: Anchoring investigation to "${identifiedName}". Updating subject context.`);
+            
+            // Auto-update investigation metadata to replace "New Target" with real identity
+            await prisma.investigation.update({
+                where: { id: investigationId },
+                data: { 
+                    title: identifiedName,
+                    subjectName: identifiedName
+                }
+            });
+
+            primaryTarget = identifiedName;
+            investigation.subjectName = identifiedName;
         }
 
         const phase2: Promise<any>[] = [];
