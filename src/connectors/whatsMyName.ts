@@ -19,6 +19,8 @@ const NOT_FOUND_PATTERNS = [
     "page may have been removed"
 ];
 
+const GENERIC_BLOCKLIST = new Set(['new target', 'new investigation', 'untitled', 'unknown', 'target', 'subject', 'search', 'placeholder', 'case', 'dossier', 'null', 'undefined', 'anonymous']);
+
 /**
  * WhatsMyName Connector — high-fidelity username scouting with HTML-level verification.
  * Eliminates "hallucinations" caused by redirects and generic login pages.
@@ -26,6 +28,10 @@ const NOT_FOUND_PATTERNS = [
 export async function whatsMyName(username: string): Promise<ConnectorResult> {
     const results: SearchResult[] = [];
     const cleanUsername = username.trim().toLowerCase();
+
+    if (GENERIC_BLOCKLIST.has(cleanUsername) || cleanUsername.length < 3) {
+        return { connectorType: 'whatsmyname', query: username, results: [], generatedAt: new Date().toISOString() };
+    }
 
     const platforms = [
         { name: 'GitHub', url: `https://github.com/${cleanUsername}` },

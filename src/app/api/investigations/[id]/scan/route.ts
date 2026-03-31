@@ -292,11 +292,11 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
             const raw = investigation.subjectEmail || 
                         investigation.subjectUsername || 
                         investigation.subjectName || 
-                        investigation.subjectPhone ||
-                        investigation.title;
+                        investigation.subjectPhone;
             
             if (!raw) return null;
-            const clean = raw.toLowerCase().replace(/^investigation:\s*/i, '').trim();
+            const clean = raw.toLowerCase().trim();
+            // Generic safety check for Name/Username values
             if (GENERIC_TARGETS.has(clean) || clean.length < 2) return null;
             return raw;
         };

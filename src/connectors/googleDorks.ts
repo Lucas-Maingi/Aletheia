@@ -11,6 +11,8 @@ function getRandomUserAgent() {
     return agents[Math.floor(Math.random() * agents.length)];
 }
 
+const GENERIC_BLOCKLIST = new Set(['new target', 'new investigation', 'untitled', 'unknown', 'target', 'subject', 'search', 'placeholder', 'case', 'dossier', 'null', 'undefined', 'anonymous', 'investigation']);
+
 /**
  * Intelligence Dorks — uses DuckDuckGo Instant Answer, Wikipedia API, 
  * and DuckDuckGo HTML search to find real information about the target.
@@ -21,10 +23,10 @@ export async function googleDorks({ name, username, email }: {
     email?: string;
 }): Promise<ConnectorResult> {
     const results: SearchResult[] = [];
-    const query = email || username || name || '';
+    const query = (email || username || name || '').trim();
 
-    if (!query) {
-        return { connectorType: 'google_dork', query: '', results: [], generatedAt: new Date().toISOString() };
+    if (!query || GENERIC_BLOCKLIST.has(query.toLowerCase()) || query.length < 3) {
+        return { connectorType: 'google_dork', query: query, results: [], generatedAt: new Date().toISOString() };
     }
 
     const quickFetch = (url: string, opts: RequestInit = {}) => {

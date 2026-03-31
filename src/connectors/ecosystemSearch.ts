@@ -10,6 +10,8 @@ function getRandomUserAgent() {
     return agents[Math.floor(Math.random() * agents.length)];
 }
 
+const GENERIC_BLOCKLIST = new Set(['new target', 'new investigation', 'untitled', 'unknown', 'target', 'subject', 'search', 'placeholder', 'case', 'dossier', 'null', 'undefined', 'anonymous', 'investigation']);
+
 /**
  * Ecosystem Discovery — High-Surface Area Account Detection.
  * Dorks 50+ major platforms to confirm account presence.
@@ -18,6 +20,15 @@ export async function ecosystemSearch(target: string): Promise<ConnectorResult> 
     const results: SearchResult[] = [];
     const cleanTarget = target.trim().toLowerCase();
     const handle = cleanTarget.includes('@') ? cleanTarget.split('@')[0] : cleanTarget;
+
+    if (GENERIC_BLOCKLIST.has(cleanTarget) || cleanTarget.length < 3) {
+        return {
+            connectorType: 'ecosystem_discovery',
+            query: target,
+            results: [],
+            generatedAt: new Date().toISOString(),
+        };
+    }
 
     // FIDELITY: If the target is an email, do NOT run handle-guess dorking. 
     // It leads to massive false positives (searching for email prefixes as usernames).

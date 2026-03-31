@@ -1,10 +1,15 @@
 import { ConnectorResult, SearchResult } from './types';
+const GENERIC_BLOCKLIST = new Set(['new target', 'new investigation', 'untitled', 'unknown', 'target', 'subject', 'search', 'placeholder', 'case', 'dossier', 'null', 'undefined', 'anonymous', 'investigation']);
 
 /**
  * Global People Search Aggregator
  * Searches public records and missing persons databases.
  */
 export async function peopleSearch(query: string): Promise<ConnectorResult> {
+    const cleanQuery = query.trim().toLowerCase();
+    if (!query || GENERIC_BLOCKLIST.has(cleanQuery) || cleanQuery.length < 3) {
+        return { connectorType: 'people_search', query: query, results: [], generatedAt: new Date().toISOString() };
+    }
     console.log(`[CONNECTOR] People Search: ${query}`);
     
     const results: SearchResult[] = [

@@ -5,11 +5,13 @@ import { ConnectorResult, SearchResult } from './types';
  * to find social profile data that direct scraping can't get (JS-rendered pages).
  */
 const SERVICE_BLOCKLIST = new Set(['gmail', 'outlook', 'hotmail', 'yahoo', 'apple', 'icloud', 'protonmail', 'proton', 'mail', 'live', 'me', 'msn', 'yandex', 'google', 'facebook', 'instagram', 'twitter', 'x', 'linkedin', 'github', 'reddit', 'medium', 'youtube', 'tiktok']);
+const GENERIC_BLOCKLIST = new Set(['new target', 'new investigation', 'untitled', 'unknown', 'target', 'subject', 'search', 'placeholder', 'case', 'dossier', 'null', 'undefined', 'anonymous', 'investigation']);
 
 export async function usernameSearch(username: string): Promise<ConnectorResult> {
     const results: SearchResult[] = [];
+    const cleanUsername = username.toLowerCase().trim();
 
-    if (SERVICE_BLOCKLIST.has(username.toLowerCase())) {
+    if (SERVICE_BLOCKLIST.has(cleanUsername) || GENERIC_BLOCKLIST.has(cleanUsername) || cleanUsername.length < 3) {
         return {
             connectorType: 'username_search',
             query: username,

@@ -1,4 +1,5 @@
 import { ConnectorResult, SearchResult } from './types';
+const GENERIC_BLOCKLIST = new Set(['new target', 'new investigation', 'untitled', 'unknown', 'target', 'subject', 'search', 'placeholder', 'case', 'dossier', 'null', 'undefined', 'anonymous', 'investigation']);
 
 /**
  * Interpol Red Notices Search - Global Criminal Background
@@ -6,10 +7,10 @@ import { ConnectorResult, SearchResult } from './types';
  */
 export async function interpolSearch({ name, username }: { name?: string, username?: string }): Promise<ConnectorResult> {
     const results: SearchResult[] = [];
-    const query = name || username || '';
+    const query = (name || username || '').trim();
 
-    if (!query) {
-        return { connectorType: 'interpol_search', query: '', results: [], generatedAt: new Date().toISOString() };
+    if (!query || GENERIC_BLOCKLIST.has(query.toLowerCase()) || query.length < 3) {
+        return { connectorType: 'interpol_search', query: query, results: [], generatedAt: new Date().toISOString() };
     }
 
     try {
