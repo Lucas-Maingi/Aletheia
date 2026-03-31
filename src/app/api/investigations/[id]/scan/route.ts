@@ -552,7 +552,7 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
         const phase1: Promise<any>[] = [];
 
         // 1. Username Sweep (Handle + whatsMyName + Ecosystem)
-        const usernameTarget = investigation.subjectUsername || (!primaryTarget.includes('@') && !primaryTarget.includes('.') ? primaryTarget : null);
+        const usernameTarget = investigation.subjectUsername || (primaryTarget && !primaryTarget.includes('@') && !primaryTarget.includes('.') ? primaryTarget : null);
         const usernameIsGeneric = usernameTarget && GENERIC_TARGETS.has(usernameTarget.toLowerCase());
 
         if (usernameTarget && !usernameIsGeneric) {
@@ -562,7 +562,7 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
         }
 
         // 2. Email Sweep (Breach + Registration Scout + Reputation)
-        const emailTarget = investigation.subjectEmail || (primaryTarget.includes('@') ? primaryTarget : null);
+        const emailTarget = investigation.subjectEmail || (primaryTarget?.includes('@') ? primaryTarget : null);
         if (emailTarget) {
             phase1.push(safeRun('Breach Search', () => breachSearch(emailTarget)));
             phase1.push(safeRun('Registration Scout', () => registrationScout(emailTarget)));
@@ -590,7 +590,7 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
         }
 
         // 4. Infrastructure & Domain Sweep
-        const domainTarget = investigation.subjectDomain || (primaryTarget.includes('.') && !primaryTarget.includes('@') ? primaryTarget : null) || emailTarget?.split('@')[1];
+        const domainTarget = investigation.subjectDomain || (primaryTarget?.includes('.') && !primaryTarget?.includes('@') ? primaryTarget : null) || emailTarget?.split('@')[1];
         if (domainTarget && !['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'proton.me', 'protonmail.com'].includes(domainTarget)) {
             phase1.push(safeRun('Domain Search', () => domainSearch(domainTarget)));
         }

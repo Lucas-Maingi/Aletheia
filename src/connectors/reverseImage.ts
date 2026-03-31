@@ -2,9 +2,9 @@ import { ConnectorResult, SearchResult } from './types';
 
 const FACECHECK_SITE = 'https://facecheck.id';
 const FACECHECK_API_TOKEN = process.env.FACECHECK_API_TOKEN || '';
-// In testing mode, no credits are deducted but results are limited to 100k faces.
-// Set FACECHECK_TESTING_MODE=false in production env when you have purchased credits.
-const TESTING_MODE = process.env.FACECHECK_TESTING_MODE !== 'false';
+// In testing mode, no credits are deducted but results are limited to static demo payloads.
+// We default to REAL production results if a token is present to avoid the 'Same Results' loop.
+const TESTING_MODE = process.env.FACECHECK_TESTING_MODE === 'true' || (!FACECHECK_API_TOKEN);
 
 const MAX_POLL_ATTEMPTS = 30; // 30s max poll time (1s intervals)
 
