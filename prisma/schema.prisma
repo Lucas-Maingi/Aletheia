@@ -121,6 +121,7 @@ model Evidence {
   captureTimestamp   DateTime? // Exact time the snapshot was taken
   provenanceHash     String? // Cryptographic SHA-256 hash verifying evidence immutability
   provenanceSourceId String? // ID of the parent evidence that led to this discovery (Graph Link)
+  metadata           Json?    // Flexible storage for AI signatures, thumbnails, and engine data
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
