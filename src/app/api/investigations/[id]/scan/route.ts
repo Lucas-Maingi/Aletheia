@@ -23,7 +23,7 @@ import {
     siphonHub
 } from '@/connectors';
 import { extractExif } from '@/connectors/exifMetadata';
-import { FacialMatch } from '@/connectors/visualIntel';
+import { FacialMatch, mapFaceCheckResults } from '@/connectors/visualIntel';
 import { calculateConfidence, getConfidenceLabel } from '@/lib/osint/registry';
 import { createHash } from 'crypto';
 
@@ -642,8 +642,21 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
 
         // 5. Visual Intelligence Swep (Image + Biometrics + EXIF + Siphon)
         if (investigation.subjectImageUrl) {
-            phase1.push(safeRun('Visual Intelligence', () => reverseImageSearch(investigation.subjectImageUrl)));
-            phase1.push(safeRun('Aletheia Siphon Hub', () => siphonHub(investigation.subjectImageUrl)));
+            phase1.push(safeRun('Visual Intelligence', async () => {
+                const res = await reverseImageSearch(investigation.subjectImageUrl!);
+                const mapped = mapFaceCheckResults(res.results);
+                facialMatches.push(...mapped);
+                return res;
+            }));
+            
+            phase1.push(safeRun('Aletheia Siphon Hub', async () => {
+                const res = await siphonHub(investigation.subjectImageUrl!);
+                // Also map Siphon results if they contain face metadata
+                const mapped = mapFaceCheckResults(res.results);
+                facialMatches.push(...mapped);
+                return res;
+            }));
+
             phase1.push(safeRun('EXIF Extraction', () => extractExif(investigation.subjectImageUrl)));
         }
 
