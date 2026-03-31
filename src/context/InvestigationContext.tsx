@@ -23,6 +23,7 @@ interface InvestigationContextType {
     setTerminalLogs: (logs: string[]) => void;
     refresh: () => Promise<void>;
     startScan: (id: string) => Promise<void>;
+    forceVisualScrape: () => Promise<void>;
 }
 
 const InvestigationContext = createContext<InvestigationContextType | undefined>(undefined);
@@ -206,7 +207,6 @@ export function InvestigationProvider({ children }: { children: React.ReactNode 
             setTerminalLogs(prev => [...prev, "[SYS] Transitioning to Visual Analysis Processor..."]);
 
             // Phase 2: Visual/Biometric Sweep
-            // The route itself will instantly return if there's no subjectImageUrl
             console.log(`[Context] Initiating Visual Sweep...`);
             const visualRes = await fetch(`/api/investigations/${id}/scan/visual`, { method: "POST", headers });
             if (visualRes.ok) {
@@ -240,6 +240,45 @@ export function InvestigationProvider({ children }: { children: React.ReactNode 
         }
     }, [activeInvestigationId, refresh]);
 
+    const forceVisualScrape = useCallback(async () => {
+        if (!activeInvestigationId) return;
+        
+        setScanStatus('scanning');
+        setTerminalLogs(prev => [...prev, "[SYS] Manual Override: Initiating Deep Visual Siphon Hub...", "[SYS] Bypassing cache... Re-scanning Google, Google Lens, Bing, and Yandex..."]);
+
+        try {
+            const geminiKey = typeof window !== 'undefined' ? localStorage.getItem("openvector_gemini_key") : null;
+            const headers: Record<string, string> = { "Content-Type": "application/json" };
+            if (geminiKey) headers['x-gemini-key'] = geminiKey;
+
+            const res = await fetch(`/api/investigations/${activeInvestigationId}/scan/visual`, { 
+                method: "POST", 
+                headers,
+                body: JSON.stringify({ force: true })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data.facialMatches) {
+                    setFacialMatches(prev => {
+                        const existingUrls = new Set(prev.map(p => p.url));
+                        const newOnes = data.facialMatches.filter((m: any) => !existingUrls.has(m.url));
+                        return [...prev, ...newOnes];
+                    });
+                }
+                setScanStatus('complete');
+                setTerminalLogs(prev => [...prev, `✔ Manual Visual Recon complete. Found ${data.facialMatches?.length || 0} additional leads.`]);
+                await refresh();
+            } else {
+                throw new Error("Visual Siphon Hub collapsed.");
+            }
+        } catch (err: any) {
+            console.error("Force Scrape Error:", err);
+            setScanStatus('error');
+            setTerminalLogs(prev => [...prev, `[ERR] Visual Siphon failure: ${err.message}`]);
+        }
+    }, [activeInvestigationId, refresh]);
+
     return (
         <InvestigationContext.Provider value={{
             activeInvestigationId,
@@ -259,7 +298,8 @@ export function InvestigationProvider({ children }: { children: React.ReactNode 
             terminalLogs,
             setTerminalLogs,
             refresh,
-            startScan
+            startScan,
+            forceVisualScrape
         }}>
             {children}
         </InvestigationContext.Provider>

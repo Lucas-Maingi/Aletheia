@@ -19,7 +19,8 @@ import {
     whatsMyName,
     securityTrails,
     ecosystemSearch,
-    registrationScout
+    registrationScout,
+    siphonHub
 } from '@/connectors';
 import { extractExif } from '@/connectors/exifMetadata';
 import { FacialMatch } from '@/connectors/visualIntel';
@@ -61,6 +62,8 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
     const params = await props.params;
     const investigationId = params.id;
     const customApiKey = req.headers.get('x-gemini-key') || undefined;
+    const body = await req.json().catch(() => ({}));
+    const isForce = body.force === true;
 
     if (!isValidUuid(investigationId)) {
         return NextResponse.json({ error: 'Invalid identifier format' }, { status: 400 });
@@ -143,6 +146,46 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
             where: { id: investigationId },
             data: { status: 'active' },
         });
+
+        // IF FORCE: Run only visual siphoning and return early
+        if (isForce && investigation.subjectImageUrl) {
+            console.log(`[SCAN] Forced Visual Recon triggered for: ${investigationId}`);
+            
+            // Run Siphon Hub in background
+            (async () => {
+                const siphonResults = await siphonHub(investigation.subjectImageUrl!);
+                if (siphonResults.results.length > 0) {
+                   await Promise.all(siphonResults.results.map(res => 
+                        prisma.evidence.create({
+                            data: {
+                                investigationId,
+                                title: res.title,
+                                content: res.description, // Corrected field
+                                sourceUrl: res.url,       // Corrected field
+                                type: 'url',
+                                confidenceScore: res.confidenceScore || 0,
+                                confidenceLabel: res.confidenceLabel || 'MEDIUM',
+                                metadata: {
+                                    ...res.metadata,
+                                    platform: res.platform || 'SiphonHub'
+                                } as any
+                            }
+                        })
+                   ));
+                }
+                
+                await prisma.investigation.update({
+                    where: { id: investigationId },
+                    data: { status: 'completed' }
+                });
+            })();
+
+            return NextResponse.json({ 
+                success: true, 
+                message: 'Forced Visual Recon triggered.',
+                mode: 'visual_only'
+            });
+        }
 
         // CLEAR DATA & HANDSHAKE
         await Promise.all([

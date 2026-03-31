@@ -3,7 +3,7 @@ export const maxDuration = 60;
 import { prisma } from '@/lib/prisma';
 import { getEffectiveUserId } from '@/lib/auth-utils';
 import { isValidUuid } from '@/lib/security';
-import { reverseImageSearch } from '@/connectors';
+import { reverseImageSearch, siphonHub } from '@/connectors';
 
 export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
     const user = await getEffectiveUserId();
@@ -37,9 +37,17 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
         }).catch(() => {});
 
         console.log(`[SCAN:VISUAL] Starting FaceCheck for ${investigation.subjectImageUrl}`);
-        const result = await reverseImageSearch(investigation.subjectImageUrl);
         
-        const facialMatches = result?.results || [];
+        // Concurrent Visual Recons
+        const [faceCheckResult, siphonResult] = await Promise.all([
+            reverseImageSearch(investigation.subjectImageUrl).catch(() => null),
+            siphonHub(investigation.subjectImageUrl).catch(() => null)
+        ]);
+        
+        const facialMatches = [
+            ...(faceCheckResult?.results || []),
+            ...(siphonResult?.results || [])
+        ];
 
         await prisma.searchLog.create({
             data: {

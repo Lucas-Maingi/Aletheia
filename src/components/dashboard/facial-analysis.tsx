@@ -12,6 +12,8 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useInvestigation } from "@/context/InvestigationContext";
+import { Zap } from "lucide-react";
 
 interface VitalityAudit {
   verdict: "Real" | "Synthetic" | "Suspicious";
@@ -31,6 +33,7 @@ export function FacialAnalysis({
   exifData?: any[]
 }) {
   const [showMarkers, setShowMarkers] = useState(false);
+  const { forceVisualScrape } = useInvestigation();
 
   if (!isScanning && matches.length === 0 && exifData.length === 0) {
     return (
@@ -38,13 +41,43 @@ export function FacialAnalysis({
         <div className="p-4 rounded-full bg-white/5 border border-white/10 mb-4">
           <Shield className="w-8 h-8 text-text-primary/10" />
         </div>
-        <p className="text-[10px] text-text-tertiary font-mono uppercase tracking-[0.2em]">No Visual Intelligence Identified</p>
+        <p className="text-[10px] text-text-tertiary font-mono uppercase tracking-[0.2em] mb-6">No Visual Intelligence Identified</p>
+        
+        <button 
+          onClick={() => forceVisualScrape()}
+          disabled={isScanning}
+          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-accent/20 border border-accent/30 text-accent text-[10px] font-mono font-black uppercase tracking-[0.2em] hover:bg-accent/30 transition-all disabled:opacity-50"
+        >
+          <Zap className={`w-4 h-4 ${isScanning ? 'animate-spin' : ''}`} />
+          Force_Deep_Scrape
+        </button>
       </div>
     );
   }
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* Visual Intelligence Header with Force Scrape */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 py-2 border-b border-white/5 mb-4">
+         <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center shadow-glow-cyan-sm">
+                <Shield className="w-5 h-5 text-accent" />
+            </div>
+            <div>
+                <h3 className="text-sm font-black uppercase tracking-[0.3em] text-text-primary/90 italic">Visual_Intelligence_Network</h3>
+                <p className="text-[9px] text-text-tertiary font-mono uppercase tracking-widest mt-0.5">Global Biometric & Metadata Siphon</p>
+            </div>
+         </div>
+
+         <button 
+          onClick={() => forceVisualScrape()}
+          disabled={isScanning}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.03] border border-white/10 text-[10px] font-mono font-black uppercase tracking-[0.15em] text-text-primary/60 hover:bg-accent/20 hover:text-accent hover:border-accent/30 transition-all group/btn disabled:opacity-50"
+        >
+          <Zap className={`w-3.5 h-3.5 group-hover/btn:animate-pulse ${isScanning ? 'animate-spin' : ''}`} />
+          Force_Deep_Scrape
+        </button>
+      </div>
       {/* EXIF / Metadata Section */}
       {exifData.length > 0 && (
         <div className="space-y-4">
@@ -193,7 +226,14 @@ export function FacialAnalysis({
               </div>
 
               <div className="mb-5">
-                <div className="text-sm font-black text-text-primary/90 mb-1 truncate tracking-tight">{match.platform}</div>
+                <div className="flex items-center gap-2 mb-2">
+                    <div className="text-sm font-black text-text-primary/90 truncate tracking-tight">{match.platform}</div>
+                    {match.metadata?.source && (
+                        <Badge variant="outline" className="text-[8px] px-1.5 py-0 rounded bg-white/[0.02] border-white/10 text-text-tertiary uppercase font-mono">
+                            {match.metadata.source}
+                        </Badge>
+                    )}
+                </div>
                 {match.extractedIdentity && (
                     <div className="text-[10px] font-black text-accent uppercase tracking-widest mb-1 italic">
                         ID: {match.extractedIdentity}

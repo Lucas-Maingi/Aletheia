@@ -13,3 +13,4 @@ export * from './ipinfo';
 export * from './securityTrails';
 export * from './ecosystemSearch';
 export * from './registrationScout';
+export * from './siphonHub';
