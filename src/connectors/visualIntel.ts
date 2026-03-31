@@ -8,6 +8,7 @@ export interface FacialMatch {
   timestamp: string;
   isVerified?: boolean;
   extractedIdentity?: string | null;
+  metadata?: Record<string, any>;
 }
 
 /**
@@ -29,7 +30,8 @@ export function mapFaceCheckResults(connectorResults: any[]): FacialMatch[] {
       thumbnailBase64: r.metadata?.thumbnailBase64,
       timestamp: new Date().toISOString(),
       isVerified: !!r.isVerified,
-      extractedIdentity: r.metadata?.extractedIdentity
+      extractedIdentity: r.metadata?.extractedIdentity,
+      metadata: r.metadata
     }))
     .sort((a, b) => (b.isVerified ? 1 : 0) - (a.isVerified ? 1 : 0) || b.score - a.score);
 }
