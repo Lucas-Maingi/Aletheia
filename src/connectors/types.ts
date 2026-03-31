@@ -15,5 +15,5 @@ export interface SearchResult {
     error?: string;
     metadata?: Record<string, any>;
     confidenceScore?: number; // 0.0 to 1.0 ranking for Signal-to-Noise
-    confidenceLabel?: 'HIGH' | 'MEDIUM' | 'LOW';
+    confidenceLabel?: 'HIGH' | 'MEDIUM' | 'LOW' | 'VERIFIED';
 }
