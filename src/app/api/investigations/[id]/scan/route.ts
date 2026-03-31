@@ -489,7 +489,9 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
                     const confidenceLabel = getConfidenceLabel(confidenceScore);
 
                     // SIGNAL FLOOR: Prune any "hallucinations" or low-certainty results
-                    if (confidenceScore < 55) {
+                    // Special calibration for visual results (allowing more potential leads)
+                    const floor = label.toLowerCase().includes('visual') || label.toLowerCase().includes('siphon') ? 40 : 55;
+                    if (confidenceScore < floor) {
                         console.log(`[FIDELITY] Pruning low-signal result from ${label}: ${res.title} (${confidenceScore}%)`);
                         continue;
                     }
@@ -638,9 +640,10 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
             phase1.push(safeRun('Domain Search', () => domainSearch(domainTarget)));
         }
 
-        // 5. Visual Intelligence Swep (Image + Biometrics + EXIF)
+        // 5. Visual Intelligence Swep (Image + Biometrics + EXIF + Siphon)
         if (investigation.subjectImageUrl) {
             phase1.push(safeRun('Visual Intelligence', () => reverseImageSearch(investigation.subjectImageUrl)));
+            phase1.push(safeRun('Aletheia Siphon Hub', () => siphonHub(investigation.subjectImageUrl)));
             phase1.push(safeRun('EXIF Extraction', () => extractExif(investigation.subjectImageUrl)));
         }
 
