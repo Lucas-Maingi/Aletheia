@@ -41,8 +41,11 @@ async function fetchImageBuffer(imageUrl: string): Promise<{ buffer: Buffer; mim
         return { buffer: Buffer.from(base64Data, 'base64'), mimeType };
     }
 
+    const cacheBuster = `?v_fidel=${Date.now()}`;
+    const targetUrl = imageUrl.includes('?') ? `${imageUrl}&${cacheBuster.slice(1)}` : `${imageUrl}${cacheBuster}`;
+    
     const timeout = AbortSignal.timeout(15000);
-    const res = await fetch(imageUrl, { signal: timeout });
+    const res = await fetch(targetUrl, { signal: timeout });
     if (!res.ok) throw new Error(`Failed to fetch image: ${res.status} ${res.statusText}`);
     
     const contentType = res.headers.get('content-type') || 'image/jpeg';

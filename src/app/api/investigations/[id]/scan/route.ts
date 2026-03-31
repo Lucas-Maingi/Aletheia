@@ -242,22 +242,29 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
         const processedUrls = new Set<string>();
         const processedHashes = new Set<string>();
         const USERNAME_BLOCKLIST = new Set(['gmail', 'outlook', 'hotmail', 'yahoo', 'apple', 'icloud', 'protonmail', 'proton', 'mail', 'live', 'me', 'msn', 'yandex', 'google', 'facebook', 'instagram', 'twitter', 'x', 'linkedin', 'github', 'reddit', 'medium', 'youtube', 'tiktok', 'pinned', 'user', 'admin']);
-        const GENERIC_TARGETS = new Set(['new target', 'untitled', 'unknown', 'investigation', 'target', 'subject', 'search', 'placeholder']);
+        const GENERIC_TARGETS = new Set(['new target', 'untitled', 'unknown', 'investigation', 'target', 'subject', 'search', 'placeholder', 'case', 'dossier', 'new investigation', 'untitled investigation']);
 
-        // SAFETY: If all subject fields are empty, use investigation title as fallback target
-        let primaryTarget = 
-            investigation.subjectEmail || 
-            investigation.subjectUsername || 
-            investigation.subjectName || 
-            investigation.subjectPhone ||
-            investigation.title;
+        // SAFETY: Only extract a primary target if it's NOT a generic system placeholder
+        const getRawTarget = () => {
+            const raw = investigation.subjectEmail || 
+                        investigation.subjectUsername || 
+                        investigation.subjectName || 
+                        investigation.subjectPhone ||
+                        investigation.title;
+            
+            if (!raw) return null;
+            const clean = raw.toLowerCase().replace(/^investigation:\s*/i, '').trim();
+            if (GENERIC_TARGETS.has(clean) || clean.length < 2) return null;
+            return raw;
+        };
+
+        let primaryTarget = getRawTarget();
         
-        // CLEANUP: Strip "Investigation:" prefix if falling back to title
-        if (primaryTarget && primaryTarget.toLowerCase().startsWith('investigation:')) {
-            primaryTarget = primaryTarget.replace(/^investigation:\s*/i, '').trim();
+        if (primaryTarget) {
+            console.log(`[SCAN] Primary focus target: ${primaryTarget}`);
+        } else {
+            console.log(`[SCAN] No unique identifier provided. Engine operating in Visual-Only-Mode.`);
         }
-        
-        console.log(`[SCAN] Primary focus target: ${primaryTarget}`);
 
         const extractIdentifiers = (text: string, title?: string, sourceId?: string) => {
             const batch: { type: string; value: string }[] = [];
@@ -638,21 +645,15 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
 
         // ========== PHASE 2: Intelligence Pivoting (Throttled & Limited) ==========
         
-        // RECOVERY: If Phase 1 found a high-confidence facial identity, anchor the investigation
-        const highConfidenceFace = allEvidence.find(e => e.title.includes('Identity Match') && e.confidenceScore > 0.9);
+        // RECOVERY: If Phase 1 found a high-confidence facial identity, anchor the investigation SESSION
+        const highConfidenceFace = allEvidence.find(e => e.title.includes('Identity Match') && e.confidenceScore > 0.92);
         if (highConfidenceFace?.metadata?.extractedIdentity) {
             const identifiedName = highConfidenceFace.metadata.extractedIdentity;
-            console.log(`[SCAN] Elite Fidelity: Anchoring investigation to "${identifiedName}". Updating subject context.`);
+            console.log(`[SCAN] Elite Fidelity: Anchoring active session to "${identifiedName}".`);
             
-            // Auto-update investigation metadata to replace "New Target" with real identity
-            await prisma.investigation.update({
-                where: { id: investigationId },
-                data: { 
-                    title: identifiedName,
-                    subjectName: identifiedName
-                }
-            });
-
+            // NOTE: We no longer permanently update the DB title/subject here to prevent cross-scan pollution
+            // This allows the user to swap images without "sticking" to the previous identity.
+            
             primaryTarget = identifiedName;
             investigation.subjectName = identifiedName;
         }
