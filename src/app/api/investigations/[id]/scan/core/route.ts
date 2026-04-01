@@ -50,16 +50,34 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
         const startTime = Date.now();
         const HOBBY_LIMIT = 57000;
 
-        // Determine targets
-        let primaryTarget = 
-            investigation.subjectEmail || 
-            investigation.subjectUsername || 
-            investigation.subjectName || 
-            investigation.subjectPhone ||
-            investigation.title;
-        
-        if (primaryTarget && primaryTarget.toLowerCase().startsWith('investigation:')) {
-            primaryTarget = primaryTarget.replace(/^investigation:\s*/i, '').trim();
+        // Determine targets — NEVER fall back to investigation title (it's usually "New Target")
+        const GENERIC_TITLES = new Set([
+            'new target', 'untitled', 'unknown', 'investigation', 'target', 'subject',
+            'new investigation', 'untitled investigation', 'new', 'n/a', 'none'
+        ]);
+
+        const rawPrimary =
+            investigation.subjectEmail ||
+            investigation.subjectUsername ||
+            investigation.subjectName ||
+            investigation.subjectPhone;
+
+        let primaryTarget: string | null = rawPrimary;
+
+        // If only a title exists (image-only investigation), skip core scan entirely
+        if (!primaryTarget) {
+            await prisma.searchLog.create({
+                data: { investigationId, userId: user.id, connectorType: 'system', query: '[SYS] No text identifiers found. Core sweep skipped — Visual Intelligence will handle this target.' }
+            }).catch(() => {});
+            return NextResponse.json({ success: true, message: 'No text target — image-only investigation. Proceeding to visual scan.', phase: 'core_skipped' });
+        }
+
+        // Also reject generic placeholders
+        if (GENERIC_TITLES.has(primaryTarget.toLowerCase().trim())) {
+            await prisma.searchLog.create({
+                data: { investigationId, userId: user.id, connectorType: 'system', query: `[SYS] Target "${primaryTarget}" is a generic placeholder. Core sweep skipped.` }
+            }).catch(() => {});
+            return NextResponse.json({ success: true, message: 'Generic target skipped.', phase: 'core_skipped' });
         }
 
         const safeRun = async (label: string, fn: () => Promise<any>) => {
