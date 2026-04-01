@@ -227,56 +227,26 @@ export async function reverseImageSearch(imageUrl?: string): Promise<ConnectorRe
         };
     }
 
-    // ── No API token — fall back to search URL links ───────────────────────
+    // ── No API token — FaceCheck automated biometric scan is unavailable ──────
+    // Real visual search (Yandex, TinEye, Bing) is handled by the Siphon Hub.
+    // Return a single advisory card so the analyst knows how to unlock face ID.
     if (!FACECHECK_API_TOKEN) {
-        console.warn('[ReverseImage] FACECHECK_API_TOKEN not set — falling back to search URL links');
-        
-        // CRITICAL: Do NOT pass base64 Data URLs via GET parameter 'url='. 
-        // This causes 414 Request-URI Too Large or engine rejection.
-        const encoded = isDataUrl ? '' : encodeURIComponent(imageUrl);
-        const yandexUrl = isDataUrl ? 'https://yandex.com/images/search?rpt=imageview' : `https://yandex.com/images/search?rpt=imageview&url=${encoded}`;
-        const googleUrl = isDataUrl ? 'https://lens.google.com' : `https://lens.google.com/uploadbyurl?url=${encoded}`;
-
+        console.warn('[ReverseImage] FACECHECK_API_TOKEN not set — facial recognition skipped. Siphon Hub handles visual search.');
         return {
             connectorType: 'reverse_image',
             query: isDataUrl ? 'local_upload' : imageUrl,
             results: [
                 {
-                    title: 'FaceCheck.id — Manual Biometric Recon',
-                    url: `https://facecheck.id`,
-                    description: isDataUrl 
-                        ? `**Tactical Bridge:** You are using a local target image. Click this bridge to upload the subject directly to FaceCheck.id for elite facial recognition.`
-                        : `Upload image manually at FaceCheck.id for real facial recognition results. Set FACECHECK_API_TOKEN to enable automatic scanning.`,
+                    title: 'Facial Recognition — API Token Required',
+                    url: 'https://facecheck.id',
+                    description: `Automated facial recognition via FaceCheck.id requires an API token.\n\nSet the **FACECHECK_API_TOKEN** environment variable in Vercel to enable:\n- Real-time face matching across the public internet\n- Identity extraction from social profiles\n- Confidence-scored biometric results\n\nVisual search (Yandex, TinEye, Bing) is running automatically in parallel.`,
                     category: 'image_search',
                     platform: 'FaceCheck.id',
-                    confidenceScore: 0.95,
-                    confidenceLabel: 'VERIFIED',
-                    isVerified: true,
-                },
-                {
-                    title: 'Yandex Visum — Deep Visual Index',
-                    url: yandexUrl,
-                    description: isDataUrl
-                        ? `**Tactical Bridge:** Automated Yandex siphoning for local images requires a manual upload handshake. Click here to drag-and-drop the image.`
-                        : `Yandex reverse image search (highest fidelity for public figure identification).`,
-                    category: 'image_search',
-                    platform: 'Yandex',
-                    confidenceScore: 0.90,
-                    confidenceLabel: 'VERIFIED',
-                    isVerified: true,
-                },
-                {
-                    title: 'Google Lens — Global Surface Recon',
-                    url: googleUrl,
-                    description: isDataUrl
-                        ? `**Tactical Bridge:** Global surface recon for local images is restricted. Use this bridge to re-trigger the Lens lookup manually.`
-                        : `Google Lens visual identity and commercial footprint search.`,
-                    category: 'image_search',
-                    platform: 'Google Lens',
-                    confidenceScore: 0.85,
-                    confidenceLabel: 'HIGH',
-                    isVerified: true,
-                },
+                    confidenceScore: 0,
+                    confidenceLabel: 'LOW',
+                    isVerified: false,
+                    metadata: { source: 'advisory', actionRequired: 'set_FACECHECK_API_TOKEN' }
+                }
             ],
             generatedAt: new Date().toISOString(),
         };

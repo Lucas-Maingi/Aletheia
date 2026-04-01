@@ -65,10 +65,12 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
 
         console.log(`[SCAN:VISUAL] Raw results: ${allResults.length} total`);
 
-        // Deduplicate by URL
+        // Deduplicate by URL, and skip advisory/placeholder cards
         const seenUrls = new Set<string>();
         const uniqueResults = allResults.filter(r => {
             if (!r.url || seenUrls.has(r.url)) return false;
+            if (r.confidenceScore === 0) return false; // skip advisory cards
+            if ((r.metadata as any)?.source === 'advisory') return false;
             seenUrls.add(r.url);
             return true;
         });
