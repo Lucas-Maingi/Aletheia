@@ -249,7 +249,7 @@ function BiometricHub({ imageUrl, isScanning, matchCount }: {
 
 /** Sherlock-style result card */
 function MatchCard({ match, index }: { match: FacialMatch; index: number }) {
-  const pct = Math.round((match.confidence ?? match.score / 100 ?? 0.85) * 100);
+  const pct = match.confidence > 0 ? Math.round(match.confidence * 100) : (match.score || 85);
   const isHigh = pct >= 90;
   const isMed = pct >= 70 && pct < 90;
 
