@@ -109,7 +109,16 @@ export default async function DashboardLayout({
                 <main className="flex-1 overflow-y-auto no-scrollbar relative bg-surface-2 flex flex-col">
                     <CommandPalette />
 
-                    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+                    {/* Faded Background Grid to prevent harsh top line */}
+                    <div 
+                        className="absolute inset-0 pointer-events-none" 
+                        style={{
+                            backgroundImage: 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)',
+                            backgroundSize: '40px 40px',
+                            maskImage: 'linear-gradient(to bottom, transparent, black 15%, black)',
+                            WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 15%, black)'
+                        }} 
+                    />
 
                     {user.isGuest && (
                         <div className="bg-accent/10 border-b border-accent/20 px-8 py-2 flex items-center justify-between relative z-20">
@@ -123,7 +132,7 @@ export default async function DashboardLayout({
                         </div>
                     )}
 
-                    <div className="p-8 pb-24 md:pb-8 max-w-6xl mx-auto relative z-10 w-full flex-1">
+                    <div className="px-6 py-6 pb-24 md:pb-8 max-w-[1400px] w-full mx-auto relative z-10 flex-1">
                         {children}
                     </div>
                 </main>

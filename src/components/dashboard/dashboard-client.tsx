@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { 
   Activity, Fingerprint, Database, ChevronDown, ChevronUp, Terminal,
   MapPin, Clock, ArrowUpRight, Crosshair, ShieldAlert, Cpu, Trash2, RefreshCw,
-  Search, MessageSquare
+  Search, MessageSquare, ImageIcon
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +46,23 @@ export function DashboardClient({
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+          if (file.size > 3.5 * 1024 * 1024) {
+              alert("Image is too large (max 3.5MB). Please use a smaller file.");
+              return;
+          }
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+              sessionStorage.setItem('aletheia_pending_image', ev.target?.result as string);
+              router.push('/dashboard/investigations/new?autostart=true');
+          };
+          reader.readAsDataURL(file);
+      }
+  };
 
   // Combine and sort missions chronologically (Dossiers + Chats)
   const unifiedMissions = [...localInvestigations].sort((a, b) => 
@@ -70,34 +87,56 @@ export function DashboardClient({
       
       {/* HUD Header & Mission Control */}
       <section className="shrink-0 pt-4">
-        <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-10 gap-8">
-          <div className="flex-1 w-full max-w-2xl">
-            <div className="text-[11px] font-black text-accent uppercase tracking-[0.3em] mb-3 flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse" />
-                System_Status: Operational_Node_Active
-            </div>
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-8 relative z-20">
+          
+          <div className="flex-1 w-full max-w-[800px] relative">
+            {/* High-Energy Pulsing Background behind the search bar */}
+            <div className="absolute -inset-10 bg-gradient-to-r from-accent/20 to-purple-500/20 blur-3xl opacity-30 rounded-full pointer-events-none" />
             
-            <div className="relative group/search-main">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-accent opacity-50 group-hover/search-main:opacity-100 transition-opacity duration-300" />
-                <input 
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' && searchQuery) {
-                            router.push(`/dashboard/investigations/new?target=${encodeURIComponent(searchQuery)}&autostart=true`);
-                        }
-                    }}
-                    placeholder="Search Identity, Domain, or Signal..."
-                    className="w-full h-16 pl-14 pr-36 bg-surface/40 backdrop-blur-[40px] border border-border/20 rounded-2xl text-lg font-bold text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-accent/40 focus:ring-1 focus:ring-accent/10 transition-all shadow-2xl shadow-accent/5 focus:shadow-[0_0_30px_rgba(0,240,255,0.15)]"
-                />
-                <button 
-                   onClick={() => searchQuery && router.push(`/dashboard/investigations/new?target=${encodeURIComponent(searchQuery)}&autostart=true`)}
-                   className="absolute right-3 top-1/2 -translate-y-1/2 h-10 px-6 rounded-xl bg-accent text-background font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-accent transition-all shadow-lg active:scale-95 flex items-center gap-2 group/btn"
-                >
-                    Target_Sweep
-                    <Search className="w-3.5 h-3.5 group-hover/btn:scale-110 transition-transform" />
-                </button>
+            <div className="relative z-10">
+                <div className="text-[11px] font-black text-accent uppercase tracking-[0.3em] mb-4 flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse shadow-[0_0_12px_rgba(0,240,255,0.8)]" />
+                    System_Status: Operational_Node_Active
+                </div>
+                
+                <div className="relative group/search-main flex items-center">
+                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-accent opacity-50 group-hover/search-main:opacity-100 transition-opacity duration-300" />
+                    
+                    <input 
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && searchQuery) {
+                                router.push(`/dashboard/investigations/new?target=${encodeURIComponent(searchQuery)}&autostart=true`);
+                            }
+                        }}
+                        placeholder="Search Identity, Domain, or Signal..."
+                        className="w-full h-[72px] pl-16 pr-[200px] bg-surface/60 backdrop-blur-[40px] border border-border/20 rounded-2xl text-xl font-bold text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-accent/40 focus:ring-1 focus:ring-accent/10 transition-all shadow-2xl shadow-accent/5 focus:shadow-[0_0_40px_rgba(0,240,255,0.15)]"
+                    />
+                    
+                    {/* Integrated action buttons inside the search bar */}
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                        {/* Direct Visual Search Upload Button */}
+                        <button 
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            title="Direct Visual Scan (Select Image)"
+                            className="p-3 rounded-xl border border-border/10 text-text-tertiary hover:text-accent hover:border-accent/30 hover:bg-accent/10 transition-all active:scale-95"
+                        >
+                            <ImageIcon className="w-5 h-5" />
+                        </button>
+                        <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageSelect} />
+
+                        <button 
+                            onClick={() => searchQuery && router.push(`/dashboard/investigations/new?target=${encodeURIComponent(searchQuery)}&autostart=true`)}
+                            className="h-12 px-6 rounded-xl bg-accent text-background font-black text-[11px] uppercase tracking-widest hover:bg-white hover:text-accent transition-all shadow-[0_0_20px_rgba(0,240,255,0.3)] active:scale-95 flex items-center gap-2 group/btn"
+                        >
+                            Target_Sweep
+                            <Search className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+                        </button>
+                    </div>
+                </div>
             </div>
           </div>
 
