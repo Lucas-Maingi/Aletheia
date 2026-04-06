@@ -20,17 +20,26 @@ export interface FacialMatch {
  * responsible only for the in-memory data shape used by dashboard components.
  */
 export function mapFaceCheckResults(connectorResults: any[]): FacialMatch[] {
+  const allowedSources = [
+    'facecheck_id', 
+    'google_vision_web_detection', 
+    'google_vision_similar', 
+    'serpapi_google_reverse', 
+    'serpapi_google_lens', 
+    'bing_visual_api'
+  ];
+
   return connectorResults
-    .filter(r => r.category === 'image_search' && r.metadata?.source === 'facecheck_id')
+    .filter(r => r.category === 'image_search' && allowedSources.includes(r.metadata?.source))
     .map(r => ({
       platform: r.platform || 'Unknown',
       confidence: r.confidenceScore || 0,
       score: r.metadata?.faceMatchScore || Math.round((r.confidenceScore || 0) * 100),
       url: r.url,
-      thumbnailBase64: r.metadata?.thumbnailBase64,
+      thumbnailBase64: r.metadata?.thumbnailBase64 || r.metadata?.thumbnailUrl,
       timestamp: new Date().toISOString(),
       isVerified: !!r.isVerified,
-      extractedIdentity: r.metadata?.extractedIdentity,
+      extractedIdentity: r.metadata?.extractedIdentity || r.metadata?.entity || r.metadata?.identifiedEntity || null,
       metadata: r.metadata
     }))
     .sort((a, b) => (b.isVerified ? 1 : 0) - (a.isVerified ? 1 : 0) || b.score - a.score);
