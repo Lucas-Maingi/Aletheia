@@ -174,6 +174,7 @@ export default async function InvestigationDetailPage({
                 initialReports={safeInvestigation.reports}
                 initialCount={safeInvestigation._count}
                 title={safeInvestigation.title}
+                subjectImageUrl={safeInvestigation.subjectImageUrl}
                 isScanning={isScanning}
             />
         </div >

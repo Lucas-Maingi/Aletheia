@@ -26,6 +26,7 @@ interface Props {
     initialReports: any[];
     initialCount: { evidence: number; entities: number };
     title: string;
+    subjectImageUrl?: string | null;
     isScanning: boolean;
 }
 
@@ -36,6 +37,7 @@ export function InvestigationDetailClient({
     initialReports,
     initialCount,
     title,
+    subjectImageUrl,
     isScanning
 }: Props) {
     const { 
@@ -168,6 +170,7 @@ export function InvestigationDetailClient({
                         isScanning={isActuallyScanning} 
                         audit={vitalityAudit}
                         exifData={displayEvidence.filter(e => e.type === 'metadata')}
+                        subjectImageUrl={subjectImageUrl}
                     />
                     <IdentityGraph target={title} evidence={displayEvidence} />
                     <AssociatesTab reportContent={reports[0]?.content || initialReports?.[0]?.content || ''} />
@@ -208,13 +211,6 @@ export function InvestigationDetailClient({
                             </div>
                         </CardContent>
                     </Card>
-                </TabsContent>
-                <TabsContent value="visual" className="animate-in fade-in slide-in-from-bottom-2">
-                    <FacialAnalysis 
-                        matches={facialMatches} 
-                        isScanning={isActuallyScanning} 
-                        audit={vitalityAudit}
-                    />
                 </TabsContent>
                 <TabsContent value="audit" className="animate-in fade-in slide-in-from-bottom-2">
                     <ChainOfCustody evidence={displayEvidence} />
