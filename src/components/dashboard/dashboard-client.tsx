@@ -83,10 +83,10 @@ export function DashboardClient({
   ];
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto space-y-10 h-full flex flex-col pt-2 pb-10">
+    <div className="w-full max-w-[1400px] mx-auto space-y-10 h-full flex flex-col pb-10">
       
       {/* HUD Header & Mission Control */}
-      <section className="shrink-0 pt-4">
+      <section className="shrink-0 pt-0">
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-8 relative z-20">
           
           <div className="flex-1 w-full max-w-[800px] relative">

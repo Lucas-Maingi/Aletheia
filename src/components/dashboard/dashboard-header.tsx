@@ -98,6 +98,13 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
 
                 {/* Right Side Actions */}
                 <div className="flex items-center gap-6">
+                    {/* Public Drop Nav */}
+                    <nav className="hidden xl:flex items-center gap-8 mr-2 text-[10px] font-black uppercase tracking-widest text-text-tertiary">
+                        <Link href="/pricing" className="hover:text-accent hover:text-[11px] transition-all">Pricing</Link>
+                        <Link href="/#features" className="hover:text-accent hover:text-[11px] transition-all">Features</Link>
+                        <Link href="/#faq" className="hover:text-accent hover:text-[11px] transition-all">FAQs</Link>
+                    </nav>
+
                     <div 
                         onClick={() => window.dispatchEvent(new CustomEvent('ale-toggle-command-palette'))}
                         className="hidden lg:flex items-center gap-3 px-4 py-2.5 rounded-xl bg-accent/5 border border-accent/20 text-[11px] font-black text-accent uppercase tracking-widest cursor-pointer hover:bg-accent/10 hover:border-accent/40 hover:scale-[1.02] transition-all group/search shadow-lg shadow-accent/5"

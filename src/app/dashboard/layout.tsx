@@ -132,7 +132,7 @@ export default async function DashboardLayout({
                         </div>
                     )}
 
-                    <div className="px-6 py-6 pb-24 md:pb-8 max-w-[1400px] w-full mx-auto relative z-10 flex-1">
+                    <div className="px-4 md:px-8 pb-24 md:pb-8 max-w-[1400px] w-full mx-auto relative z-10 flex-1">
                         {children}
                     </div>
                 </main>
