@@ -73,12 +73,12 @@ export function Solution() {
                                         <div className="w-2 h-2 rounded-full bg-error" />
                                         <div className="w-2 h-2 rounded-full bg-warning" />
                                         <div className="w-2 h-2 rounded-full bg-success" />
-                                        <span className="ml-4 text-[10px] font-mono text-text-muted">OPEN_VECTOR_TERMINAL_V1.0</span>
+                                        <span className="ml-4 text-[10px] font-mono text-text-muted">ALETHEIA_TERMINAL_V1.0</span>
                                     </div>
                                     <Shield className="w-4 h-4 text-text-muted" />
                                 </div>
                                 <div className="space-y-4 font-mono text-xs opacity-80">
-                                    <div className="text-accent">$ python openvector.py --target "jdoe_admin"</div>
+                                    <div className="text-accent">$ python aletheia.py --target "jdoe_admin"</div>
                                     <div className="text-text-secondary">[INFO] Scanning 140+ social platforms...</div>
                                     <div className="text-text-secondary">[INFO] Searching 8.2B breach records...</div>
                                     <div className="flex items-center gap-2">

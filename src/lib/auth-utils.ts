@@ -45,7 +45,7 @@ export async function getEffectiveUserId(): Promise<{ id: string; email: string;
 
     return { 
         id: identity, 
-        email: `${identity}@openvector.io`, 
+        email: `${identity}@aletheia.io`, 
         isGuest: true 
     };
 }

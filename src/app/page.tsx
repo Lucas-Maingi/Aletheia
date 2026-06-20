@@ -59,6 +59,8 @@ const FloatingParticles = () => {
 export default function Landing() {
   const [searchValue, setSearchValue] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [emailToken, setEmailToken] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   
@@ -108,7 +110,7 @@ export default function Landing() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface border border-accent/30 text-accent text-sm font-mono mb-8 shadow-[0_0_20px_rgba(168,85,247,0.2)] backdrop-blur-md animate-pulse"
           >
             <Sparkles className="w-4 h-4 text-accent" />
-            <span className="font-bold">Monday, April 6:</span> The LTD Reveal. 50 Slots Available.
+            <span className="font-bold">Founding Member LTDs Now Available</span> — Limited Slots Remaining
           </motion.div>
 
           <motion.h1
@@ -196,6 +198,12 @@ export default function Landing() {
                 </button>
               </div>
             </form>
+            <div className="mt-4 flex justify-center">
+              <Link href="/dashboard/demo" className="text-[10px] font-bold uppercase tracking-widest text-text-tertiary hover:text-accent transition-colors flex items-center gap-2">
+                <Eye className="w-3.5 h-3.5" />
+                See Live Demo — No Sign-Up Required
+              </Link>
+            </div>
             <div className="mt-8 flex items-center justify-center gap-6 text-[10px] font-black uppercase tracking-[0.3em] text-text-tertiary">
                 <div className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_5px_var(--success)]" />
@@ -390,54 +398,55 @@ export default function Landing() {
                 <Shield className="w-3.5 h-3.5" /> Operations: Limited Slots
             </div>
             <h2 className="text-4xl md:text-6xl font-black text-white mb-6 uppercase italic tracking-tighter">
-                Secure Your <br/><span className="text-accent underline decoration-accent/20 underline-offset-8">LTD Priority</span> Slot.
+                Secure Your <br/><span className="text-accent underline decoration-accent/20 underline-offset-8">Lifetime Access</span> Now.
             </h2>
             <p className="text-lg text-text-secondary mb-12 font-medium max-w-2xl mx-auto leading-relaxed">
-                Joining the waitlist grants you 2-hour early access on Monday. Limited to the first 50 investigators. No commitment required until reveal.
+                Founding member lifetime deals are live. Lock in one-time pricing before we switch to monthly billing. 30-day money-back guarantee.
             </p>
+            <div className="mb-8">
+              <Link href="/pricing" className="inline-flex items-center gap-3 bg-accent hover:bg-white hover:text-accent text-white px-10 py-5 rounded-2xl font-black transition-all transform hover:scale-[1.02] shadow-[0_0_40px_rgba(168,85,247,0.3)] uppercase tracking-widest text-xs">
+                View Lifetime Deals
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
 
-            {(() => {
-              const [submitted, setSubmitted] = useState(false);
-              const [emailToken, setEmailToken] = useState("");
-
-              return !submitted ? (
-                <form 
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    setSubmitted(true);
-                  }}
-                  className="relative max-w-md mx-auto group"
-                >
-                    <div className="absolute -inset-1 bg-gradient-to-r from-accent to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000" />
-                    <div className="relative flex p-1.5 bg-surface border border-border/20 rounded-2xl shadow-2xl">
-                        <input 
-                            type="email" 
-                            required 
-                            placeholder="agency-email@domain.com" 
-                            className="flex-1 bg-transparent px-5 py-3 text-sm text-text-primary placeholder:text-text-tertiary/40 outline-none font-bold"
-                            value={emailToken}
-                            onChange={(e) => setEmailToken(e.target.value)}
-                        />
-                        <button 
-                            type="submit" 
-                            className="bg-accent hover:bg-white hover:text-accent text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all transform active:scale-95 shadow-xl"
-                        >
-                            Join Waitlist
-                        </button>
-                    </div>
-                </form>
-              ) : (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="p-8 rounded-2xl bg-surface border-2 border-accent/30 max-w-sm mx-auto shadow-glow-sm"
-                >
-                  <CheckCircle2 className="w-10 h-10 text-accent mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-white uppercase italic tracking-tighter mb-2">Priority Secured.</h3>
-                  <p className="text-[10px] font-mono text-text-tertiary uppercase tracking-widest">A confirmation packet has been dispatched to {emailToken}. See you Monday.</p>
-                </motion.div>
-              );
-            })()}
+            {submitted ? (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="p-8 rounded-2xl bg-surface border-2 border-accent/30 max-w-sm mx-auto shadow-glow-sm"
+              >
+                <CheckCircle2 className="w-10 h-10 text-accent mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-white uppercase italic tracking-tighter mb-2">Priority Secured.</h3>
+                <p className="text-[10px] font-mono text-text-tertiary uppercase tracking-widest">A confirmation packet has been dispatched to {emailToken}. See you soon.</p>
+              </motion.div>
+            ) : (
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setSubmitted(true);
+                }}
+                className="relative max-w-md mx-auto group"
+              >
+                  <div className="absolute -inset-1 bg-gradient-to-r from-accent to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000" />
+                  <div className="relative flex p-1.5 bg-surface border border-border/20 rounded-2xl shadow-2xl">
+                      <input 
+                          type="email" 
+                          required 
+                          placeholder="agency-email@domain.com" 
+                          className="flex-1 bg-transparent px-5 py-3 text-sm text-text-primary placeholder:text-text-tertiary/40 outline-none font-bold"
+                          value={emailToken}
+                          onChange={(e) => setEmailToken(e.target.value)}
+                      />
+                      <button 
+                          type="submit" 
+                          className="bg-accent hover:bg-white hover:text-accent text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all transform active:scale-95 shadow-xl"
+                      >
+                          Join Waitlist
+                      </button>
+                  </div>
+              </form>
+            )}
             
             <div className="mt-12 flex items-center justify-center gap-8 grayscale opacity-40">
                <div className="text-[10px] font-black text-text-tertiary uppercase tracking-widest flex items-center gap-2">

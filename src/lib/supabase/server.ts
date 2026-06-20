@@ -40,7 +40,7 @@ export async function createClient() {
                 data: {
                     user: {
                         id: 'local-dev-user',
-                        email: 'analyst@openvector.io',
+                        email: 'analyst@aletheia.io',
                         app_metadata: {},
                         user_metadata: {},
                         aud: 'authenticated',

@@ -15,7 +15,7 @@ export async function GET() {
             update: { updatedAt: new Date() },
             create: {
                 id: user.id,
-                email: user.email || 'guest@openvector.io',
+                email: user.email || 'guest@aletheia.io',
                 role: user.isGuest ? 'guest' : 'analyst'
             }
         });
