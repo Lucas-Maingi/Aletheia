@@ -33,7 +33,13 @@ export async function middleware(request: NextRequest) {
         }
     );
 
-    const { data: { user } } = await supabase.auth.getUser();
+    let user = null;
+    try {
+        const { data } = await supabase.auth.getUser();
+        user = data?.user || null;
+    } catch (err) {
+        console.warn('[Middleware] Supabase session check failed:', err);
+    }
 
     // 2. Guest Identity Provisioning (Persistence Fix)
     const guestId = request.cookies.get('ale_guest_id')?.value;
