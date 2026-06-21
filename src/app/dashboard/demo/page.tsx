@@ -652,6 +652,7 @@ function CinematicDemo() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const dossierContainerRef = useRef<HTMLDivElement>(null);
   const logFeedRef = useRef<HTMLDivElement>(null);
+  const evidenceContainerRef = useRef<HTMLDivElement>(null);
 
   // Auto-play control loop
   useEffect(() => {
@@ -746,6 +747,13 @@ function CinematicDemo() {
       logFeedRef.current.scrollTop = logFeedRef.current.scrollHeight;
     }
   }, [visibleLogs]);
+
+  // Auto-scroll evidence container to bottom as new evidence is collected
+  useEffect(() => {
+    if (evidenceContainerRef.current) {
+      evidenceContainerRef.current.scrollTop = evidenceContainerRef.current.scrollHeight;
+    }
+  }, [visibleEvidence]);
 
   const animateTyping = (text: string) => {
     let index = 0;
@@ -954,22 +962,26 @@ function CinematicDemo() {
                 {/* Active scan status */}
                 <div className="bg-surface/50 border border-border/10 rounded-xl p-5 shadow-xl backdrop-blur-sm">
                   <h3 className="text-xs font-bold text-text-tertiary uppercase tracking-widest mb-3">Scanning Node</h3>
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h2 className="text-sm font-bold truncate text-text-primary">{DEMO_PERSON.investigation.title}</h2>
-                      <span className="text-[10px] text-text-secondary">Subject: john.doe@example.com</span>
+                  <div className="flex items-center justify-between gap-4 mb-4">
+                    <div className="min-w-0 flex-1">
+                      <h2 className="text-sm font-bold truncate text-text-primary" title={DEMO_PERSON.investigation.title}>
+                        {DEMO_PERSON.investigation.title}
+                      </h2>
+                      <p className="text-[10px] text-text-secondary truncate">Subject: john.doe@example.com</p>
                     </div>
-                    {currentStep >= 14 ? (
-                      <Badge variant="success" size="sm" className="gap-1.5 px-2.5 py-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        COMPLETE
-                      </Badge>
-                    ) : (
-                      <Badge variant="warning" size="sm" className="gap-1.5 px-2.5 py-1 animate-pulse bg-accent/15 border-accent/20 text-accent">
-                        <Loader className="w-3.5 h-3.5 animate-spin text-accent" />
-                        SCANNING
-                      </Badge>
-                    )}
+                    <div className="shrink-0">
+                      {currentStep >= 14 ? (
+                        <Badge variant="success" size="sm" className="gap-1.5 px-2.5 py-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          COMPLETE
+                        </Badge>
+                      ) : (
+                        <Badge variant="warning" size="sm" className="gap-1.5 px-2.5 py-1 animate-pulse bg-accent/15 border-accent/20 text-accent">
+                          <Loader className="w-3.5 h-3.5 animate-spin text-accent" />
+                          SCANNING
+                        </Badge>
+                      )}
+                    </div>
                   </div>
 
                   {/* Connectors Matrix */}
@@ -1073,10 +1085,11 @@ function CinematicDemo() {
                     {view === 'evidence' && (
                       <motion.div
                         key="evidence"
+                        ref={evidenceContainerRef}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="h-[520px] overflow-y-auto pr-2 custom-scrollbar"
+                        className="h-[590px] overflow-y-auto pr-2 custom-scrollbar"
                       >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {visibleEvidence.map((ev) => (
@@ -1099,7 +1112,7 @@ function CinematicDemo() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="rounded-xl border border-border bg-surface/80 backdrop-blur-sm p-6 h-[520px] overflow-y-auto custom-scrollbar"
+                        className="rounded-xl border border-border bg-surface/80 backdrop-blur-sm p-6 h-[590px] overflow-y-auto custom-scrollbar"
                       >
                         <h3 className="text-xs uppercase tracking-widest text-text-secondary font-medium mb-6 flex items-center gap-2">
                           <Clock className="w-4 h-4 text-accent" />
@@ -1126,7 +1139,7 @@ function CinematicDemo() {
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
-                        className="rounded-xl border border-border bg-surface/80 backdrop-blur-sm p-8 prose-invert max-w-none h-[520px] flex flex-col"
+                        className="rounded-xl border border-border bg-surface/80 backdrop-blur-sm p-8 prose-invert max-w-none h-[590px] flex flex-col"
                       >
                         <div className="flex items-center gap-2 mb-6 pb-4 border-b border-border shrink-0">
                           <Terminal className="w-4 h-4 text-accent" />
@@ -1178,7 +1191,7 @@ function CinematicDemo() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="rounded-xl border border-border bg-surface/80 backdrop-blur-sm p-6 h-[520px] overflow-y-auto custom-scrollbar"
+                        className="rounded-xl border border-border bg-surface/80 backdrop-blur-sm p-6 h-[590px] overflow-y-auto custom-scrollbar"
                       >
                         <div className="flex items-center gap-2 mb-4">
                           <Database className="w-4 h-4 text-accent" />

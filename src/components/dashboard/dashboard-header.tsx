@@ -20,7 +20,6 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ user }: DashboardHeaderProps) {
     const pathname = usePathname();
-    if (pathname === '/dashboard/demo') return null;
     const router = useRouter();
     const segments = pathname.split('/').filter(Boolean);
     const [isVisible, setIsVisible] = useState(true);
