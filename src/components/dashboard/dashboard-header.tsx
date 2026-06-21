@@ -114,7 +114,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                     <nav className="hidden xl:flex items-center gap-8 mr-2 text-[10px] font-black uppercase tracking-widest text-text-tertiary">
                         <Link href="/pricing" className="hover:text-accent hover:text-[11px] transition-all">Pricing</Link>
                         <Link href="/#features" className="hover:text-accent hover:text-[11px] transition-all">Features</Link>
-                        <Link href="/#faq" className="hover:text-accent hover:text-[11px] transition-all">FAQs</Link>
+                        <Link href="/dashboard/demo" className="hover:text-accent hover:text-[11px] transition-all">Demo</Link>
                     </nav>
 
                     <div 

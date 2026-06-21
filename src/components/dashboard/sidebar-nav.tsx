@@ -104,20 +104,6 @@ export function SidebarNav({ isGuest, isAdmin }: { isGuest?: boolean; isAdmin?: 
                     icon={<Shield className="w-4 h-4" />} 
                     badge="Pro"
                 />
-
-                <NavLink 
-                    href="/dashboard/demo" 
-                    label="Interactive Demo" 
-                    icon={<Activity className="w-4 h-4" />} 
-                    badge="Free"
-                />
-
-                <NavLink 
-                    href="/dashboard/demo/social" 
-                    label="Cinematic Demo" 
-                    icon={<MessageSquare className="w-4 h-4" />} 
-                    badge="Rec"
-                />
             </div>
 
             <div className="mt-auto pt-4 pb-1">

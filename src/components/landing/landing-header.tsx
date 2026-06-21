@@ -36,6 +36,9 @@ export function LandingHeader() {
                 </div>
 
                 <div className="flex items-center gap-6 md:gap-8">
+                    <Link href="/dashboard/demo" className="hidden md:flex text-xs font-black uppercase tracking-widest text-text-secondary hover:text-accent transition-all duration-300">
+                        Demo
+                    </Link>
                     <Link href="/pricing" className="hidden md:flex text-xs font-black uppercase tracking-widest text-text-secondary hover:text-accent transition-all duration-300">
                         Pricing
                     </Link>
