@@ -71,54 +71,57 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                         </Link>
                     </div>
 
-                    {/* Separator */}
-                    <div className="h-6 w-px bg-border/20 hidden md:block" />
-
-                    {/* Back Button (Only on subpages) */}
                     {pathname !== "/dashboard" && pathname !== "/dashboard/" && (
-                        <button
-                            onClick={() => router.back()}
-                            className="group/back-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent/5 border border-accent/20 hover:bg-accent/10 hover:border-accent/40 text-accent text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-md shadow-accent/5"
-                        >
-                            <ArrowLeft className="w-3.5 h-3.5 group-hover/back-btn:-translate-x-0.5 transition-transform" />
-                            <span>Back</span>
-                        </button>
+                        <>
+                            {/* Separator */}
+                            <div className="h-6 w-px bg-border/20 hidden md:block" />
+
+                            {/* Back Button */}
+                            <button
+                                onClick={() => router.back()}
+                                className="group/back-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent/5 border border-accent/20 hover:bg-accent/10 hover:border-accent/40 text-accent text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-md shadow-accent/5"
+                            >
+                                <ArrowLeft className="w-3.5 h-3.5 group-hover/back-btn:-translate-x-0.5 transition-transform" />
+                                <span>Back</span>
+                            </button>
+                        </>
                     )}
-
-                    {/* Breadcrumbs */}
-                    <nav className="flex items-center gap-2 text-[11px] uppercase font-black tracking-[0.2em] text-text-tertiary">
-                    {(() => {
-                        const filteredSegments = segments.filter(s => s.toLowerCase() !== 'dashboard');
-                        return filteredSegments.map((segment, index) => {
-                            const isLast = index === filteredSegments.length - 1;
-                            const originalIndex = segments.indexOf(segment);
-                            const path = `/${segments.slice(0, originalIndex + 1).join('/')}`;
-                            const label = segment.replace(/-/g, ' ');
-
-                            return (
-                                <div key={path} className="flex items-center gap-2">
-                                    {index > 0 && <ChevronRight className="w-3.5 h-3.5 opacity-20" />}
-                                    {isLast ? (
-                                        <span className="text-gradient-vibrant font-black">{label}</span>
-                                    ) : (
-                                        <Link href={path} className="hover:text-text-primary transition-all hover:tracking-[0.3em]">
-                                            {label}
-                                        </Link>
-                                    )}
-                                </div>
-                            );
-                        });
-                    })()}
-                    </nav>
                 </div>
 
                 {/* Right Side Actions */}
                 <div className="flex items-center gap-6">
                     {/* Public Drop Nav */}
-                    <nav className="hidden xl:flex items-center gap-8 mr-2 text-[10px] font-black uppercase tracking-widest text-text-tertiary">
-                        <Link href="/pricing" className="hover:text-accent hover:text-[11px] transition-all">Pricing</Link>
-                        <Link href="/#features" className="hover:text-accent hover:text-[11px] transition-all">Features</Link>
-                        <Link href="/dashboard/demo" className="hover:text-accent hover:text-[11px] transition-all">Demo</Link>
+                    <nav className="hidden xl:flex items-center gap-8 mr-2 text-[10px] font-black uppercase tracking-widest">
+                        <Link 
+                            href="/pricing" 
+                            className={`hover:text-accent transition-all ${
+                                pathname === '/pricing' 
+                                    ? 'text-accent drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] font-bold' 
+                                    : 'text-text-tertiary'
+                            }`}
+                        >
+                            Pricing
+                        </Link>
+                        <Link 
+                            href="/features" 
+                            className={`hover:text-accent transition-all ${
+                                pathname === '/features' 
+                                    ? 'text-accent drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] font-bold' 
+                                    : 'text-text-tertiary'
+                            }`}
+                        >
+                            Features
+                        </Link>
+                        <Link 
+                            href="/dashboard/demo" 
+                            className={`hover:text-accent transition-all ${
+                                pathname === '/dashboard/demo' 
+                                    ? 'text-accent drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] font-bold' 
+                                    : 'text-text-tertiary'
+                            }`}
+                        >
+                            Demo
+                        </Link>
                     </nav>
 
                     <div 
