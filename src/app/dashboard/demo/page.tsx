@@ -667,9 +667,9 @@ export default function DemoPage() {
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, delay: 1 }}
-        className="fixed bottom-0 left-0 right-0 z-50"
+        className="sticky bottom-4 left-0 right-0 z-40 mt-12"
       >
-        <div className="relative overflow-hidden border-t border-accent/20">
+        <div className="relative overflow-hidden border border-accent/20 rounded-2xl">
           {/* Background */}
           <div className="absolute inset-0 bg-background/90 backdrop-blur-xl" />
           <div className="absolute inset-0 bg-gradient-to-r from-accent/10 via-purple-500/5 to-pink-500/5" />

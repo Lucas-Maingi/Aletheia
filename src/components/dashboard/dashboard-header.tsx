@@ -87,24 +87,28 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
 
                     {/* Breadcrumbs */}
                     <nav className="flex items-center gap-2 text-[11px] uppercase font-black tracking-[0.2em] text-text-tertiary">
-                    {segments.filter(s => s.toLowerCase() !== 'dashboard').map((segment, index) => {
-                        const isLast = index === segments.length - 1;
-                        const path = `/${segments.slice(0, index + 1).join('/')}`;
-                        const label = segment.replace(/-/g, ' ');
+                    {(() => {
+                        const filteredSegments = segments.filter(s => s.toLowerCase() !== 'dashboard');
+                        return filteredSegments.map((segment, index) => {
+                            const isLast = index === filteredSegments.length - 1;
+                            const originalIndex = segments.indexOf(segment);
+                            const path = `/${segments.slice(0, originalIndex + 1).join('/')}`;
+                            const label = segment.replace(/-/g, ' ');
 
-                        return (
-                            <div key={path} className="flex items-center gap-2">
-                                {index > 0 && <ChevronRight className="w-3.5 h-3.5 opacity-20" />}
-                                {isLast ? (
-                                    <span className="text-gradient-vibrant font-black">{label}</span>
-                                ) : (
-                                    <Link href={path} className="hover:text-text-primary transition-all hover:tracking-[0.3em]">
-                                        {label}
-                                    </Link>
-                                )}
-                            </div>
-                        );
-                    })}
+                            return (
+                                <div key={path} className="flex items-center gap-2">
+                                    {index > 0 && <ChevronRight className="w-3.5 h-3.5 opacity-20" />}
+                                    {isLast ? (
+                                        <span className="text-gradient-vibrant font-black">{label}</span>
+                                    ) : (
+                                        <Link href={path} className="hover:text-text-primary transition-all hover:tracking-[0.3em]">
+                                            {label}
+                                        </Link>
+                                    )}
+                                </div>
+                            );
+                        });
+                    })()}
                     </nav>
                 </div>
 
