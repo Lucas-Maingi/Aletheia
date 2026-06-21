@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
-import { Zap, Palette, MessageSquare, Layers, Shield, Bell, Activity, LogOut, ArrowRight } from 'lucide-react';
+import { Zap, Palette, MessageSquare, Layers, Bell, Activity, LogOut } from 'lucide-react';
 import { AlertBell } from '@/components/dashboard/alert-bell';
 import { AletheiaLogo } from '@/components/AletheiaLogo';
 import { prisma } from '@/lib/prisma';
@@ -91,11 +91,6 @@ export default async function DashboardLayout({
                                 </nav>
 
                             <div className="p-4 border-t border-r border-border/10 mt-auto bg-foreground/[0.04] backdrop-blur-3xl relative z-30 space-y-2">
-                                <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-foreground/[0.05] text-text-tertiary hover:text-text-primary transition-all group/home border border-transparent hover:border-border/10">
-                                    <Shield className="w-4 h-4 text-text-tertiary group-hover/home:text-accent transition-colors" />
-                                    <span className="text-[11px] font-black uppercase tracking-widest flex-1">Site_Home</span>
-                                    <ArrowRight className="w-3 h-3 opacity-0 group-hover/home:opacity-100 transition-all translate-x-[-4px] group-hover/home:translate-x-0" />
-                                </Link>
                                 <Link href="/dashboard/settings" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-foreground/[0.05] text-text-secondary hover:text-text-primary transition-all group/settings border border-transparent hover:border-border/10">
                                     <Palette className="w-4 h-4 text-text-tertiary group-hover/settings:text-accent transition-colors" />
                                     <span className="text-[11px] font-black uppercase tracking-widest flex-1">System_Config</span>

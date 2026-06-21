@@ -57,7 +57,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                 <div className="flex items-center gap-8">
                     {/* Brand Section */}
                     <div className="flex items-center gap-3.5 group/header-brand">
-                        <Link href="/dashboard" className="flex items-center gap-3.5">
+                        <Link href="/" className="flex items-center gap-3.5">
                             <div className="p-1 px-2.5 bg-accent/10 rounded-lg border border-accent/30 shadow-lg shadow-accent/5 group-hover/header-brand:scale-110 transition-all duration-500">
                                 <AletheiaLogo className="w-5 h-5 text-accent" />
                             </div>
