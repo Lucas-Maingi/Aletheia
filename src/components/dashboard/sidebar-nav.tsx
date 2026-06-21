@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MessageSquare, Layers, Shield, Zap, Search, Activity, ArrowUpRight, LayoutDashboard } from "lucide-react";
+import { 
+    MessageSquare, Layers, Shield, Zap, Search, 
+    Activity, ArrowUpRight, LayoutDashboard, Database, Lock 
+} from "lucide-react";
 
 interface NavLinkProps {
     href: string;
@@ -10,9 +13,10 @@ interface NavLinkProps {
     icon: React.ReactNode;
     badge?: string;
     isPrimary?: boolean;
+    isLocked?: boolean;
 }
 
-function NavLink({ href, label, icon, badge, isPrimary }: NavLinkProps) {
+function NavLink({ href, label, icon, badge, isPrimary, isLocked }: NavLinkProps) {
     const pathname = usePathname();
     const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
 
@@ -39,11 +43,12 @@ function NavLink({ href, label, icon, badge, isPrimary }: NavLinkProps) {
             </span>
 
             {badge && (
-                <span className={`ml-auto text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter transition-all ${
+                <span className={`ml-auto flex items-center gap-1 text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter transition-all ${
                     isActive 
                         ? "bg-accent text-white border border-accent shadow-[0_0_8px_rgba(0,240,255,0.4)]" 
                         : "bg-foreground/[0.06] text-text-secondary border border-border/10 group-hover:bg-accent/10 group-hover:text-accent opacity-100"
                 }`}>
+                    {isLocked && <Lock className="w-2 h-2 text-current shrink-0" />}
                     {badge}
                 </span>
             )}
@@ -51,22 +56,41 @@ function NavLink({ href, label, icon, badge, isPrimary }: NavLinkProps) {
     );
 }
 
-export function SidebarNav({ isGuest, isAdmin }: { isGuest?: boolean; isAdmin?: boolean }) {
-    return (
-        <div className="space-y-1 flex flex-col h-full">
-            <div className="text-[9px] font-bold text-text-tertiary uppercase tracking-[0.4em] mb-2 mt-2 px-4 border-l-2 border-accent/10 ml-1">
-                {isGuest ? 'Anonymous_Session' : 'Mission_Operations'}
-            </div>
+export function SidebarNav({ 
+    isGuest, 
+    isAdmin, 
+    plan = "free" 
+}: { 
+    isGuest?: boolean; 
+    isAdmin?: boolean; 
+    plan?: string;
+}) {
+    // Determine locked states
+    const isWatchlistLocked = plan === "free";
+    const isBulkLocked = plan === "free" || plan === "pro";
 
-            <div className="space-y-0.5">
-                {isAdmin && (
+    return (
+        <div className="space-y-4 flex flex-col h-full">
+            {/* Admin Section */}
+            {isAdmin && (
+                <div className="space-y-1">
+                    <div className="text-[9px] font-bold text-text-tertiary uppercase tracking-[0.4em] mb-2 px-4 border-l-2 border-accent/10 ml-1">
+                        Admin_Ops
+                    </div>
                     <NavLink 
                         href="/dashboard/admin/feedback" 
                         label="Admin Terminal" 
                         icon={<Activity className="w-4 h-4" />} 
-                        isPrimary
                     />
-                )}
+                </div>
+            )}
+
+            {/* Mission Control Section */}
+            <div className="space-y-1">
+                <div className="text-[9px] font-bold text-text-tertiary uppercase tracking-[0.4em] mb-2 px-4 border-l-2 border-accent/10 ml-1">
+                    {isGuest ? 'Anonymous_Session' : 'Mission_Control'}
+                </div>
+
                 <NavLink 
                     href="/dashboard" 
                     label="Dashboard Overview" 
@@ -75,7 +99,7 @@ export function SidebarNav({ isGuest, isAdmin }: { isGuest?: boolean; isAdmin?: 
 
                 <Link
                     href="/dashboard/investigations/new"
-                    className="flex items-center justify-between px-4 py-3 mt-1.5 mb-5 text-[12px] text-white bg-accent border border-accent shadow-xl shadow-accent/20 rounded-xl hover:bg-accent-hover hover:scale-[1.02] transition-all duration-300 font-black uppercase tracking-widest group relative overflow-hidden"
+                    className="flex items-center justify-between px-4 py-3 mt-1.5 mb-2.5 text-[12px] text-white bg-accent border border-accent shadow-xl shadow-accent/20 rounded-xl hover:bg-accent-hover hover:scale-[1.02] transition-all duration-300 font-black uppercase tracking-widest group relative overflow-hidden"
                 >
                     <div className="flex items-center gap-2.5 relative z-10 overflow-hidden">
                         <Search className="w-3.5 h-3.5 shrink-0" />
@@ -92,10 +116,24 @@ export function SidebarNav({ isGuest, isAdmin }: { isGuest?: boolean; isAdmin?: 
                 />
 
                 <NavLink 
+                    href="/dashboard/investigations" 
+                    label="Intelligence Archive" 
+                    icon={<Database className="w-4 h-4" />} 
+                />
+            </div>
+
+            {/* Automated Systems Section */}
+            <div className="space-y-1">
+                <div className="text-[9px] font-bold text-text-tertiary uppercase tracking-[0.4em] mb-2 mt-4 px-4 border-l-2 border-accent/10 ml-1">
+                    Automated_Recon
+                </div>
+
+                <NavLink 
                     href="/dashboard/investigations/batch" 
                     label="Bulk Processing" 
                     icon={<Layers className="w-4 h-4" />} 
                     badge="Elite"
+                    isLocked={isBulkLocked}
                 />
 
                 <NavLink 
@@ -103,36 +141,42 @@ export function SidebarNav({ isGuest, isAdmin }: { isGuest?: boolean; isAdmin?: 
                     label="Watchlists" 
                     icon={<Shield className="w-4 h-4" />} 
                     badge="Pro"
+                    isLocked={isWatchlistLocked}
                 />
             </div>
 
-            <div className="mt-auto pt-4 pb-1">
-                <Link
-                    href="/pricing"
-                    className="relative flex flex-col p-5 rounded-3xl bg-surface/50 backdrop-blur-3xl border border-accent/20 dark:border-white/5 hover:border-accent/40 shadow-xl transition-all duration-500 group overflow-hidden"
-                >
-                    <div className="absolute -right-10 -top-10 w-32 h-32 bg-accent/5 blur-3xl group-hover:bg-accent/10 transition-all" />
-                    
-                    <div className="relative z-10">
-                        <div className="flex items-center justify-between mb-5">
-                            <div className="p-2.5 rounded-xl bg-accent/10 border border-accent/20">
-                                <Zap className="w-4 h-4 text-accent" />
-                            </div>
-                            <span className="text-[9px] font-black text-accent uppercase tracking-[0.2em] border border-accent/20 px-2.5 py-1 rounded-lg bg-accent/5">Elite_Tier</span>
-                        </div>
+            {/* Call to Action Upgrade Box */}
+            {(plan === "free" || plan === "pro") && (
+                <div className="mt-auto pt-4 pb-1">
+                    <Link
+                        href="/pricing"
+                        className="relative flex flex-col p-5 rounded-3xl bg-surface/50 backdrop-blur-3xl border border-accent/20 dark:border-white/5 hover:border-accent/40 shadow-xl transition-all duration-500 group overflow-hidden"
+                    >
+                        <div className="absolute -right-10 -top-10 w-32 h-32 bg-accent/5 blur-3xl group-hover:bg-accent/10 transition-all" />
                         
-                        <h4 className="text-[13px] font-black text-text-primary uppercase tracking-widest mb-2">Go Premium</h4>
-                        <p className="text-[11px] text-text-tertiary leading-relaxed uppercase tracking-tight">
-                            Access unfiltered Intelligence nodes & data feeds.
-                        </p>
+                        <div className="relative z-10">
+                            <div className="flex items-center justify-between mb-5">
+                                <div className="p-2.5 rounded-xl bg-accent/10 border border-accent/20">
+                                    <Zap className="w-4 h-4 text-accent" />
+                                </div>
+                                <span className="text-[9px] font-black text-accent uppercase tracking-[0.2em] border border-accent/20 px-2.5 py-1 rounded-lg bg-accent/5">
+                                    {plan === "free" ? "Upgrade" : "Go Elite"}
+                                </span>
+                            </div>
+                            
+                            <h4 className="text-[13px] font-black text-text-primary uppercase tracking-widest mb-2">Go Premium</h4>
+                            <p className="text-[11px] text-text-tertiary leading-relaxed uppercase tracking-tight">
+                                Access unfiltered Intelligence nodes & data feeds.
+                            </p>
 
-                        <div className="mt-5 flex items-center gap-2.5 text-[11px] font-black text-accent uppercase tracking-widest group-hover:gap-4 transition-all duration-500">
-                            Upgrade Profile
-                            <ArrowUpRight className="w-4 h-4" />
+                            <div className="mt-5 flex items-center gap-2.5 text-[11px] font-black text-accent uppercase tracking-widest group-hover:gap-4 transition-all duration-500">
+                                Upgrade Profile
+                                <ArrowUpRight className="w-4 h-4" />
+                            </div>
                         </div>
-                    </div>
-                </Link>
-            </div>
+                    </Link>
+                </div>
+            )}
         </div>
     );
 }

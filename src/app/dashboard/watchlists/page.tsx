@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { 
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter 
 } from "@/components/ui/dialog";
+import Link from "next/link";
 
 interface WatchlistItem {
   id: string;
@@ -27,6 +28,7 @@ interface WatchlistItem {
 
 export default function WatchlistPage() {
   const [watchlists, setWatchlists] = useState<WatchlistItem[]>([]);
+  const [plan, setPlan] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
   
@@ -37,7 +39,23 @@ export default function WatchlistPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    fetchWatchlists();
+    const initData = async () => {
+      try {
+        const usageRes = await fetch('/api/user/usage');
+        if (usageRes.ok) {
+          const usageData = await usageRes.json();
+          setPlan(usageData.plan || 'free');
+        } else {
+          setPlan('free');
+        }
+        await fetchWatchlists();
+      } catch (err) {
+        console.error("Watchlists init error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    initData();
   }, []);
 
   const fetchWatchlists = async () => {
@@ -101,6 +119,75 @@ export default function WatchlistPage() {
       console.error("Delete error:", err);
     }
   };
+
+  if (!loading && plan === 'free') {
+    return (
+      <div className="max-w-4xl mx-auto py-12 px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <Card className="relative overflow-hidden bg-surface/20 border-accent/20 shadow-[0_0_80px_rgba(0,240,255,0.08)] backdrop-blur-3xl p-8 md:p-12 rounded-3xl group">
+          {/* Ambient Glows */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 blur-[120px] rounded-full pointer-events-none -z-10 group-hover:bg-accent/15 transition-all duration-700" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-transparent pointer-events-none opacity-50" />
+
+          <div className="relative z-10 flex flex-col md:flex-row gap-8 md:gap-12 items-center">
+            {/* Icon Block */}
+            <div className="flex-shrink-0 w-24 h-24 rounded-2xl bg-accent/10 border border-accent/30 flex items-center justify-center relative shadow-[0_0_30px_rgba(0,240,255,0.15)] group-hover:scale-105 transition-transform duration-500">
+              <div className="absolute inset-0 bg-accent/20 blur-md rounded-2xl opacity-50 group-hover:opacity-100 transition-opacity" />
+              <Shield className="w-12 h-12 text-accent relative z-10 animate-pulse" />
+            </div>
+
+            {/* Copy Block */}
+            <div className="flex-1 space-y-4 text-center md:text-left">
+              <Badge variant="outline" className="px-4 py-1.5 border-accent/30 bg-accent/10 text-accent uppercase font-black tracking-widest text-[9px]">
+                <Zap className="w-3 h-3 mr-1.5 fill-accent animate-pulse" /> Premium Surveillance Feature
+              </Badge>
+              <h1 className="text-3xl md:text-4xl font-serif font-black text-white uppercase tracking-tight italic">
+                Unlock 24/7 <br />
+                <span className="text-accent">Autonomous Watchlists</span>
+              </h1>
+              <p className="text-text-muted text-sm md:text-base leading-relaxed font-sans max-w-xl">
+                Continuous surveillance nodes scan global dark web leaks, social graphs, carrier records, and facial recognition registers. Deploy intelligence pulses to automatically monitor targets and receive instant threat telemetry.
+              </p>
+              
+              {/* Feature Check Grid */}
+              <div className="grid sm:grid-cols-2 gap-3 pt-2 text-[11px] font-mono uppercase tracking-wider text-slate-300">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-accent shrink-0" />
+                  <span>24/7 Passive Scanning</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-accent shrink-0" />
+                  <span>Real-Time Ingestion Alerts</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-accent shrink-0" />
+                  <span>Email & Webhook Feeds</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-accent shrink-0" />
+                  <span>Biometric Leak Sweep</span>
+                </div>
+              </div>
+
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row items-center gap-4 pt-6">
+                <Link href="/pricing" className="w-full sm:w-auto">
+                  <Button className="w-full bg-accent text-slate-900 font-black hover:brightness-110 shadow-[0_0_30px_rgba(0,240,255,0.3)] hover:scale-[1.02] transition-all duration-300 uppercase tracking-widest text-xs h-11 px-8">
+                    Upgrade to Command Center
+                  </Button>
+                </Link>
+                <Link href="/dashboard" className="w-full sm:w-auto">
+                  <Button variant="ghost" className="w-full border border-white/10 text-white hover:bg-white/5 uppercase tracking-widest text-xs h-11 px-8">
+                    Back to Terminal
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">

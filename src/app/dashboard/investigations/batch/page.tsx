@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, FileText, Play, CheckCircle2, AlertCircle, X, Shield, Layers, Database, Target, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useInvestigation } from "@/context/InvestigationContext";
 import { useRouter } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 export default function BatchInvestigationPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -15,8 +17,30 @@ export default function BatchInvestigationPage() {
   const [progress, setProgress] = useState(0);
   const [targets, setTargets] = useState<string[]>([]);
   const [results, setResults] = useState<{ id: string, target: string, status: string }[]>([]);
+  const [plan, setPlan] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchPlan = async () => {
+      try {
+        const res = await fetch('/api/user/usage');
+        if (res.ok) {
+          const data = await res.json();
+          setPlan(data.plan || 'free');
+        } else {
+          setPlan('free');
+        }
+      } catch (err) {
+        console.error("Failed to fetch plan:", err);
+        setPlan('free');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPlan();
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -66,6 +90,84 @@ export default function BatchInvestigationPage() {
 
     setIsProcessing(false);
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 opacity-30 animate-pulse">
+          <Layers className="w-12 h-12 mb-4 text-accent animate-pulse" />
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em]">Authenticating Node Access...</p>
+      </div>
+    );
+  }
+
+  if (!loading && plan !== 'elite' && plan !== 'enterprise') {
+    return (
+      <div className="max-w-4xl mx-auto py-12 px-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <Card className="relative overflow-hidden bg-surface/20 border-accent/20 shadow-[0_0_80px_rgba(0,240,255,0.08)] backdrop-blur-3xl p-8 md:p-12 rounded-3xl group">
+          {/* Ambient Glows */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 blur-[120px] rounded-full pointer-events-none -z-10 group-hover:bg-accent/15 transition-all duration-700" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-transparent pointer-events-none opacity-50" />
+
+          <div className="relative z-10 flex flex-col md:flex-row gap-8 md:gap-12 items-center">
+            {/* Icon Block */}
+            <div className="flex-shrink-0 w-24 h-24 rounded-2xl bg-accent/10 border border-accent/30 flex items-center justify-center relative shadow-[0_0_30px_rgba(0,240,255,0.15)] group-hover:scale-105 transition-transform duration-500">
+              <div className="absolute inset-0 bg-accent/20 blur-md rounded-2xl opacity-50 group-hover:opacity-100 transition-opacity" />
+              <Layers className="w-12 h-12 text-accent relative z-10 animate-pulse" />
+            </div>
+
+            {/* Copy Block */}
+            <div className="flex-1 space-y-4 text-center md:text-left">
+              <Badge variant="outline" className="px-4 py-1.5 border-accent/30 bg-accent/10 text-accent uppercase font-black tracking-widest text-[9px]">
+                <Zap className="w-3 h-3 mr-1.5 fill-accent animate-pulse" /> Premium Operations Feature
+              </Badge>
+              <h1 className="text-3xl md:text-4xl font-serif font-black text-white uppercase tracking-tight italic">
+                Unlock Massively <br />
+                <span className="text-accent">Parallel Batch Intel</span>
+              </h1>
+              <p className="text-text-muted text-sm md:text-base leading-relaxed font-sans max-w-xl">
+                Ingest CSV, TXT, or JSON target logs to execute thousands of OSINT connectors concurrently. Ideal for bulk audit logs, incident response list sweeps, and automated multi-vector synthesis reports.
+              </p>
+              
+              {/* Feature Check Grid */}
+              <div className="grid sm:grid-cols-2 gap-3 pt-2 text-[11px] font-mono uppercase tracking-wider text-slate-300">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-accent shrink-0" />
+                  <span>Parallel Scanning Nodes</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-accent shrink-0" />
+                  <span>Bulk CSV/JSON Import</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-accent shrink-0" />
+                  <span>Clustered Report Synthesis</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-accent shrink-0" />
+                  <span>Webhook & API Auto-Export</span>
+                </div>
+              </div>
+
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row items-center gap-4 pt-6">
+                <Link href="/pricing" className="w-full sm:w-auto">
+                  <Button className="w-full bg-accent text-slate-900 font-black hover:brightness-110 shadow-[0_0_30px_rgba(0,240,255,0.3)] hover:scale-[1.02] transition-all duration-300 uppercase tracking-widest text-xs h-11 px-8">
+                    Upgrade to Command Center
+                  </Button>
+                </Link>
+                <Link href="/dashboard" className="w-full sm:w-auto">
+                  <Button variant="ghost" className="w-full border border-white/10 text-white hover:bg-white/5 uppercase tracking-widest text-xs h-11 px-8">
+                    Back to Terminal
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">

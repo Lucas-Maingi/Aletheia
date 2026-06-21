@@ -73,9 +73,10 @@ export default async function DashboardLayout({
 
         const dbUser = await prisma.user.findUnique({
             where: { id: user.id },
-            select: { role: true }
+            select: { role: true, plan: true }
         });
         const isAdmin = dbUser?.role === 'admin';
+        const plan = dbUser?.plan || 'free';
 
         return (
             <InvestigationProvider>
@@ -87,7 +88,7 @@ export default async function DashboardLayout({
                         <MobileSidebarToggle>
                             <aside className="w-64 bg-surface/80 backdrop-blur-2xl flex flex-col relative z-20 shadow-[10px_0_50px_rgba(0,0,0,0.3)] h-full overflow-hidden pt-16">
                                 <nav className="flex-1 p-4 overflow-y-auto no-scrollbar border-r border-border/10 relative z-30 bg-surface/40">
-                                    <SidebarNav isGuest={user.isGuest} isAdmin={isAdmin} />
+                                    <SidebarNav isGuest={user.isGuest} isAdmin={isAdmin} plan={plan} />
                                 </nav>
 
 
