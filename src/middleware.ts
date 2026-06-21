@@ -104,7 +104,8 @@ export async function middleware(request: NextRequest) {
         '/blog',
         '/pricing',
         '/ethics',
-        '/checkout'
+        '/checkout',
+        '/contact'
     ];
     
     const isPublicRoute = publicRoutes.some((route) => 

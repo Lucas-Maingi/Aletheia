@@ -14,6 +14,7 @@ import { InvestigationProvider } from '@/context/InvestigationContext';
 import { getEffectiveUserId } from '@/lib/auth-utils';
 import { SidebarNav } from '@/components/dashboard/sidebar-nav';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
+import { Footer } from '@/components/footer';
 
 export default async function DashboardLayout({
     children,
@@ -100,12 +101,6 @@ export default async function DashboardLayout({
                                     <span className="text-[11px] font-black uppercase tracking-widest flex-1">System_Config</span>
                                     <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shadow-[0_0_8px_rgba(0,240,255,0.6)]" />
                                 </Link>
-                                <div className="pt-2 flex flex-wrap justify-between gap-x-2 gap-y-1.5 border-t border-border/10 text-[9px] font-bold text-text-tertiary uppercase tracking-wider relative z-30">
-                                    <Link href="/about" className="hover:text-accent transition-colors">About</Link>
-                                    <Link href="/ethics" className="hover:text-accent transition-colors">Ethics</Link>
-                                    <Link href="/privacy" className="hover:text-accent transition-colors">Privacy</Link>
-                                    <Link href="/terms" className="hover:text-accent transition-colors">Terms</Link>
-                                </div>
                             </div>
                         </aside>
                     </MobileSidebarToggle>
@@ -141,6 +136,8 @@ export default async function DashboardLayout({
                     <div className="px-4 md:px-8 pb-24 md:pb-8 max-w-[1400px] w-full mx-auto relative z-10 flex-1">
                         {children}
                     </div>
+
+                    <Footer className="bg-surface/30 backdrop-blur-md border-t border-border/10 relative z-20" />
                 </main>
 
                 </div>

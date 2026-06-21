@@ -199,7 +199,7 @@ export function DashboardClient({
             </Link>
           </div>
 
-          <div className="space-y-4 overflow-y-auto no-scrollbar pb-4 pr-1">
+          <div className="space-y-4 max-h-[480px] overflow-y-auto custom-scrollbar pb-4 pr-2">
             {unifiedMissions.length === 0 ? (
                 <div className="text-center py-16 border border-dashed border-white/5 rounded-2xl bg-white/[0.02] text-text-tertiary text-[10px] font-mono uppercase tracking-[0.3em]">
                     No active mission telemetry.
