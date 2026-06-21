@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { LandingHeader } from "@/components/landing/landing-header";
 import { Footer } from "@/components/footer";
+import { ContentBackButton } from "@/components/landing/content-back-button";
+
 
 export default function ContactPage() {
     const [name, setName] = useState("");
@@ -64,6 +66,7 @@ export default function ContactPage() {
             <div className="absolute bottom-40 right-10 w-[400px] h-[400px] bg-purple-900/10 blur-[150px] rounded-full pointer-events-none -z-10" />
 
             <main className="flex-1 max-w-6xl mx-auto px-6 pt-32 pb-24 w-full relative z-10">
+                <ContentBackButton />
                 {/* Section Header */}
                 <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface border border-accent/30 text-accent text-xs font-black uppercase tracking-widest shadow-[0_0_30px_rgba(168,85,247,0.15)] backdrop-blur-md">

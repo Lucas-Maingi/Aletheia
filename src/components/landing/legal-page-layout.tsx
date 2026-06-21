@@ -7,6 +7,8 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { LandingHeader } from "./landing-header";
 import { Footer } from "../footer";
+import { ContentBackButton } from "./content-back-button";
+
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -87,7 +89,7 @@ export function LegalPageLayout({ title, lastUpdated, sections }: LegalPageLayou
       <div className="fixed bottom-0 left-0 w-[600px] h-[600px] bg-indigo-900/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-[1400px] mx-auto px-6 pt-24 md:pt-32 relative z-10">
-        
+        <ContentBackButton />
         {/* Page Header */}
         <div className="mb-16 md:mb-24 text-center md:text-left">
           <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-4 tracking-tight drop-shadow-lg">

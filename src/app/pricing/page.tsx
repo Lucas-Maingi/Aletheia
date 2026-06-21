@@ -16,6 +16,8 @@ import { LandingHeader } from "@/components/landing/landing-header";
 import { Footer } from "@/components/footer";
 import { LAUNCH_CONFIG } from "@/lib/launch-config";
 import { useState } from "react";
+import { ContentBackButton } from "@/components/landing/content-back-button";
+
 
 // ─── LTD Tier Feature Definitions ───────────────────────────────────
 const LTD_FEATURES: Record<string, { target: string; features: string[]; icon: any; gradient: string; glowColor: string }> = {
@@ -198,8 +200,12 @@ export default function PricingPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-background to-background pointer-events-none -z-10" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-accent/10 blur-[180px] rounded-full pointer-events-none -z-10" />
 
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <motion.div
+        <div className="max-w-4xl mx-auto relative z-10">
+          <div className="flex justify-start">
+            <ContentBackButton />
+          </div>
+          <div className="text-center">
+            <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -251,6 +257,7 @@ export default function PricingPage() {
               Founding Member Badge
             </div>
           </motion.div>
+          </div>
         </div>
       </section>
 

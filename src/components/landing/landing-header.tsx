@@ -1,27 +1,15 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { AletheiaLogo } from "../AletheiaLogo";
 
 export function LandingHeader() {
     const pathname = usePathname();
-    const router = useRouter();
 
     return (
         <header className="h-16 border-b border-border/10 bg-surface/90 backdrop-blur-3xl fixed top-0 left-0 right-0 z-50 px-8 flex items-center justify-between shadow-xl vibrant-indicator">
             <div className="flex items-center gap-8">
-                {pathname !== '/' && pathname !== '' && (
-                    <button
-                        onClick={() => router.back()}
-                        className="group/back-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent/5 border border-accent/20 hover:bg-accent/10 hover:border-accent/40 text-accent text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-md shadow-accent/5"
-                    >
-                        <ArrowLeft className="w-3.5 h-3.5 group-hover/back-btn:-translate-x-0.5 transition-transform" />
-                        <span>Back</span>
-                    </button>
-                )}
-
                 {/* Brand Section */}
                 <div className="flex items-center gap-3.5 group/header-brand">
                     <Link href="/" className="flex items-center gap-3.5">

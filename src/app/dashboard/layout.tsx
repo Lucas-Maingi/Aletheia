@@ -15,7 +15,7 @@ import { getEffectiveUserId } from '@/lib/auth-utils';
 import { SidebarNav } from '@/components/dashboard/sidebar-nav';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { Footer } from '@/components/footer';
-
+import { DashboardBackButton } from '@/components/dashboard/dashboard-back-button';
 export default async function DashboardLayout({
     children,
 }: {
@@ -134,6 +134,7 @@ export default async function DashboardLayout({
                     )}
 
                     <div className="px-4 md:px-8 pb-24 md:pb-8 max-w-[1400px] w-full mx-auto relative z-10 flex-1">
+                        <DashboardBackButton />
                         {children}
                     </div>
 

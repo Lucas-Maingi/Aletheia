@@ -2,6 +2,8 @@ import { LandingHeader } from "@/components/landing/landing-header";
 import { Footer } from "@/components/footer";
 import { Shield, Target, Users, Code, Award, Zap } from "lucide-react";
 import type { Metadata } from "next";
+import { ContentBackButton } from "@/components/landing/content-back-button";
+
 
 export const metadata: Metadata = {
   title: "About Us — Aletheia",
@@ -14,6 +16,7 @@ export default function AboutPage() {
       <LandingHeader />
 
       <main className="flex-1 max-w-5xl mx-auto px-6 pt-32 pb-24">
+        <ContentBackButton />
         {/* Hero Section */}
         <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-bold text-accent tracking-widest uppercase">

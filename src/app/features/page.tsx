@@ -7,6 +7,8 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import type { Metadata } from "next";
+import { ContentBackButton } from "@/components/landing/content-back-button";
+
 
 export const metadata: Metadata = {
   title: "Platform Features — Aletheia",
@@ -98,6 +100,7 @@ export default function FeaturesPage() {
       <LandingHeader />
 
       <main className="flex-1 max-w-6xl mx-auto px-6 pt-32 pb-24 w-full">
+        <ContentBackButton />
         {/* Hero Section */}
         <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-xs font-bold text-accent tracking-widest uppercase">

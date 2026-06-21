@@ -71,21 +71,6 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                         </Link>
                     </div>
 
-                    {pathname !== "/dashboard" && pathname !== "/dashboard/" && (
-                        <>
-                            {/* Separator */}
-                            <div className="h-6 w-px bg-border/20 hidden md:block" />
-
-                            {/* Back Button */}
-                            <button
-                                onClick={() => router.back()}
-                                className="group/back-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent/5 border border-accent/20 hover:bg-accent/10 hover:border-accent/40 text-accent text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-md shadow-accent/5"
-                            >
-                                <ArrowLeft className="w-3.5 h-3.5 group-hover/back-btn:-translate-x-0.5 transition-transform" />
-                                <span>Back</span>
-                            </button>
-                        </>
-                    )}
                 </div>
 
                 {/* Right Side Actions */}
@@ -93,14 +78,14 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                     {/* Public Drop Nav */}
                     <nav className="hidden xl:flex items-center gap-8 mr-2 text-[10px] font-black uppercase tracking-widest">
                         <Link 
-                            href="/pricing" 
+                            href="/dashboard/demo" 
                             className={`hover:text-accent transition-all ${
-                                pathname === '/pricing' 
+                                pathname === '/dashboard/demo' 
                                     ? 'text-accent drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] font-bold' 
                                     : 'text-text-tertiary'
                             }`}
                         >
-                            Pricing
+                            Demo
                         </Link>
                         <Link 
                             href="/features" 
@@ -113,14 +98,14 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                             Features
                         </Link>
                         <Link 
-                            href="/dashboard/demo" 
+                            href="/pricing" 
                             className={`hover:text-accent transition-all ${
-                                pathname === '/dashboard/demo' 
+                                pathname === '/pricing' 
                                     ? 'text-accent drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] font-bold' 
                                     : 'text-text-tertiary'
                             }`}
                         >
-                            Demo
+                            Pricing
                         </Link>
                     </nav>
 
