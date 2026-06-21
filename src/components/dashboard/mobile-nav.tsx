@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-    Menu, X, Home, PlusCircle, MessageSquare, User
+    Menu, X, Home, PlusCircle, MessageSquare, User, ChevronLeft, ChevronRight
 } from "lucide-react";
+import { motion } from "framer-motion";
 
 export function MobileNav() {
     const pathname = usePathname();
@@ -46,13 +47,59 @@ export function MobileNav() {
 
 export function MobileSidebarToggle({ children }: { children: React.ReactNode }) {
     const [open, setOpen] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        const stored = localStorage.getItem("ale_sidebar_collapsed");
+        if (stored === "true") {
+            setIsCollapsed(true);
+        }
+        setIsMounted(true);
+    }, []);
+
+    const toggleSidebar = () => {
+        const nextState = !isCollapsed;
+        setIsCollapsed(nextState);
+        localStorage.setItem("ale_sidebar_collapsed", String(nextState));
+    };
 
     return (
         <>
-            {/* Desktop: Always visible */}
-            <div className="hidden md:flex">
-                {children}
-            </div>
+            {/* Desktop: Collapsible Sidebar Wrapper */}
+            {!isMounted ? (
+                <div className="hidden md:flex w-64 h-full shrink-0">
+                    {children}
+                </div>
+            ) : (
+                <div className="relative flex h-full shrink-0 z-30">
+                    <motion.div
+                        animate={{ 
+                            width: isCollapsed ? 0 : 256,
+                            opacity: isCollapsed ? 0 : 1
+                        }}
+                        transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
+                        className="hidden md:flex h-full overflow-hidden"
+                    >
+                        <div className="w-64 h-full shrink-0">
+                            {children}
+                        </div>
+                    </motion.div>
+
+                    {/* Toggle Button */}
+                    <button
+                        onClick={toggleSidebar}
+                        className="hidden md:flex items-center justify-center absolute top-20 z-40 w-7 h-7 rounded-full bg-surface border border-border/20 text-text-secondary hover:text-text-primary hover:border-accent/40 hover:scale-110 active:scale-95 shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-all cursor-pointer"
+                        style={{
+                            left: isCollapsed ? "12px" : "242px",
+                            transition: "left 0.3s cubic-bezier(0.25, 1, 0.5, 1), transform 0.2s, border-color 0.2s"
+                        }}
+                        aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                    >
+                        {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+                    </button>
+                </div>
+            )}
 
             {/* Mobile: Hamburger + slide-in */}
             <button
