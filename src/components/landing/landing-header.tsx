@@ -3,9 +3,37 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AletheiaLogo } from "../AletheiaLogo";
+import { createClient } from "@/lib/supabase/client";
+import { useEffect, useState } from "react";
+import { User } from "@supabase/supabase-js";
 
 export function LandingHeader() {
     const pathname = usePathname();
+    const supabase = createClient();
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const getUser = async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                setUser(user);
+            } catch (err) {
+                console.error("Error fetching user session:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        getUser();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        });
+
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, []);
 
     return (
         <header className="h-16 border-b border-border/10 bg-surface/90 backdrop-blur-3xl fixed top-0 left-0 right-0 z-50 px-8 flex items-center justify-between shadow-xl vibrant-indicator">
@@ -59,16 +87,18 @@ export function LandingHeader() {
                     >
                         Pricing
                     </Link>
-                    <Link 
-                        href="/auth/login" 
-                        className={`hover:text-accent transition-all ${
-                            pathname === '/auth/login'
-                                ? 'text-accent drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] font-bold'
-                                : 'text-text-secondary'
-                        }`}
-                    >
-                        Sign_In
-                    </Link>
+                    {!loading && !user && (
+                        <Link 
+                            href="/auth/login" 
+                            className={`hover:text-accent transition-all ${
+                                pathname === '/auth/login'
+                                    ? 'text-accent drop-shadow-[0_0_8px_rgba(0,240,255,0.4)] font-bold'
+                                    : 'text-text-secondary'
+                            }`}
+                        >
+                            Sign_In
+                        </Link>
+                    )}
                 </nav>
 
                 <Link 
