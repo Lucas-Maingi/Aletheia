@@ -737,6 +737,102 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* ─── LTD Capital Allocation Section ────────────────────── */}
+      <section className="py-28 px-6 border-t border-border/10 relative overflow-hidden bg-background">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-accent/5 blur-[160px] rounded-full pointer-events-none -z-10" />
+
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="grid lg:grid-cols-12 gap-12 items-center">
+            {/* Left text block: Strategic Positioning */}
+            <div className="lg:col-span-5 space-y-6">
+              <Badge
+                variant="outline"
+                className="px-4 py-1.5 border-accent/20 bg-accent/5 text-accent uppercase font-black tracking-widest text-[10px]"
+              >
+                Capital Strategy
+              </Badge>
+              
+              <h2 className="text-3xl md:text-5xl font-black text-text-primary tracking-tight leading-none uppercase italic">
+                Why the LTD? <br />
+                <span className="text-accent">Our Roadmap.</span>
+              </h2>
+              
+              <div className="space-y-4 text-sm text-text-secondary leading-relaxed font-semibold">
+                <p>
+                  Aletheia is a self-sustaining, privately funded platform. We are not raising capital for survival or daily operations. Every core feature shown in our interactive demo is fully functional, online, and backed by robust infrastructure today.
+                </p>
+                <p>
+                  Instead, we are launching this limited Founding Member Initiative to establish an upfront capital reserve. High-fidelity intelligence requires access to proprietary registers, facial recognition indexes, and commercial API queries. These inputs cannot be scraped or sourced for free.
+                </p>
+                <p>
+                  By purchasing a Lifetime Deal today, you are directly funding the bulk licenses and API credits required to integrate these premium pipelines. This allows us to scale Aletheia's scanning depth to unmatched levels while keeping our operational query costs low for you forever.
+                </p>
+              </div>
+            </div>
+
+            {/* Right block: Ingestion & Operations allocations */}
+            <div className="lg:col-span-7 grid sm:grid-cols-2 gap-6">
+              {[
+                {
+                  icon: Network,
+                  title: "Premium Data Integrations",
+                  desc: "Funding bulk upfront API access to commercial facial recognition databases, reverse-image scanners (PimEyes/TinEye custom nodes), cell carrier registers, and dark web leak indexes.",
+                  gradient: "from-blue-500/10 via-indigo-500/5 to-transparent",
+                  border: "border-blue-500/20",
+                  iconColor: "text-blue-400"
+                },
+                {
+                  icon: Database,
+                  title: "Historical Registries",
+                  desc: "Securing corporate data feeds for deep historical WHOIS registers, reverse-DNS histories, and blockchain transaction risk telemetry (Chainalysis/Elliptic nodes).",
+                  gradient: "from-purple-500/10 via-accent/5 to-transparent",
+                  border: "border-purple-500/20",
+                  iconColor: "text-purple-400"
+                },
+                {
+                  icon: Cpu,
+                  title: "Edge Engine Infrastructure",
+                  desc: "Scaling globally distributed parallel scanning clusters. Enhancing HSM (Hardware Security Module) client-side zero-knowledge encryption key storage nodes.",
+                  gradient: "from-emerald-500/10 via-teal-500/5 to-transparent",
+                  border: "border-emerald-500/20",
+                  iconColor: "text-emerald-400"
+                },
+                {
+                  icon: Users,
+                  title: "Professional Team Growth",
+                  desc: "Expanding our active core team: dedicated threat-intelligence developers to update connectors, compliance lawyers for OSINT frameworks, and priority customer service support.",
+                  gradient: "from-amber-500/10 via-orange-500/5 to-transparent",
+                  border: "border-amber-500/20",
+                  iconColor: "text-amber-400"
+                }
+              ].map((item, i) => (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  className={`relative p-6 rounded-2xl border ${item.border} bg-surface/20 backdrop-blur-xl overflow-hidden flex flex-col`}
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} pointer-events-none opacity-50`} />
+                  <div className="relative z-10 flex flex-col h-full">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-background/50 border border-border/10 ${item.iconColor}`}>
+                      <item.icon className="w-5 h-5" />
+                    </div>
+                    <h3 className="text-base font-black text-text-primary uppercase tracking-tight italic mb-2">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-text-secondary font-medium leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ─── Final CTA ────────────────────────────── */}
       <section className="py-28 px-6 border-t border-border/10 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-900/15 via-background to-background pointer-events-none" />
