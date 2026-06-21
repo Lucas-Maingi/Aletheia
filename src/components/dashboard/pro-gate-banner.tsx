@@ -65,18 +65,18 @@ export function ProGateBanner({ currentCount, freeLimit, isPro }: ProGateBannerP
 
                 <div className="flex items-center gap-3 shrink-0">
                     <div className="hidden sm:block text-right">
-                        <div className="text-[10px] font-black text-accent uppercase tracking-widest">Tactical Pro</div>
-                        <div className="text-lg font-black text-text-primary">$99<span className="text-xs text-text-tertiary font-medium">/mo</span></div>
-                        <div className="text-[9px] text-success font-bold">7-Day Free Trial</div>
+                        <div className="text-[10px] font-black text-accent uppercase tracking-widest">Analyst Pro</div>
+                        <div className="text-lg font-black text-text-primary">$299<span className="text-[10px] text-text-tertiary font-medium lowercase"> one-time</span></div>
+                        <div className="text-[9px] text-success font-bold">Lifetime Deal Active</div>
                     </div>
-                    <Link href="/api/checkout/gumroad?plan=pro" className="block">
+                    <Link href="/checkout?plan=analyst_pro" className="block">
                         <motion.div
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
                             className="flex items-center gap-2 px-4 py-2.5 bg-accent text-black font-black text-[11px] uppercase tracking-widest rounded-xl shadow-[0_0_20px_rgba(0,240,255,0.3)] hover:shadow-[0_0_30px_rgba(0,240,255,0.5)] transition-shadow"
                         >
                             {isAtLimit ? <Lock className="w-3.5 h-3.5" /> : <Shield className="w-3.5 h-3.5" />}
-                            Upgrade to Pro
+                            Get Lifetime Access
                             <ArrowRight className="w-3.5 h-3.5" />
                         </motion.div>
                     </Link>

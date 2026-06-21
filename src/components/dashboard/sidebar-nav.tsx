@@ -104,11 +104,25 @@ export function SidebarNav({ isGuest, isAdmin }: { isGuest?: boolean; isAdmin?: 
                     icon={<Shield className="w-4 h-4" />} 
                     badge="Pro"
                 />
+
+                <NavLink 
+                    href="/dashboard/demo" 
+                    label="Interactive Demo" 
+                    icon={<Activity className="w-4 h-4" />} 
+                    badge="Free"
+                />
+
+                <NavLink 
+                    href="/dashboard/demo/social" 
+                    label="Cinematic Demo" 
+                    icon={<MessageSquare className="w-4 h-4" />} 
+                    badge="Rec"
+                />
             </div>
 
             <div className="mt-auto pt-4 pb-1">
                 <Link
-                    href="/premium"
+                    href="/pricing"
                     className="relative flex flex-col p-5 rounded-3xl bg-surface/50 backdrop-blur-3xl border border-accent/20 dark:border-white/5 hover:border-accent/40 shadow-xl transition-all duration-500 group overflow-hidden"
                 >
                     <div className="absolute -right-10 -top-10 w-32 h-32 bg-accent/5 blur-3xl group-hover:bg-accent/10 transition-all" />
