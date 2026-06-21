@@ -1,8 +1,8 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { UserNav } from "./user-nav";
-import { ChevronRight, Search } from "lucide-react";
+import { ChevronRight, Search, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { AlertBell } from "./alert-bell";
 import { ThemeSwitcher } from "../ui/theme-switcher";
@@ -20,6 +20,7 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ user }: DashboardHeaderProps) {
     const pathname = usePathname();
+    const router = useRouter();
     const segments = pathname.split('/').filter(Boolean);
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
@@ -72,6 +73,17 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
 
                     {/* Separator */}
                     <div className="h-6 w-px bg-border/20 hidden md:block" />
+
+                    {/* Back Button (Only on subpages) */}
+                    {pathname !== "/dashboard" && pathname !== "/dashboard/" && (
+                        <button
+                            onClick={() => router.back()}
+                            className="group/back-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent/5 border border-accent/20 hover:bg-accent/10 hover:border-accent/40 text-accent text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-md shadow-accent/5"
+                        >
+                            <ArrowLeft className="w-3.5 h-3.5 group-hover/back-btn:-translate-x-0.5 transition-transform" />
+                            <span>Back</span>
+                        </button>
+                    )}
 
                     {/* Breadcrumbs */}
                     <nav className="flex items-center gap-2 text-[11px] uppercase font-black tracking-[0.2em] text-text-tertiary">

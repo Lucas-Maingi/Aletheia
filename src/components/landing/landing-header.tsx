@@ -1,10 +1,14 @@
 "use client";
 
-import { Shield, Zap } from "lucide-react";
+import { Shield, Zap, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { usePathname, useRouter } from "next/navigation";
 
 export function LandingHeader() {
+    const pathname = usePathname();
+    const router = useRouter();
+
     const scrollToPricing = () => {
         const element = document.getElementById("pricing");
         element?.scrollIntoView({ behavior: "smooth" });
@@ -13,12 +17,23 @@ export function LandingHeader() {
     return (
         <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
             <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                <Link href="/" className="flex items-center gap-2 group">
-                    <Shield className="w-6 h-6 text-accent group-hover:scale-110 transition-transform" />
-                    <span className="text-xl font-bold tracking-tight text-text-primary">
-                        Aletheia
-                    </span>
-                </Link>
+                <div className="flex items-center gap-4">
+                    {pathname !== '/' && pathname !== '' && (
+                        <button
+                            onClick={() => router.back()}
+                            className="group/back-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface border border-border text-text-primary text-xs font-semibold transition-all active:scale-95 hover:bg-surface-hover hover:border-border/80 shadow-md"
+                        >
+                            <ArrowLeft className="w-3.5 h-3.5 group-hover/back-btn:-translate-x-0.5 transition-transform" />
+                            <span>Back</span>
+                        </button>
+                    )}
+                    <Link href="/" className="flex items-center gap-2 group">
+                        <Shield className="w-6 h-6 text-accent group-hover:scale-110 transition-transform" />
+                        <span className="text-xl font-bold tracking-tight text-text-primary">
+                            Aletheia
+                        </span>
+                    </Link>
+                </div>
 
                 <div className="flex items-center gap-6 md:gap-8">
                     <Link href="/pricing" className="hidden md:flex text-xs font-black uppercase tracking-widest text-text-secondary hover:text-accent transition-all duration-300">
