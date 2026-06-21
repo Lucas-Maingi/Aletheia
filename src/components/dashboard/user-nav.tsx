@@ -1,7 +1,6 @@
 "use client";
 
 import { 
-    User, 
     Settings, 
     LogOut, 
     Shield,
@@ -67,14 +66,8 @@ export function UserNav({ user }: UserNavProps) {
                 <DropdownMenuGroup className="p-1">
                     <Link href="/dashboard/settings">
                         <DropdownMenuItem className="rounded-xl px-3 py-2.5 text-xs font-bold uppercase tracking-widest text-text-secondary focus:text-accent focus:bg-accent/5 cursor-pointer gap-3 transition-colors">
-                            <User className="w-4 h-4" />
-                            Identity Profile
-                        </DropdownMenuItem>
-                    </Link>
-                    <Link href="/dashboard/settings">
-                        <DropdownMenuItem className="rounded-xl px-3 py-2.5 text-xs font-bold uppercase tracking-widest text-text-secondary focus:text-accent focus:bg-accent/5 cursor-pointer gap-3 transition-colors">
                             <Settings className="w-4 h-4" />
-                            Global_Config
+                            Account Settings
                         </DropdownMenuItem>
                     </Link>
                 </DropdownMenuGroup>

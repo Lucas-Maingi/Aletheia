@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
-import { Zap, Palette, MessageSquare, Layers, Bell, Activity, LogOut } from 'lucide-react';
+import { Zap, MessageSquare, Layers, Bell, Activity, LogOut } from 'lucide-react';
 import { AlertBell } from '@/components/dashboard/alert-bell';
 import { AletheiaLogo } from '@/components/AletheiaLogo';
 import { prisma } from '@/lib/prisma';
@@ -90,13 +90,7 @@ export default async function DashboardLayout({
                                     <SidebarNav isGuest={user.isGuest} isAdmin={isAdmin} />
                                 </nav>
 
-                            <div className="p-4 border-t border-r border-border/10 mt-auto bg-foreground/[0.04] backdrop-blur-3xl relative z-30 space-y-2">
-                                <Link href="/dashboard/settings" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-foreground/[0.05] text-text-secondary hover:text-text-primary transition-all group/settings border border-transparent hover:border-border/10">
-                                    <Palette className="w-4 h-4 text-text-tertiary group-hover/settings:text-accent transition-colors" />
-                                    <span className="text-[11px] font-black uppercase tracking-widest flex-1">System_Config</span>
-                                    <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shadow-[0_0_8px_rgba(0,240,255,0.6)]" />
-                                </Link>
-                            </div>
+
                         </aside>
                     </MobileSidebarToggle>
 

@@ -25,6 +25,10 @@ export default function SettingsPage() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        document.title = "Settings — Aletheia";
+    }, []);
+
+    useEffect(() => {
         const loadData = async () => {
             try {
                 // Load BYOK from local storage
@@ -105,15 +109,16 @@ export default function SettingsPage() {
                     <Activity className="w-5 h-5 animate-pulse" />
                     <span className="text-[10px] font-black uppercase tracking-[0.4em]">Aletheia_System_Node</span>
                 </div>
-                <h1 className="text-4xl font-black tracking-tight text-text-primary uppercase italic">System Configuration</h1>
+                <h1 className="text-4xl font-black tracking-tight text-text-primary uppercase italic">Settings</h1>
                 <p className="text-xs text-text-tertiary font-medium max-w-2xl leading-relaxed uppercase tracking-wider">
-                    Manage core intelligence protocols, API bridges, and resource allocation for the decentralized Aletheia network.
+                    Manage your identity profile, resource consumption quotas, and vault security keys on the Aletheia network.
                 </p>
             </div>
 
-            <Tabs defaultValue="quota" className="w-full" onValueChange={setActiveTab}>
+            <Tabs defaultValue="identity" className="w-full" onValueChange={setActiveTab}>
                 <TabsList className="bg-foreground/[0.03] border border-border/10 w-fit rounded-2xl h-14 p-1.5 gap-2 shadow-inner">
                     {[
+                        { id: "identity", label: "Identity Profile", icon: <UserIcon className="w-3.5 h-3.5" /> },
                         { id: "quota", label: "Resource Quotas", icon: <Database className="w-3.5 h-3.5" /> },
                         { id: "security", label: "Security & Keys", icon: <Shield className="w-3.5 h-3.5" /> }
                     ].map((tab) => (
@@ -127,6 +132,66 @@ export default function SettingsPage() {
                         </TabsTrigger>
                     ))}
                 </TabsList>
+
+                {/* Identity Profile Content */}
+                <TabsContent value="identity" className="mt-10 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <Card className="bg-surface border border-border/10 shadow-xl rounded-3xl overflow-hidden group max-w-2xl">
+                        <CardHeader className="bg-foreground/[0.02] border-b border-border/5 p-8">
+                            <CardTitle className="flex items-center gap-4 text-text-primary uppercase tracking-[0.1em] text-lg font-black">
+                                <UserIcon className="w-6 h-6 text-accent group-hover:scale-110 transition-transform" />
+                                Identity Profile
+                            </CardTitle>
+                            <CardDescription className="text-xs font-bold text-text-tertiary uppercase tracking-wider leading-relaxed pt-2">
+                                Update your public display name and avatar credentials on the Aletheia network.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-8 space-y-8">
+                            <div className="flex items-center gap-6">
+                                <Avatar className="h-16 w-16 border-2 border-accent/20">
+                                    <AvatarFallback className="bg-accent/10 text-lg font-black text-accent uppercase">
+                                        {profile.name?.substring(0, 2).toUpperCase() || profile.email?.substring(0, 2).toUpperCase() || "AN"}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="space-y-1">
+                                    <h4 className="text-sm font-black text-text-primary uppercase">{profile.name || "Vector Analyst"}</h4>
+                                    <p className="text-[10px] font-mono text-text-tertiary uppercase">{profile.email}</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-5">
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black text-text-tertiary tracking-[0.2em] uppercase pl-1">Display Name</Label>
+                                    <Input
+                                        type="text"
+                                        value={profile.name}
+                                        onChange={(e) => setProfile(e.target.value ? { ...profile, name: e.target.value } : { ...profile, name: "" })}
+                                        placeholder="Analyst Name"
+                                        className="h-14 bg-foreground/[0.03] border-border/10 font-bold text-sm px-5 rounded-2xl animate-none focus:border-accent/40"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black text-text-tertiary tracking-[0.2em] uppercase pl-1">Avatar Image URL (Optional)</Label>
+                                    <Input
+                                        type="text"
+                                        value={profile.avatarUrl}
+                                        onChange={(e) => setProfile(e.target.value ? { ...profile, avatarUrl: e.target.value } : { ...profile, avatarUrl: "" })}
+                                        placeholder="https://..."
+                                        className="h-14 bg-foreground/[0.03] border-border/10 font-bold text-sm px-5 rounded-2xl animate-none focus:border-accent/40"
+                                    />
+                                </div>
+                            </div>
+
+                            <Button
+                                onClick={handleSaveProfile}
+                                disabled={isSaving}
+                                className="w-full h-14 bg-accent hover:bg-accent-hover text-white font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all disabled:opacity-50"
+                            >
+                                {isSaving ? "Saving Credentials..." : "Save Identity Changes"}
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
 
                 {/* Quota & Billing Content */}
                 <TabsContent value="quota" className="mt-10 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
