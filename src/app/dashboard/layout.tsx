@@ -16,6 +16,7 @@ import { SidebarNav } from '@/components/dashboard/sidebar-nav';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { Footer } from '@/components/footer';
 import { DashboardBackButton } from '@/components/dashboard/dashboard-back-button';
+import { DemoLayoutHelper } from '@/components/dashboard/demo-layout-helper';
 export default async function DashboardLayout({
     children,
 }: {
@@ -79,6 +80,7 @@ export default async function DashboardLayout({
 
         return (
             <InvestigationProvider>
+                <DemoLayoutHelper />
                 <div className="flex flex-col h-screen overflow-hidden bg-background">
                     <DashboardHeader user={user} />
                     

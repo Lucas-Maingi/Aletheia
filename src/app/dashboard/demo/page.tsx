@@ -543,59 +543,8 @@ export default function DemoPage() {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      {/* ── Demo Banner ── */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="relative overflow-hidden"
-      >
-        {/* Gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-r from-accent/20 via-purple-500/15 to-pink-500/10" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(59,130,246,0.15),_transparent_60%)]" />
-        {/* Grid pattern overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '40px 40px',
-          }}
-        />
-
-        <div className="relative max-w-7xl mx-auto px-6 py-10 sm:py-14">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Badge variant="accent" size="sm" className="flex items-center gap-1">
-                  <Zap className="w-3 h-3" />
-                  DEMO PORTAL
-                </Badge>
-                <Badge variant="outline" size="sm">
-                  Synthetic Data — No API Calls
-                </Badge>
-              </div>
-              <h1 className="text-3xl sm:text-4xl font-black text-text-primary tracking-tight mb-2">
-                Experience Aletheia&apos;s{' '}
-                <span className="text-gradient-vibrant">Intelligence Engine</span>
-              </h1>
-              <p className="text-text-secondary max-w-xl">
-                Explore our dual demonstration suite. Test the interactive sandbox or watch the cinematic auto-play sweep.
-              </p>
-            </div>
-
-            <Link href="/pricing">
-              <Button size="lg" className="group shrink-0 shadow-lg shadow-accent/20">
-                Get Lifetime Access
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </motion.div>
-
       {/* ── Demo Mode Switcher ── */}
-      <div className="max-w-7xl mx-auto px-6 pt-6 flex justify-center">
+      <div className="max-w-7xl mx-auto px-6 pt-12 flex justify-center">
         <div className="bg-surface/50 border border-border/10 p-1.5 rounded-2xl flex items-center gap-2">
           <button
             onClick={() => setDemoMode('interactive')}
@@ -606,7 +555,7 @@ export default function DemoPage() {
             }`}
           >
             <Activity className="w-4 h-4" />
-            Interactive Sandbox
+            Interactive Demo
           </button>
           <button
             onClick={() => setDemoMode('cinematic')}
@@ -617,7 +566,7 @@ export default function DemoPage() {
             }`}
           >
             <Video className="w-4 h-4" />
-            Cinematic Playback
+            Watch Autoplay Demo
           </button>
         </div>
       </div>
@@ -661,44 +610,6 @@ export default function DemoPage() {
           </motion.div>
         )}
       </div>
-
-      {/* ── Sticky CTA Bar ── */}
-      <motion.div
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, delay: 1 }}
-        className="sticky bottom-4 left-0 right-0 z-40 mt-12"
-      >
-        <div className="relative overflow-hidden border border-accent/20 rounded-2xl">
-          {/* Background */}
-          <div className="absolute inset-0 bg-background/90 backdrop-blur-xl" />
-          <div className="absolute inset-0 bg-gradient-to-r from-accent/10 via-purple-500/5 to-pink-500/5" />
-
-          <div className="relative max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="hidden sm:flex items-center justify-center w-10 h-10 rounded-xl bg-accent/15 border border-accent/20">
-                <Shield className="w-5 h-5 text-accent" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-text-primary">
-                  Ready to investigate your own targets?
-                </p>
-                <p className="text-xs text-text-secondary hidden sm:block">
-                  Full access to 12+ intelligence connectors, AI dossier generation, and breach monitoring.
-                </p>
-              </div>
-            </div>
-
-            <Link href="/pricing">
-              <Button size="lg" className="group whitespace-nowrap shadow-lg shadow-accent/25">
-                <Zap className="w-4 h-4" />
-                Claim Lifetime Access
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </motion.div>
     </div>
   );
 }
@@ -726,7 +637,7 @@ function Loader(props: any) {
 function CinematicDemo() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1.2); // Speed multiplier
-  const [currentStep, setCurrentStep] = useState(0); // 0: Idle/Prompt, 1: Typing, 2: Dispatching, 3: Scanning, 4: AI Synthesis, 5: Complete
+  const [currentStep, setCurrentStep] = useState(0); 
   const [typedTarget, setTypedTarget] = useState("");
   const [activeConnectors, setActiveConnectors] = useState<string[]>([]);
   const [finishedConnectors, setFinishedConnectors] = useState<string[]>([]);
@@ -735,10 +646,12 @@ function CinematicDemo() {
   const [visibleLogs, setVisibleLogs] = useState<typeof DEMO_PERSON.timeline>([]);
   const [showDossier, setShowDossier] = useState(false);
   const [dossierText, setDossierText] = useState("");
-  const [hideControls, setHideControls] = useState(false);
+  const [view, setView] = useState<'evidence' | 'timeline' | 'dossier' | 'entities'>('timeline');
 
   const targetEmail = "john.doe@example.com";
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const dossierContainerRef = useRef<HTMLDivElement>(null);
+  const logFeedRef = useRef<HTMLDivElement>(null);
 
   // Auto-play control loop
   useEffect(() => {
@@ -809,6 +722,31 @@ function CinematicDemo() {
     };
   }, [isPlaying, speed]);
 
+  // Autotabbing controller based on scanning step progress
+  useEffect(() => {
+    if (currentStep === 1) {
+      setView('timeline');
+    } else if (currentStep >= 2 && currentStep <= 12) {
+      setView('evidence');
+    } else if (currentStep === 14) {
+      setView('dossier');
+    }
+  }, [currentStep]);
+
+  // Auto-scroll dossier container to bottom as it compiles
+  useEffect(() => {
+    if (dossierContainerRef.current) {
+      dossierContainerRef.current.scrollTop = dossierContainerRef.current.scrollHeight;
+    }
+  }, [dossierText]);
+
+  // Auto-scroll log feed container to bottom as it logs
+  useEffect(() => {
+    if (logFeedRef.current) {
+      logFeedRef.current.scrollTop = logFeedRef.current.scrollHeight;
+    }
+  }, [visibleLogs]);
+
   const animateTyping = (text: string) => {
     let index = 0;
     const typingTimer = setInterval(() => {
@@ -849,6 +787,7 @@ function CinematicDemo() {
     setVisibleLogs([]);
     setShowDossier(false);
     setDossierText("");
+    setView('timeline');
   };
 
   const skipToEnd = () => {
@@ -862,140 +801,52 @@ function CinematicDemo() {
     setVisibleLogs(DEMO_PERSON.timeline);
     setShowDossier(true);
     setDossierText(DEMO_PERSON.dossier);
+    setView('dossier');
   };
 
+  const dossierHtml = useMemo(() => renderMarkdown(dossierText), [dossierText]);
+
   return (
-    <div className="w-full min-h-[650px] bg-black text-white font-sans overflow-hidden flex flex-col relative rounded-2xl border border-zinc-800 shadow-2xl p-6">
+    <div className="w-full min-h-[680px] bg-surface/20 border border-border/10 rounded-2xl flex flex-col relative p-6">
       {/* Background glow effects */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-900/10 blur-[120px] pointer-events-none" />
-
-      {/* Cinematic Control Panel */}
-      <AnimatePresence>
-        {!hideControls && (
-          <motion.div
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -20, opacity: 0 }}
-            className="absolute top-4 left-1/2 -translate-x-1/2 z-30 px-6 py-3 bg-zinc-900/95 border border-zinc-800 rounded-full shadow-2xl backdrop-blur-md flex items-center gap-6"
-          >
-            <div className="flex items-center gap-2 border-r border-zinc-800 pr-4">
-              <Video className="w-4 h-4 text-purple-400 animate-pulse" />
-              <span className="text-xs font-bold tracking-wider text-zinc-400 uppercase">Record Studio</span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="h-8 w-8 rounded-full p-0 hover:bg-zinc-800 text-white"
-                title={isPlaying ? "Pause" : "Play"}
-              >
-                {isPlaying ? (
-                  <span className="text-xs font-bold text-yellow-400">PAUSE</span>
-                ) : (
-                  <Play className="w-3.5 h-3.5 fill-current text-emerald-400" />
-                )}
-              </Button>
-
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={resetSimulation}
-                className="h-8 w-8 rounded-full p-0 hover:bg-zinc-800 text-zinc-400 hover:text-white"
-                title="Reset"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-              </Button>
-
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={skipToEnd}
-                className="h-8 px-3 rounded-full hover:bg-zinc-800 text-xs text-zinc-400 hover:text-white"
-              >
-                Skip to End
-              </Button>
-            </div>
-
-            <div className="flex items-center gap-2 border-l border-zinc-800 pl-4">
-              <span className="text-[10px] text-zinc-500 uppercase font-mono">Speed:</span>
-              <div className="flex gap-1">
-                {[0.5, 1, 1.2, 2.0].map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setSpeed(s)}
-                    className={`text-[10px] px-2 py-0.5 rounded font-mono transition-colors ${
-                      speed === s ? "bg-purple-600 text-white" : "text-zinc-500 hover:text-zinc-300"
-                    }`}
-                  >
-                    {s}x
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <button
-              onClick={() => setHideControls(true)}
-              className="text-zinc-500 hover:text-zinc-300 pl-2 border-l border-zinc-800"
-              title="Hide controls (Double click anywhere to show again)"
-            >
-              <EyeOff className="w-4 h-4" />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Helper trigger to restore controls if hidden */}
-      {hideControls && (
-        <div 
-          className="absolute top-0 left-0 right-0 h-4 z-30 cursor-pointer hover:bg-purple-900/10 transition-colors flex items-center justify-center"
-          onClick={() => setHideControls(false)}
-          title="Click to show recording controls"
-        >
-          <div className="w-16 h-1 rounded-full bg-zinc-800" />
-        </div>
-      )}
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/5 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-900/5 blur-[120px] pointer-events-none" />
 
       {/* Main Studio Viewport */}
-      <div 
-        className="flex-1 flex flex-col pt-16 w-full"
-        onDoubleClick={() => setHideControls(false)}
-      >
+      <div className="flex-1 flex flex-col w-full">
         {/* Stage 1: Terminal Input Prompt */}
         {currentStep === 0 && (
-          <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="flex-1 flex flex-col items-center justify-center py-16">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="w-full max-w-xl bg-zinc-950/80 border border-zinc-800 rounded-xl p-6 shadow-2xl backdrop-blur-md"
+              className="w-full max-w-xl bg-surface/60 border border-border/10 rounded-2xl p-6 shadow-2xl backdrop-blur-md"
             >
-              <div className="flex items-center justify-between border-b border-zinc-900 pb-3 mb-6">
+              <div className="flex items-center justify-between border-b border-border/10 pb-3 mb-6">
                 <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-                  <span className="ml-3 text-[10px] font-mono text-zinc-500 tracking-wider">ALETHEIA INTEL DIRECTORY SWEEP</span>
+                  <div className="w-2.5 h-2.5 rounded-full bg-danger" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-warning" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-success" />
+                  <span className="ml-3 text-[10px] font-mono text-text-tertiary tracking-wider">ALETHEIA INTEL DIRECTORY SWEEP</span>
                 </div>
-                <Shield className="w-4 h-4 text-purple-500" />
+                <Shield className="w-4 h-4 text-accent" />
               </div>
 
               <div className="space-y-4">
-                <div className="text-sm font-semibold text-zinc-400">Initiate footprint sweep for target:</div>
-                <div className="flex items-center gap-3 p-3 bg-black border border-zinc-900 rounded-lg">
-                  <Terminal className="w-4 h-4 text-purple-400" />
-                  <span className="font-mono text-emerald-400">john.doe@example.com</span>
-                  <span className="w-1.5 h-4 bg-zinc-500 animate-pulse" />
+                <div className="text-sm font-semibold text-text-secondary uppercase tracking-wider">Initiate footprint sweep for target:</div>
+                <div className="flex items-center gap-3 p-4 bg-background/50 border border-border/10 rounded-xl">
+                  <Terminal className="w-4 h-4 text-accent" />
+                  <span className="font-mono text-accent text-sm font-bold">john.doe@example.com</span>
+                  <span className="w-1.5 h-4 bg-accent animate-pulse" />
                 </div>
 
                 <div className="pt-4 flex justify-end">
                   <Button
                     onClick={startSimulation}
-                    className="bg-purple-600 hover:bg-purple-500 text-white font-bold px-6 py-2 rounded-lg gap-2 shadow-[0_0_20px_rgba(147,51,234,0.3)]"
+                    className="bg-accent hover:bg-accent-hover text-white font-bold px-6 py-2 rounded-xl gap-2 shadow-[0_0_20px_rgba(0,240,255,0.3)] uppercase text-[10px] tracking-widest"
                   >
                     <Play className="w-4 h-4 fill-current" />
-                    Start Auto-Play Demo
+                    Start Autoplay Scan
                   </Button>
                 </div>
               </div>
@@ -1005,201 +856,351 @@ function CinematicDemo() {
 
         {/* Stage 2: Active Investigation Board */}
         {currentStep > 0 && (
-          <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* LEFT COLUMN: Scan Status & Console Logs */}
-            <div className="lg:col-span-1 flex flex-col gap-6">
-              {/* Scan Status Panel */}
-              <div className="bg-zinc-950/80 border border-zinc-900 rounded-xl p-5 shadow-xl backdrop-blur-md">
-                <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Investigation Engine</h3>
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="text-md font-bold truncate text-white">{DEMO_PERSON.investigation.title}</h2>
-                    <span className="text-[10px] text-zinc-400">Subject: John Michael Doe</span>
-                  </div>
-                  {currentStep >= 14 ? (
-                    <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 gap-1.5 px-2.5 py-1">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      COMPLETE
-                    </Badge>
+          <div className="flex-1 flex flex-col gap-6">
+            {/* Inline controls bar instead of floating header */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl border border-border bg-surface/50 shadow-md">
+              <div className="flex items-center gap-2">
+                <Video className="w-4 h-4 text-accent animate-pulse" />
+                <span className="text-xs font-bold tracking-wider text-text-secondary uppercase">Autoplay Controls</span>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setIsPlaying(!isPlaying)}
+                  className="h-8 px-3 rounded-full hover:bg-foreground/5 text-text-primary text-[10px] font-black uppercase tracking-widest"
+                  title={isPlaying ? "Pause Scan" : "Resume Scan"}
+                >
+                  {isPlaying ? (
+                    <span className="text-warning font-bold">PAUSE</span>
                   ) : (
-                    <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/30 gap-1.5 px-2.5 py-1 animate-pulse">
-                      <Loader className="w-3.5 h-3.5 animate-spin" />
-                      SCANNING
-                    </Badge>
+                    <span className="text-success font-bold flex items-center gap-1">
+                      <Play className="w-3 h-3 fill-current text-success" /> PLAY
+                    </span>
                   )}
-                </div>
+                </Button>
 
-                {/* Simulated Connector Matrix */}
-                <div className="border-t border-zinc-900 pt-4">
-                  <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Connectors Running ({visibleEntities.length}/12)</h4>
-                  <div className="grid grid-cols-3 gap-2">
-                    {Object.entries(CONNECTOR_DISPLAY_NAMES).map(([key, value]) => {
-                      const isActive = activeConnectors.includes(key);
-                      const isFinished = finishedConnectors.includes(key);
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={resetSimulation}
+                  className="h-8 w-8 rounded-full p-0 hover:bg-foreground/5 text-text-secondary hover:text-text-primary"
+                  title="Reset Scan"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                </Button>
 
-                      return (
-                        <div
-                          key={key}
-                          className={`p-2 rounded border text-center transition-all duration-300 ${
-                            isFinished
-                              ? "bg-emerald-500/5 border-emerald-500/30 text-emerald-400"
-                              : isActive
-                              ? "bg-purple-500/5 border-purple-500/30 text-purple-400 shadow-[0_0_10px_rgba(147,51,234,0.1)]"
-                              : "bg-zinc-900/20 border-zinc-950 text-zinc-600"
-                          }`}
-                        >
-                          <div className="text-xs mb-1">{value.icon}</div>
-                          <div className="text-[9px] truncate font-mono">{value.name}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={skipToEnd}
+                  className="h-8 px-3 rounded-full hover:bg-foreground/5 text-xs text-text-secondary hover:text-text-primary font-bold uppercase tracking-wider"
+                >
+                  Skip to End
+                </Button>
               </div>
 
-              {/* Console Logs */}
-              <div className="flex-1 bg-zinc-950/80 border border-zinc-900 rounded-xl p-5 shadow-xl backdrop-blur-md flex flex-col">
-                <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Live Log Feed</h3>
-                <div className="flex-1 font-mono text-[10px] space-y-2.5 overflow-y-auto max-h-[300px] scrollbar-thin scrollbar-thumb-zinc-800 pr-1">
-                  <AnimatePresence initial={false}>
-                    {visibleLogs.map((log, index) => {
-                      let typeColor = "text-zinc-500";
-                      if (log.type === "social" || log.type === "professional") typeColor = "text-purple-400";
-                      if (log.type === "breach") typeColor = "text-red-400";
-                      if (log.type === "infrastructure" || log.type === "geolocation") typeColor = "text-blue-400";
-                      if (log.type === "ai") typeColor = "text-yellow-400 font-bold";
-                      if (log.type === "complete") typeColor = "text-emerald-400 font-bold";
-
-                      return (
-                        <motion.div
-                          key={index}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          className="flex items-start gap-2 leading-relaxed"
-                        >
-                          <span className="text-zinc-600">[{log.time}]</span>
-                          <span className={`${typeColor}`}>{log.event}</span>
-                        </motion.div>
-                      );
-                    })}
-                  </AnimatePresence>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-text-tertiary uppercase font-mono">Speed:</span>
+                <div className="flex gap-1">
+                  {[0.5, 1, 1.2, 2.0].map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setSpeed(s)}
+                      className={`text-[10px] px-2 py-0.5 rounded font-mono transition-colors ${
+                        speed === s ? "bg-accent text-white" : "text-text-tertiary hover:text-text-primary"
+                      }`}
+                    >
+                      {s}x
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
 
-            {/* CENTER & RIGHT COLUMN: Entities, Evidence, & Dossier */}
-            <div className="lg:col-span-2 flex flex-col gap-6">
-              {/* Discovered Entities Board */}
-              <div className="bg-zinc-950/80 border border-zinc-900 rounded-xl p-5 shadow-xl backdrop-blur-md">
-                <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Discovered Targets & Pivots</h3>
-                <div className="flex flex-wrap gap-2">
-                  <AnimatePresence>
-                    {visibleEntities.map((entity, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] font-mono text-zinc-300"
-                      >
-                        {entity.type === "email" && <Mail className="w-3 h-3 text-purple-400" />}
-                        {entity.type === "username" && <User className="w-3 h-3 text-purple-400" />}
-                        {entity.type === "domain" && <Globe className="w-3 h-3 text-blue-400" />}
-                        {entity.type === "ip" && <Hash className="w-3 h-3 text-blue-400" />}
-                        {entity.type === "location" && <MapPin className="w-3 h-3 text-emerald-400" />}
-                        {entity.type === "name" && <User className="w-3 h-3 text-zinc-400" />}
-                        
-                        <span>{entity.value}</span>
-                        <span className="text-[8px] text-zinc-500 bg-black px-1 rounded-sm">{entity.confidence}%</span>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
+            {/* Real-time stats row */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <StatCard
+                index={0}
+                label="Connectors Run"
+                value={`${finishedConnectors.length}/12`}
+                icon={<Zap className="w-4 h-4" />}
+              />
+              <StatCard
+                index={1}
+                label="Evidence Collected"
+                value={visibleEvidence.length}
+                icon={<Search className="w-4 h-4" />}
+              />
+              <StatCard
+                index={2}
+                label="Entities Found"
+                value={visibleEntities.length}
+                icon={<Database className="w-4 h-4" />}
+              />
+              <StatCard
+                index={3}
+                label="Avg Confidence"
+                value={currentStep >= 2 ? "94%" : "0%"}
+                icon={<Shield className="w-4 h-4" />}
+              />
+            </div>
+
+            {/* Split layout: left column status, right column results */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left Column: Live Scan Status & Activity Feed */}
+              <div className="lg:col-span-1 flex flex-col gap-6">
+                {/* Active scan status */}
+                <div className="bg-surface/50 border border-border/10 rounded-xl p-5 shadow-xl backdrop-blur-sm">
+                  <h3 className="text-xs font-bold text-text-tertiary uppercase tracking-widest mb-3">Scanning Node</h3>
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="text-sm font-bold truncate text-text-primary">{DEMO_PERSON.investigation.title}</h2>
+                      <span className="text-[10px] text-text-secondary">Subject: john.doe@example.com</span>
+                    </div>
+                    {currentStep >= 14 ? (
+                      <Badge variant="success" size="sm" className="gap-1.5 px-2.5 py-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        COMPLETE
+                      </Badge>
+                    ) : (
+                      <Badge variant="warning" size="sm" className="gap-1.5 px-2.5 py-1 animate-pulse bg-accent/15 border-accent/20 text-accent">
+                        <Loader className="w-3.5 h-3.5 animate-spin text-accent" />
+                        SCANNING
+                      </Badge>
+                    )}
+                  </div>
+
+                  {/* Connectors Matrix */}
+                  <div className="border-t border-border/10 pt-4">
+                    <h4 className="text-[10px] font-bold text-text-tertiary uppercase tracking-wider mb-2">Connectors Ingestion ({finishedConnectors.length}/12)</h4>
+                    <div className="grid grid-cols-3 gap-2">
+                      {Object.entries(CONNECTOR_DISPLAY_NAMES).map(([key, value]) => {
+                        const isActive = activeConnectors.includes(key);
+                        const isFinished = finishedConnectors.includes(key);
+
+                        return (
+                          <div
+                            key={key}
+                            className={`p-2 rounded border text-center transition-all duration-300 ${
+                              isFinished
+                                ? "bg-emerald-500/5 border-emerald-500/30 text-emerald-400"
+                                : isActive
+                                ? "bg-accent/10 border-accent/30 text-accent animate-pulse"
+                                : "bg-foreground/[0.02] border-border/5 text-text-tertiary/40"
+                            }`}
+                          >
+                            <div className="text-xs mb-1">{value.icon}</div>
+                            <div className="text-[8px] truncate font-mono">{value.name}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Live log feed box */}
+                <div className="bg-surface/50 border border-border/10 rounded-xl p-5 shadow-xl backdrop-blur-sm flex flex-col flex-1 h-[280px]">
+                  <h3 className="text-xs font-bold text-text-tertiary uppercase tracking-widest mb-3">Live Log Feed</h3>
+                  <div 
+                    ref={logFeedRef}
+                    className="flex-1 font-mono text-[10px] space-y-2.5 overflow-y-auto custom-scrollbar pr-1"
+                  >
+                    <AnimatePresence initial={false}>
+                      {visibleLogs.map((log, index) => {
+                        let typeColor = "text-text-tertiary";
+                        if (log.type === "social" || log.type === "professional") typeColor = "text-purple-400";
+                        if (log.type === "breach") typeColor = "text-red-400";
+                        if (log.type === "infrastructure" || log.type === "geolocation") typeColor = "text-blue-400";
+                        if (log.type === "ai") typeColor = "text-accent font-bold";
+                        if (log.type === "complete") typeColor = "text-emerald-400 font-bold";
+
+                        return (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="flex items-start gap-2 leading-relaxed"
+                          >
+                            <span className="text-text-tertiary/50">[{log.time}]</span>
+                            <span className={`${typeColor}`}>{log.event}</span>
+                          </motion.div>
+                        );
+                      })}
+                    </AnimatePresence>
+                  </div>
                 </div>
               </div>
 
-              {/* Live Intelligence Feed or Dossier */}
-              <div className="flex-1 min-h-[400px] flex flex-col">
-                <AnimatePresence mode="wait">
-                  {!showDossier ? (
-                    // Evidence Card Grid
-                    <motion.div
-                      key="evidence"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4"
+              {/* Right Column: Uniform Tab content */}
+              <div className="lg:col-span-2 flex flex-col gap-6">
+                {/* Content Switcher */}
+                <div className="flex flex-wrap gap-2 bg-foreground/[0.03] border border-border/10 p-1 rounded-xl w-fit">
+                  {(
+                    [
+                      { key: 'evidence', label: 'Evidence', icon: <Search className="w-3.5 h-3.5" /> },
+                      { key: 'timeline', label: 'Timeline', icon: <Clock className="w-3.5 h-3.5" /> },
+                      { key: 'dossier', label: 'Dossier', icon: <Terminal className="w-3.5 h-3.5" /> },
+                      { key: 'entities', label: 'Entities', icon: <Database className="w-3.5 h-3.5" /> },
+                    ] as const
+                  ).map((tab) => (
+                    <button
+                      key={tab.key}
+                      onClick={() => setView(tab.key)}
+                      className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
+                        view === tab.key
+                          ? 'bg-accent/15 text-accent border border-accent/20'
+                          : 'text-text-secondary hover:text-text-primary border border-transparent'
+                      }`}
                     >
-                      {visibleEvidence.map((ev) => (
-                        <motion.div
-                          key={ev.id}
-                          initial={{ opacity: 0, y: 15 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="bg-zinc-950/70 border border-zinc-900 rounded-xl p-4 flex flex-col justify-between shadow-lg"
-                        >
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-[10px] font-mono text-purple-400 bg-purple-950/30 border border-purple-900/30 px-2 py-0.5 rounded-full">
-                                {ev.platform}
-                              </span>
-                              <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded ${
-                                ev.confidenceLabel === "VERIFIED" ? "bg-emerald-500/10 text-emerald-400" :
-                                ev.confidenceLabel === "HIGH" ? "bg-blue-500/10 text-blue-400" : "bg-zinc-800 text-zinc-400"
-                              }`}>
-                                {ev.confidenceLabel}
-                              </span>
-                            </div>
-                            <h4 className="text-xs font-bold text-white mb-1.5">{ev.title}</h4>
-                            <p className="text-[10px] text-zinc-400 leading-relaxed line-clamp-3">{ev.content}</p>
-                          </div>
-                          <div className="text-[8px] text-zinc-600 font-mono mt-3 text-right">
-                            {ev.timestamp.split("T")[1].replace("Z", "")}
-                          </div>
-                        </motion.div>
-                      ))}
-                      {visibleEvidence.length === 0 && (
-                        <div className="col-span-2 flex-1 flex flex-col items-center justify-center text-zinc-600">
-                          <Database className="w-10 h-10 mb-2 animate-bounce" />
-                          <span className="text-xs font-mono">Awaiting connector ingestion...</span>
-                        </div>
+                      {tab.icon}
+                      {tab.label}
+                      {tab.key === 'evidence' && (
+                        <span className="text-[10px] font-mono ml-1 opacity-60 bg-foreground/10 px-1.5 py-0.5 rounded">{visibleEvidence.length}</span>
                       )}
-                    </motion.div>
-                  ) : (
-                    // Dossier Display
-                    <motion.div
-                      key="dossier"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex-1 bg-zinc-950/80 border border-zinc-900 rounded-xl p-6 shadow-2xl backdrop-blur-md flex flex-col font-mono text-xs text-zinc-300 leading-relaxed overflow-y-auto max-h-[400px]"
-                    >
-                      <div className="flex items-center gap-2 text-yellow-400 mb-4 border-b border-zinc-900 pb-3">
-                        <Sparkles className="w-4 h-4" />
-                        <span className="font-bold uppercase tracking-wider">AI Executive Dossier Synthesis</span>
-                      </div>
-                      
-                      <div className="whitespace-pre-wrap flex-1 scrollbar-thin">
-                        {dossierText}
-                      </div>
+                      {tab.key === 'entities' && (
+                        <span className="text-[10px] font-mono ml-1 opacity-60 bg-foreground/10 px-1.5 py-0.5 rounded">{visibleEntities.length}</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
 
-                      {currentStep >= 15 && (
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.8 }}
-                          className="mt-6 p-4 border border-purple-500/30 rounded-xl bg-purple-900/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[0_0_30px_rgba(147,51,234,0.1)]"
-                        >
-                          <div>
-                            <div className="text-xs font-bold text-white mb-1">Founding Member LTDs Available</div>
-                            <p className="text-[10px] text-zinc-400">Deploy Aletheia on your own target domains and investigators.</p>
+                {/* Tab content panel */}
+                <div className="flex-1 flex flex-col">
+                  <AnimatePresence mode="wait">
+                    {/* Evidence Tab */}
+                    {view === 'evidence' && (
+                      <motion.div
+                        key="evidence"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="h-[520px] overflow-y-auto pr-2 custom-scrollbar"
+                      >
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {visibleEvidence.map((ev) => (
+                            <EvidenceCard key={ev.id} item={ev} />
+                          ))}
+                        </div>
+                        {visibleEvidence.length === 0 && (
+                          <div className="h-full flex flex-col items-center justify-center text-text-tertiary">
+                            <Database className="w-8 h-8 mb-2 animate-pulse text-accent" />
+                            <span className="text-xs font-mono uppercase tracking-wider">Awaiting evidence ingestion...</span>
                           </div>
-                          <Link href="/pricing">
-                            <Button className="bg-purple-600 hover:bg-purple-500 text-white font-bold text-[10px] h-8 rounded-lg">
-                              Claim Lifetime Deal →
-                            </Button>
-                          </Link>
-                        </motion.div>
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                        )}
+                      </motion.div>
+                    )}
+
+                    {/* Timeline Tab */}
+                    {view === 'timeline' && (
+                      <motion.div
+                        key="timeline"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="rounded-xl border border-border bg-surface/80 backdrop-blur-sm p-6 h-[520px] overflow-y-auto custom-scrollbar"
+                      >
+                        <h3 className="text-xs uppercase tracking-widest text-text-secondary font-medium mb-6 flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-accent" />
+                          Scan Timeline
+                        </h3>
+                        <div className="space-y-1">
+                          {visibleLogs.map((entry, i) => (
+                            <TimelineItem key={i} entry={entry} index={i} />
+                          ))}
+                        </div>
+                        {visibleLogs.length === 0 && (
+                          <div className="h-full flex flex-col items-center justify-center text-text-tertiary">
+                            <Clock className="w-8 h-8 mb-2 animate-pulse text-accent" />
+                            <span className="text-xs font-mono uppercase tracking-wider">Awaiting scan initiation...</span>
+                          </div>
+                        )}
+                      </motion.div>
+                    )}
+
+                    {/* Dossier Tab */}
+                    {view === 'dossier' && (
+                      <motion.div
+                        key="dossier"
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        className="rounded-xl border border-border bg-surface/80 backdrop-blur-sm p-8 prose-invert max-w-none h-[520px] flex flex-col"
+                      >
+                        <div className="flex items-center gap-2 mb-6 pb-4 border-b border-border shrink-0">
+                          <Terminal className="w-4 h-4 text-accent" />
+                          <span className="text-xs uppercase tracking-widest text-text-secondary font-medium">
+                            AI Executive Dossier Synthesis
+                          </span>
+                        </div>
+                        
+                        <div 
+                          ref={dossierContainerRef}
+                          className="text-text-secondary leading-relaxed space-y-1 flex-1 font-mono text-xs overflow-y-auto pr-2 custom-scrollbar"
+                        >
+                          {dossierText ? (
+                            <div dangerouslySetInnerHTML={{ __html: dossierHtml }} />
+                          ) : (
+                            <div className="h-full flex flex-col items-center justify-center text-text-tertiary">
+                              <Sparkles className="w-8 h-8 mb-2 animate-pulse text-accent" />
+                              <span className="text-xs font-mono uppercase tracking-wider">Awaiting AI synthesis compilation...</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {currentStep >= 15 && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.8 }}
+                            className="mt-6 p-4 border border-accent/20 rounded-2xl bg-accent/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg shadow-accent/5 shrink-0"
+                          >
+                            <div>
+                              <div className="text-[10px] font-bold text-text-primary mb-0.5 uppercase tracking-wide">Founding Member LTDs Available</div>
+                              <p className="text-[9px] text-text-secondary font-medium">Deploy Aletheia on your own targets with private database scans.</p>
+                            </div>
+                            <Link href="/pricing">
+                              <Button className="bg-accent hover:bg-accent-hover text-white font-black uppercase text-[9px] tracking-widest h-8 px-4 rounded-xl shadow-md transition-all">
+                                Claim Lifetime Deal
+                                <ArrowRight className="w-3 h-3 ml-1" />
+                              </Button>
+                            </Link>
+                          </motion.div>
+                        )}
+                      </motion.div>
+                    )}
+
+                    {/* Entities Tab */}
+                    {view === 'entities' && (
+                      <motion.div
+                        key="entities"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="rounded-xl border border-border bg-surface/80 backdrop-blur-sm p-6 h-[520px] overflow-y-auto custom-scrollbar"
+                      >
+                        <div className="flex items-center gap-2 mb-4">
+                          <Database className="w-4 h-4 text-accent" />
+                          <span className="text-xs uppercase tracking-widest text-text-secondary font-medium">
+                            Discovered Entities ({visibleEntities.length})
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {visibleEntities.map((entity, i) => (
+                            <EntityChip key={i} entity={entity} />
+                          ))}
+                          {visibleEntities.length === 0 && (
+                            <div className="h-full flex flex-col items-center justify-center text-text-tertiary">
+                              <Database className="w-8 h-8 mb-2 animate-pulse text-accent" />
+                              <span className="text-xs font-mono uppercase tracking-wider">Awaiting entity extraction...</span>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
           </div>
