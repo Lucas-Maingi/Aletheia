@@ -101,6 +101,7 @@ export async function middleware(request: NextRequest) {
         '/privacy', 
         '/terms', 
         '/faq', 
+        '/faqs', 
         '/blog',
         '/pricing',
         '/ethics',

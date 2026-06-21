@@ -50,7 +50,7 @@ export function Footer({ className }: FooterProps) {
                 <div>
                     <h3 className="text-sm font-semibold text-white mb-4">Support</h3>
                     <ul className="space-y-3 text-sm text-text-secondary">
-                        <li><Link href="/pricing#faq" className="hover:text-accent transition-colors">FAQs</Link></li>
+                        <li><Link href="/faqs" className="hover:text-accent transition-colors">FAQs</Link></li>
                         <li><Link href="/contact" className="hover:text-accent transition-colors">Contact Us</Link></li>
                     </ul>
                 </div>
