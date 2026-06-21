@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Shield, Github, Twitter } from 'lucide-react';
+import { Twitter } from 'lucide-react';
 import { AletheiaLogo } from './AletheiaLogo';
 
 interface FooterProps {
@@ -23,9 +23,6 @@ export function Footer({ className }: FooterProps) {
                         The fully automated, multi-threaded footprinting engine for advanced threat intelligence synthesis.
                     </p>
                     <div className="flex items-center gap-4 pt-2">
-                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-text-tertiary hover:text-white transition-colors">
-                            <Github className="w-5 h-5" />
-                        </a>
                         <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-text-tertiary hover:text-accent transition-colors">
                             <Twitter className="w-5 h-5" />
                         </a>
