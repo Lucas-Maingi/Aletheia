@@ -1089,7 +1089,7 @@ function CinematicDemo() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="h-[590px] overflow-y-auto pr-2 custom-scrollbar"
+                        className="bg-surface/50 border border-border/10 rounded-xl p-5 shadow-xl backdrop-blur-sm h-[590px] overflow-y-auto pr-2 custom-scrollbar"
                       >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {visibleEvidence.map((ev) => (
@@ -1112,7 +1112,7 @@ function CinematicDemo() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="rounded-xl border border-border bg-surface/80 backdrop-blur-sm p-6 h-[590px] overflow-y-auto custom-scrollbar"
+                        className="bg-surface/50 border border-border/10 rounded-xl p-5 shadow-xl backdrop-blur-sm h-[590px] overflow-y-auto custom-scrollbar"
                       >
                         <h3 className="text-xs uppercase tracking-widest text-text-secondary font-medium mb-6 flex items-center gap-2">
                           <Clock className="w-4 h-4 text-accent" />
@@ -1139,7 +1139,7 @@ function CinematicDemo() {
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
-                        className="rounded-xl border border-border bg-surface/80 backdrop-blur-sm p-8 prose-invert max-w-none h-[590px] flex flex-col"
+                        className="bg-surface/50 border border-border/10 rounded-xl p-5 shadow-xl backdrop-blur-sm h-[590px] flex flex-col"
                       >
                         <div className="flex items-center gap-2 mb-6 pb-4 border-b border-border shrink-0">
                           <Terminal className="w-4 h-4 text-accent" />
@@ -1191,7 +1191,7 @@ function CinematicDemo() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="rounded-xl border border-border bg-surface/80 backdrop-blur-sm p-6 h-[590px] overflow-y-auto custom-scrollbar"
+                        className="bg-surface/50 border border-border/10 rounded-xl p-5 shadow-xl backdrop-blur-sm h-[590px] overflow-y-auto custom-scrollbar"
                       >
                         <div className="flex items-center gap-2 mb-4">
                           <Database className="w-4 h-4 text-accent" />
