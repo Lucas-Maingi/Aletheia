@@ -81,10 +81,10 @@ export default async function DashboardLayout({
                 <div className="flex flex-col h-screen overflow-hidden bg-background">
                     <DashboardHeader user={user} />
                     
-                    <div className="flex flex-1 overflow-hidden pt-16">
+                    <div className="flex flex-1 overflow-hidden">
                         {/* Sidebar Navigation — hidden on mobile, shown via MobileSidebarToggle */}
                         <MobileSidebarToggle>
-                            <aside className="w-64 bg-surface/80 backdrop-blur-2xl flex flex-col relative z-20 shadow-[10px_0_50px_rgba(0,0,0,0.3)] h-full overflow-hidden">
+                            <aside className="w-64 bg-surface/80 backdrop-blur-2xl flex flex-col relative z-20 shadow-[10px_0_50px_rgba(0,0,0,0.3)] h-full overflow-hidden pt-16">
                                 <nav className="flex-1 p-4 overflow-y-auto no-scrollbar border-r border-border/10 relative z-30 bg-surface/40">
                                     <SidebarNav isGuest={user.isGuest} isAdmin={isAdmin} />
                                 </nav>
@@ -106,7 +106,7 @@ export default async function DashboardLayout({
 
 
                 {/* Main Content Area */}
-                <main className="flex-1 overflow-y-auto no-scrollbar relative bg-surface-2 flex flex-col">
+                <main className="flex-1 overflow-y-auto no-scrollbar relative bg-surface-2 flex flex-col pt-16">
                     <CommandPalette />
 
                     {/* Faded Background Grid to prevent harsh top line */}
