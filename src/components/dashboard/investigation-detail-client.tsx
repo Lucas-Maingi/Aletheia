@@ -172,7 +172,7 @@ export function InvestigationDetailClient({
                         exifData={displayEvidence.filter(e => e.type === 'metadata')}
                         subjectImageUrl={subjectImageUrl}
                     />
-                    <IdentityGraph target={title} evidence={displayEvidence} />
+                    <IdentityGraph target={title} evidence={displayEvidence} entities={displayEntities} />
                     <AssociatesTab reportContent={reports[0]?.content || initialReports?.[0]?.content || ''} />
                 </TabsContent>
 

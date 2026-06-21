@@ -2,7 +2,7 @@
 
 import { AletheiaLogo } from "@/components/AletheiaLogo";
 import { ChatEvidenceGrid } from "@/components/dashboard/chat-evidence-card";
-import { User, Bot, ImageIcon, Loader2, Sparkles, Files } from "lucide-react";
+import { User, Bot, ImageIcon, Loader2, Sparkles, Files, Zap } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -72,7 +72,26 @@ export function ChatMessage({ message }: { message: ChatMessageData }) {
                                 message.content
                             ) : (
                                 <div className="prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-headings:text-text-primary prose-headings:font-black prose-headings:uppercase prose-headings:tracking-widest prose-headings:text-[11px] prose-p:text-text-secondary prose-strong:text-accent prose-code:text-accent prose-code:bg-foreground/[0.05] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none border-l-2 border-accent/20 pl-4 py-1">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    <ReactMarkdown 
+                                        remarkPlugins={[remarkGfm]}
+                                        components={{
+                                            a: ({ href, children }) => {
+                                                if (href && href.startsWith('sandbox-pivot:')) {
+                                                    const target = href.replace('sandbox-pivot:', '');
+                                                    return (
+                                                        <button
+                                                            onClick={() => (window as any).pivotTo?.(target)}
+                                                            className="inline-flex items-center gap-1.5 px-2.5 py-1 mt-1 rounded-md bg-accent/20 border border-accent/30 text-[10px] font-black text-accent uppercase tracking-widest hover:bg-accent/30 transition-all hover:scale-105 active:scale-95 ml-1 mr-1"
+                                                        >
+                                                            <Zap className="w-3 h-3 text-accent animate-pulse" />
+                                                            Deploy Sweep: {target}
+                                                        </button>
+                                                    );
+                                                }
+                                                return <a href={href} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">{children}</a>;
+                                            }
+                                        }}
+                                    >
                                         {message.content}
                                     </ReactMarkdown>
                                 </div>

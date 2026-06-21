@@ -39,10 +39,12 @@ export async function POST(req: NextRequest) {
 
     try {
         const body = await req.json();
-        const { message, imageUrl, investigationId, history } = body as { 
+        const { message, imageUrl, investigationId, selectedInvestigationIds, mode, history } = body as { 
             message?: string; 
             imageUrl?: string; 
             investigationId?: string;
+            selectedInvestigationIds?: string[];
+            mode?: 'support' | 'copilot';
             history?: { role: 'user' | 'model', parts: { text: string }[] }[]
         };
 
@@ -58,78 +60,109 @@ export async function POST(req: NextRequest) {
 
         const apiKey = req.headers.get('x-gemini-key') || process.env.GEMINI_API_KEY;
 
-        // CASE 1: CONVERSATIONAL FOLLOW-UP
-        if (investigationId) {
-            const investigation = await prisma.investigation.findUnique({
-                where: { id: investigationId },
-                include: { evidence: { take: 50 }, entities: { take: 30 } }
+        // Mode-Based System Prompt Construction
+        let systemPrompt = "";
+        let isConversational = false;
+
+        // CASE 1: Platform Support & Customer Guide
+        if (mode === 'support') {
+            isConversational = true;
+            systemPrompt = `You are Aletheia Customer Support & Product Guide AI. You help users navigate Aletheia and answer questions about the platform, features, setup, and pricing.
+            Keep your responses professional, concise, and structured. Use Markdown formatting.
+            
+            Here are the key platform facts you must use:
+            1. WHAT IS ALETHEIA: An agentic OSINT & threat intelligence platform to track public digital footprints.
+            2. MISSION OPERATIONS (SIDEBAR LINKS):
+               - Dashboard Overview: High-level dashboard status and recent threat metrics.
+               - Start Investigation: Click this prominent button to deploy single-target sweeps (emails, domains, usernames, names, phone numbers, or vehicle plates).
+               - AI Assistant: The current co-pilot chat window. Swap modes in the header: "General Support" or "Case Co-Pilot" to analyze active cases.
+               - Intelligence Archive: The historical sweep database (/dashboard/investigations) where all past scans are stored.
+            3. AUTOMATED RECON (PREMIUM FEATURES):
+               - Bulk Processing: Ingest CSV/JSON logs to run massively parallel sweeps. Requires Elite tier.
+               - Watchlists: 24/7 background monitors that alert on footprint changes. Requires Pro tier.
+            4. PROFILE & SETTINGS:
+               - Accessible via the user avatar circle icon in the top-right of the header. Includes System Configuration, Identity Profile, and Global Settings.
+            5. VEHICLE OSINT:
+               - Supports looking up license plates (e.g., "plate: ABC-1234" or "vehicle: ABC-1234") or uploading an image of a car/plate. Visual LPR automatically extracts plates via Gemini and links registered owners. Requires Pro or higher.
+            6. PRICING & TIERS (LIFETIME DEALS):
+               - Analyst Pro ($299): Unlimited investigations, breach DB, username enum, WHOIS, watchlists (10 nodes).
+               - Command Center ($599): Everything in Pro + visual LPR, facial matching, reverse-image, dark web, crypto tracing, team seats (3), watchlists (50 nodes).
+               - Agency Arsenal ($999): Everything in Command + batch ingestion, white-label, webhooks, custom connectors, unlimited seats.
+            7. ZERO-KNOWLEDGE: All investigation parameters are encrypted client-side. Zero tracker logs are retained by Aletheia on search content.`;
+        }
+        
+        // CASE 2: Investigation Case Co-Pilot (Supports single or multiple selected cases)
+        const isCopilotMode = mode === 'copilot' || (!mode && investigationId);
+        const targetIds = [investigationId, ...(selectedInvestigationIds || [])].filter(Boolean) as string[];
+        if (isCopilotMode && targetIds.length > 0) {
+            isConversational = true;
+            
+            const investigations = await prisma.investigation.findMany({
+                where: { id: { in: targetIds }, userId: user.id },
+                include: { evidence: { take: 30 }, entities: { take: 20 } }
             });
 
-            if (!investigation) {
-                return NextResponse.json({ error: 'Investigation not found' }, { status: 404 });
+            let context = "";
+            for (const inv of investigations) {
+                context += `
+Case File: "${inv.title}"
+- Target Details: ${inv.subjectName || 'N/A'} | ${inv.subjectEmail || 'N/A'} | ${inv.subjectUsername || 'N/A'} | ${inv.subjectPhone || 'N/A'}
+- Discovered Entities: ${inv.entities.map(e => `${e.type}: ${e.value}`).join(', ') || 'None'}
+- Discovered Evidence Artifacts:
+${inv.evidence.map(e => `  * [${e.confidenceLabel || 'UNRATED'}] ${e.title}: ${e.content.slice(0, 400)}`).join('\n') || '  * None'}
+--------------------------------------------------
+`;
             }
 
-            // OWNERSHIP CHECK (Dossier v18)
-            if (investigation.userId !== user.id) {
-                return NextResponse.json({ error: 'Access denied' }, { status: 403 });
-            }
-
-            if (apiKey) {
-                const genAI = new GoogleGenerativeAI(apiKey);
-                const models = ["gemini-1.5-flash", "gemini-1.5-flash-8b", "gemini-1.5-pro", "gemini-1.0-pro"];
-                
-                const context = `
-                    Target: ${investigation.title}
-                    Evidence Found: ${investigation.evidence.map(e => `${e.title}: ${e.content.slice(0, 500)}...`).join('\n')}
-                    Entities Detected: ${investigation.entities.map(e => `${e.type}: ${e.value}`).join(', ')}
-                `;
-
-                const systemPrompt = `You are Aletheia, an Agentic OSINT Analyst. You are discussing findings for an active investigation. 
-                Use the following context to answer the user's questions or suggest new pivot vectors. 
-                Keep it clinical, data-driven, and brief. 
-                
-                CRITICAL INSTRUCTION: When synthesizing evidence, explicitly extract and report real account details such as Profile Biographies, Creation Dates, Usernames, and Platform Identities. Do not just list titles; provide the rich contextual data found within the snippets.
-                
-                PIVOT DETECTION: If you identify a new lead (e.g., a specific email, username, or IP address that hasn't been scanned), explicitly suggest it in the format: [PIVOT: target_value]. This will allow the user to immediately deploy agents to that lead.
-                
-                Investigation Context:
-                ${context}`;
-
-                let responseText = "";
-                let lastError;
-
-                for (const modelName of models) {
-                    try {
-                        const model = genAI.getGenerativeModel({ model: modelName });
-                        const chat = model.startChat({
-                            history: history || [],
-                            generationConfig: { maxOutputTokens: 1000 }
-                        });
-
-                        const result = await chat.sendMessage(`${systemPrompt}\n\nUser Question: ${sanitize(query)}`);
-                        responseText = result.response.text();
-                        break;
-                    } catch (err: any) {
-                        console.warn(`[Chat API] Model ${modelName} failed:`, err.message);
-                        lastError = err;
-                        const isOverloaded = err?.status === 503 || err?.message?.includes('503') || err?.message?.includes('EXHAUSTED');
-                        const isNotFound = err?.status === 404 || err?.message?.includes('not found');
-                        if (isOverloaded || isNotFound) continue;
-                        throw err;
-                    }
-                }
-
-                if (!responseText) throw lastError || new Error("All analysis nodes are currently at capacity.");
-
-                return NextResponse.json({ 
-                    content: responseText,
-                    role: 'agent',
-                    status: 'complete'
-                });
-            }
+            systemPrompt = `You are Aletheia, the Lead Threat Intelligence Co-Pilot. You are analyzing active investigation case files for the analyst.
+            Analyze these case files, answer questions, identify patterns or relationships across the cases, and suggest recursive search pivots.
+            Keep your tone clinical, data-driven, and highly analytical.
+            
+            CRITICAL INSTRUCTION: When suggesting a new lead/artifact (e.g. an email, username, domain, phone number, plate, or IP that hasn't been scanned), explicitly present it as an interactive pivot link using the format: \`[Deploy Sweep: target_value](sandbox-pivot:target_value)\`. This will render an interactive deploy button for the user. Do not use standard markdown links for pivots, always use the sandbox-pivot scheme.
+            
+            Investigation Context:
+            ${context}`;
         }
 
-        // CASE 2: NEW INVESTIGATION
+        // If a conversational prompt was constructed, execute Gemini directly and return
+        if (isConversational && apiKey) {
+            const genAI = new GoogleGenerativeAI(apiKey);
+            const models = ["gemini-1.5-flash", "gemini-1.5-flash-8b", "gemini-1.5-pro", "gemini-1.0-pro"];
+            
+            let responseText = "";
+            let lastError;
+
+            for (const modelName of models) {
+                try {
+                    const model = genAI.getGenerativeModel({ model: modelName });
+                    const chat = model.startChat({
+                        history: history || [],
+                        generationConfig: { maxOutputTokens: 1200 }
+                    });
+
+                    const result = await chat.sendMessage(`${systemPrompt}\n\nUser Question: ${sanitize(query)}`);
+                    responseText = result.response.text();
+                    break;
+                } catch (err: any) {
+                    console.warn(`[Chat API] Model ${modelName} failed:`, err.message);
+                    lastError = err;
+                    const isOverloaded = err?.status === 503 || err?.message?.includes('503') || err?.message?.includes('EXHAUSTED');
+                    const isNotFound = err?.status === 404 || err?.message?.includes('not found');
+                    if (isOverloaded || isNotFound) continue;
+                    throw err;
+                }
+            }
+
+            if (!responseText) throw lastError || new Error("All analysis nodes are currently at capacity.");
+
+            return NextResponse.json({ 
+                content: responseText,
+                role: 'agent',
+                status: 'complete'
+            });
+        }
+
+        // BACKWARDS COMPATIBILITY: Classic Chat-to-Scan trigger
         const chatEmail = user.email || `guest-${user.id}@aletheia.local`;
         try {
             await prisma.user.upsert({
@@ -138,7 +171,6 @@ export async function POST(req: NextRequest) {
                 create: { id: user.id, email: chatEmail },
             });
         } catch {
-            // User may already exist from scan route — that's fine
             const existing = await prisma.user.findUnique({ where: { id: user.id } }).catch(() => null);
             if (!existing) throw new Error('Cannot create user session');
         }
@@ -151,7 +183,7 @@ export async function POST(req: NextRequest) {
             data: {
                 title,
                 description: `Initiated via Aletheia Chat interface`,
-                status: 'pending', // Wait for scan to confirm active status
+                status: 'pending',
                 userId: user.id,
                 subjectName: detection?.parsed.subjectName ? sanitize(detection.parsed.subjectName) : null,
                 subjectEmail: detection?.parsed.subjectEmail ? sanitize(detection.parsed.subjectEmail) : null,
@@ -161,10 +193,6 @@ export async function POST(req: NextRequest) {
                 subjectImageUrl: imageUrl ? sanitize(imageUrl) : null,
             },
         });
-
-        // DOSSIER v28: DO NOT trigger scan from server.
-        // Scan is synchronous (30-50s) and would block the chat response.
-        // The chat page will trigger it via client-side fetch.
 
         return NextResponse.json({
             investigationId: investigation.id,

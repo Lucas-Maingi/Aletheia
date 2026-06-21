@@ -121,3 +121,112 @@ Tone: Clinical, precise, and intelligence-grade.`;
         return fallbackDossier;
     }
 }
+
+/**
+ * Downloads a public or relative image URL and structures it as inlineData base64 for Gemini multimodal API
+ */
+async function imageUrlToBase64Part(imageUrl: string) {
+    if (imageUrl.startsWith('data:')) {
+        const match = imageUrl.match(/^data:([^;]+);base64,(.+)$/);
+        if (!match) throw new Error('Invalid Data URL format');
+        return {
+            inlineData: {
+                data: match[2],
+                mimeType: match[1]
+            }
+        };
+    }
+    
+    let targetUrl = imageUrl;
+    if (imageUrl.startsWith('/')) {
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        targetUrl = `${baseUrl}${imageUrl}`;
+    }
+    
+    const res = await fetch(targetUrl);
+    if (!res.ok) throw new Error(`Failed to fetch image: ${res.status} ${res.statusText}`);
+    const arrayBuffer = await res.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const mimeType = res.headers.get('content-type') || 'image/jpeg';
+    
+    return {
+        inlineData: {
+            data: buffer.toString('base64'),
+            mimeType
+        }
+    };
+}
+
+/**
+ * Calls Gemini 1.5 Flash to identify vehicles/license plates in an image.
+ * Uses responseMimeType JSON configuration to ensure type-safe structured data returns.
+ */
+export async function analyzeVehicleImage(imageUrl: string, customApiKey?: string): Promise<{
+    detected: boolean;
+    plate?: string;
+    jurisdiction?: string;
+    vehicleDescription?: string;
+    confidence?: number;
+}> {
+    const apiKey = customApiKey || process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+        return { detected: false };
+    }
+
+    try {
+        const imagePart = await imageUrlToBase64Part(imageUrl);
+        const promptText = `Analyze the provided image. Does it contain a vehicle or a license plate?
+If yes, extract:
+1. The license plate number.
+2. The jurisdiction (state, country, province) of the plate.
+3. The vehicle description (make, model, year, color).
+
+Respond in a strict JSON format matching this schema:
+{
+  "detected": true,
+  "plate": "PLATE_NUMBER_HERE",
+  "jurisdiction": "STATE_OR_COUNTRY_HERE",
+  "vehicleDescription": "MAKE_MODEL_YEAR_COLOR_HERE",
+  "confidence": 0.0 to 1.0 (estimation)
+}
+
+If no vehicle or license plate is visible, respond in this format:
+{
+  "detected": false
+}`;
+
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [
+                        { text: promptText },
+                        imagePart
+                    ]
+                }],
+                generationConfig: { 
+                    responseMimeType: "application/json",
+                    temperature: 0.1 
+                }
+            })
+        });
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`API Error ${res.status}: ${errorText}`);
+        }
+
+        const data = await res.json();
+        const jsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!jsonText) return { detected: false };
+
+        const parsed = JSON.parse(jsonText.trim());
+        return parsed;
+    } catch (err) {
+        console.error("[LPR AI Node] Visual LPR scan failure:", err);
+        return { detected: false };
+    }
+}
+

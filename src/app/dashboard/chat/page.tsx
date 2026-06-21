@@ -24,25 +24,46 @@ function detectType(v: string) {
     return 'username';
 }
 
-const WELCOME_MESSAGE: ChatMessageData = {
-    id: 'welcome',
-    role: 'agent',
-    content: `Welcome to Aletheia Intelligence Chat.\n\nI can investigate any digital identity. Just tell me:\n• A person's name\n• Email address\n• Username or handle\n• Domain or website\n• Phone number\n• Crypto wallet address\n\nOr upload a photo — I'll find everything publicly available.`,
-    status: 'complete',
-    timestamp: new Date(),
+const WELCOME_MESSAGES = {
+    support: {
+        id: 'welcome',
+        role: 'agent' as const,
+        content: `Welcome to Aletheia Customer Support & Product Guide.\n\nAsk me anything about the platform, such as:\n• How does the Target Sweep work?\n• What are Watchlists and how do I set them up?\n• Tell me about the lifetime billing tiers.\n• How do I use the Vehicle Registry or LPR scanner?\n• Where can I configure my API keys?`,
+        status: 'complete' as const,
+        timestamp: new Date(),
+    },
+    copilot: {
+        id: 'welcome',
+        role: 'agent' as const,
+        content: `Case Co-Pilot Subsystem Initialized.\n\nSelect one or more active investigation files in the sidebar, then ask me to:\n• Look for connections or overlaps across the cases.\n• Analyze specific breach logs or domains.\n• Recommend next pivot targets.\n• Draft a cross-case threat summary.`,
+        status: 'complete' as const,
+        timestamp: new Date(),
+    }
 };
 
 export default function ChatPage() {
-    const [messages, setMessages] = useState<ChatMessageData[]>([WELCOME_MESSAGE]);
+    const [mode, setMode] = useState<'support' | 'copilot'>('support');
+    const [messages, setMessages] = useState<ChatMessageData[]>([WELCOME_MESSAGES.support]);
     const [input, setInput] = useState('');
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [sending, setSending] = useState(false);
     const [detectedBadge, setDetectedBadge] = useState<string | null>(null);
+    const [activeInvestigationId, setActiveInvestigationId] = useState<string | null>(null);
+    const [chatHistory, setChatHistory] = useState<any[]>([]);
+    const [allInvestigations, setAllInvestigations] = useState<any[]>([]);
+    const [selectedInvestigationIds, setSelectedInvestigationIds] = useState<string[]>([]);
 
     const scrollRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const fileRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
+
+    // Mode-specific Welcome Message Swap
+    useEffect(() => {
+        if (messages.length === 1 && messages[0].id === 'welcome') {
+            setMessages([WELCOME_MESSAGES[mode]]);
+        }
+    }, [mode]);
 
     // Pivot Handler for Chat Messages
     useEffect(() => {
@@ -79,9 +100,6 @@ export default function ChatPage() {
         }
     };
 
-    const [activeInvestigationId, setActiveInvestigationId] = useState<string | null>(null);
-    const [chatHistory, setChatHistory] = useState<any[]>([]);
-
     const fetchHistory = useCallback(async () => {
         try {
             const res = await fetch('/api/investigations');
@@ -95,9 +113,21 @@ export default function ChatPage() {
         }
     }, []);
 
+    const fetchAllInvestigations = useCallback(async () => {
+        try {
+            const res = await fetch('/api/investigations');
+            if (!res.ok) return;
+            const data = await res.json();
+            setAllInvestigations(data);
+        } catch (e) {
+            console.error('[Chat] Failed to fetch all investigations:', e);
+        }
+    }, []);
+
     useEffect(() => {
         fetchHistory();
-    }, [fetchHistory]);
+        fetchAllInvestigations();
+    }, [fetchHistory, fetchAllInvestigations]);
 
     const loadPastInvestigation = async (id: string) => {
         if (id === activeInvestigationId) return;
@@ -109,7 +139,7 @@ export default function ChatPage() {
             
             // Reconstruct messages for the UI
             const newMessages: ChatMessageData[] = [
-                WELCOME_MESSAGE,
+                WELCOME_MESSAGES.support,
                 {
                     id: 'past-query',
                     role: 'user',
@@ -129,6 +159,7 @@ export default function ChatPage() {
             
             setMessages(newMessages);
             setActiveInvestigationId(id);
+            setMode('support'); // Swap back to support when loading general chat
         } catch (e) {
             console.error('[Chat] Load failed:', e);
         } finally {
@@ -161,7 +192,6 @@ export default function ChatPage() {
                 const reports = data.reports || [];
                 const status = data.status;
 
-                // Dossier v78: If we have a report, display it as the primary finding!
                 if (reports.length > 0) {
                     foundReport = true;
                     setMessages(prev => prev.map(m =>
@@ -231,11 +261,14 @@ export default function ChatPage() {
 
         // Add agent placeholder
         const agentMsgId = generateId();
+        const isConversationalMode = mode === 'support' || mode === 'copilot';
         const agentMsg: ChatMessageData = {
             id: agentMsgId,
             role: 'agent',
-            content: activeInvestigationId ? 'Analyzing evidence…' : 'Deploying intelligence agents…',
-            status: activeInvestigationId ? undefined : 'scanning',
+            content: mode === 'support'
+                ? 'Searching documentation...'
+                : (mode === 'copilot' ? 'Analyzing case intelligence...' : (activeInvestigationId ? 'Analyzing evidence…' : 'Deploying intelligence agents…')),
+            status: isConversationalMode ? undefined : (activeInvestigationId ? undefined : 'scanning'),
             timestamp: new Date(),
         };
 
@@ -258,7 +291,9 @@ export default function ChatPage() {
                 body: JSON.stringify({ 
                     message: text, 
                     imageUrl: imagePreview,
-                    investigationId: activeInvestigationId,
+                    investigationId: activeInvestigationId || undefined,
+                    selectedInvestigationIds: mode === 'copilot' ? selectedInvestigationIds : undefined,
+                    mode: mode,
                     history: history.length > 0 ? history : undefined
                 }),
             });
@@ -271,17 +306,14 @@ export default function ChatPage() {
                 m.id === agentMsgId ? { 
                     ...m, 
                     content: data.content || m.content,
-                    investigationId: data.investigationId || activeInvestigationId,
+                    investigationId: data.investigationId || activeInvestigationId || undefined,
                     status: data.status || 'complete'
                 } : m
             ));
 
-            if (data.investigationId && !activeInvestigationId) {
+            if (data.investigationId && !activeInvestigationId && !isConversationalMode) {
                 setActiveInvestigationId(data.investigationId);
                 
-                // DOSSIER v28: Trigger scan from CLIENT (not server)
-                // Scan is synchronous (30-50s). We fire the fetch non-blockingly
-                // from the browser, while pollForEvidence shows live updates.
                 const geminiKey2 = typeof window !== 'undefined'
                     ? localStorage.getItem('openvector_gemini_key') : null;
                 const scanHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -324,77 +356,164 @@ export default function ChatPage() {
 
     return (
         <div className="flex h-full -m-8 -mb-0 overflow-hidden">
-            {/* Sidebar - History */}
+            {/* Sidebar - History or Case Selector */}
             <aside className="w-80 border-r border-border/10 bg-surface/50 backdrop-blur-xl flex flex-col hidden xl:flex">
                 <div className="p-6 border-b border-border/10">
-                    <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-text-tertiary mb-1">Intelligence_Log</h2>
-                    <p className="text-xs text-text-secondary font-medium uppercase tracking-tight">Previous Conversations</p>
+                    <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-text-tertiary mb-1">
+                        {mode === 'copilot' ? 'Case_Correlation' : 'Intelligence_Log'}
+                    </h2>
+                    <p className="text-xs text-text-secondary font-medium uppercase tracking-tight">
+                        {mode === 'copilot' ? 'Select Cases to Correlate' : 'Previous Conversations'}
+                    </p>
                 </div>
                 
                 <div className="flex-1 overflow-y-auto p-4 space-y-2 no-scrollbar">
-                    {chatHistory.length === 0 ? (
-                        <div className="p-8 text-center space-y-3 opacity-20">
-                            <Layers className="w-8 h-8 mx-auto" />
-                            <p className="text-[10px] font-bold uppercase tracking-widest leading-relaxed">No tactical data found in local nodes.</p>
-                        </div>
+                    {mode === 'copilot' ? (
+                        allInvestigations.length === 0 ? (
+                            <div className="p-8 text-center space-y-3 opacity-20">
+                                <Layers className="w-8 h-8 mx-auto" />
+                                <p className="text-[10px] font-bold uppercase tracking-widest leading-relaxed">No active case files found.</p>
+                            </div>
+                        ) : (
+                            allInvestigations.map((item) => {
+                                const isChecked = selectedInvestigationIds.includes(item.id);
+                                return (
+                                    <div
+                                        key={item.id}
+                                        onClick={() => {
+                                            if (isChecked) {
+                                                setSelectedInvestigationIds(prev => prev.filter(id => id !== item.id));
+                                            } else {
+                                                setSelectedInvestigationIds(prev => [...prev, item.id]);
+                                            }
+                                        }}
+                                        className={`w-full text-left p-4 rounded-2xl border transition-all cursor-pointer group flex items-start gap-3 ${
+                                            isChecked 
+                                                ? 'bg-accent/15 border-accent/40 text-accent shadow-glow-cyan-sm' 
+                                                : 'bg-surface-elevated/20 border-border/10 text-text-secondary hover:bg-surface-elevated/40 hover:border-border/30 hover:text-text-primary'
+                                        }`}
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={isChecked}
+                                            onChange={() => {}} // handled by parent div click
+                                            className="mt-1 h-3.5 w-3.5 rounded border-border/40 text-accent focus:ring-accent bg-background/50 accent-accent"
+                                        />
+                                        <div className="flex-1 overflow-hidden">
+                                            <div className="text-[11px] font-black uppercase tracking-wider truncate mb-1">
+                                                {item.title}
+                                            </div>
+                                            <div className="flex items-center gap-2 text-[9px] font-mono text-text-tertiary/60 font-bold uppercase tracking-tighter">
+                                                <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+                                                <span>•</span>
+                                                <span>{item._count?.evidence || 0} findings</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        )
                     ) : (
-                        chatHistory.map((item) => (
-                            <button
-                                key={item.id}
-                                onClick={() => loadPastInvestigation(item.id)}
-                                className={`w-full text-left p-4 rounded-2xl border transition-all group ${
-                                    activeInvestigationId === item.id 
-                                        ? 'bg-accent/10 border-accent/30 text-accent shadow-glow-cyan-sm' 
-                                        : 'bg-surface-elevated/20 border-border/10 text-text-secondary hover:bg-surface-elevated/40 hover:border-border/30 hover:text-text-primary'
-                                }`}
-                            >
-                                <div className="flex items-start gap-3">
-                                    <div className={`mt-1 p-1.5 rounded-lg border transition-colors ${
-                                        activeInvestigationId === item.id ? 'bg-accent/20 border-accent/20' : 'bg-foreground/[0.03] border-border/10 group-hover:bg-foreground/[0.05]'
-                                    }`}>
-                                        <Bot className="w-3 h-3" />
-                                    </div>
-                                    <div className="flex-1 overflow-hidden">
-                                        <div className="text-[11px] font-black uppercase tracking-wider truncate mb-1">
-                                            {item.title.replace('Chat: ', '')}
+                        chatHistory.length === 0 ? (
+                            <div className="p-8 text-center space-y-3 opacity-20">
+                                <Layers className="w-8 h-8 mx-auto" />
+                                <p className="text-[10px] font-bold uppercase tracking-widest leading-relaxed">No tactical data found in local nodes.</p>
+                            </div>
+                        ) : (
+                            chatHistory.map((item) => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => loadPastInvestigation(item.id)}
+                                    className={`w-full text-left p-4 rounded-2xl border transition-all group ${
+                                        activeInvestigationId === item.id 
+                                            ? 'bg-accent/10 border-accent/30 text-accent shadow-glow-cyan-sm' 
+                                            : 'bg-surface-elevated/20 border-border/10 text-text-secondary hover:bg-surface-elevated/40 hover:border-border/30 hover:text-text-primary'
+                                    }`}
+                                >
+                                    <div className="flex items-start gap-3">
+                                        <div className={`mt-1 p-1.5 rounded-lg border transition-colors ${
+                                            activeInvestigationId === item.id ? 'bg-accent/20 border-accent/20' : 'bg-foreground/[0.03] border-border/10 group-hover:bg-foreground/[0.05]'
+                                        }`}>
+                                            <Bot className="w-3 h-3" />
                                         </div>
-                                        <div className="flex items-center gap-2 text-[9px] font-mono text-text-tertiary/60 font-bold uppercase tracking-tighter">
-                                            <span>{new Date(item.createdAt).toLocaleDateString()}</span>
-                                            <span>•</span>
-                                            <span>{item._count?.evidence || 0} findings</span>
+                                        <div className="flex-1 overflow-hidden">
+                                            <div className="text-[11px] font-black uppercase tracking-wider truncate mb-1">
+                                                {item.title.replace('Chat: ', '')}
+                                            </div>
+                                            <div className="flex items-center gap-2 text-[9px] font-mono text-text-tertiary/60 font-bold uppercase tracking-tighter">
+                                                <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+                                                <span>•</span>
+                                                <span>{item._count?.evidence || 0} findings</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </button>
-                        ))
+                                </button>
+                            ))
+                        )
                     )}
                 </div>
 
                 <div className="p-6 border-t border-white/5 bg-foreground/[0.02]">
-                    <button 
-                        onClick={() => {
-                            setMessages([WELCOME_MESSAGE]);
-                            setActiveInvestigationId(null);
-                        }}
-                        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-accent text-white font-black text-[10px] uppercase tracking-widest hover:bg-accent/90 transition-all shadow-glow-cyan-sm active:scale-95"
-                    >
-                        New Intelligence Scan
-                    </button>
+                    {mode === 'copilot' ? (
+                        <div className="text-center text-[10px] font-mono text-text-tertiary/80 uppercase tracking-widest leading-relaxed">
+                            {selectedInvestigationIds.length} Cases Selected For Analysis
+                        </div>
+                    ) : (
+                        <button 
+                            onClick={() => {
+                                setMessages([WELCOME_MESSAGES.support]);
+                                setActiveInvestigationId(null);
+                            }}
+                            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-accent text-white font-black text-[10px] uppercase tracking-widest hover:bg-accent/90 transition-all shadow-glow-cyan-sm active:scale-95"
+                        >
+                            New Intelligence Scan
+                        </button>
+                    )}
                 </div>
             </aside>
 
             {/* Main Chat Area */}
             <div className="flex-1 flex flex-col overflow-hidden relative">
                 {/* Header */}
-                <div className="shrink-0 border-b border-border/10 bg-surface/80 backdrop-blur-xl px-4 md:px-6 py-3 flex items-center gap-3 z-10">
-                    <div className="p-2 rounded-xl bg-accent/10 border border-accent/20">
-                        <MessageSquare className="w-4 h-4 text-accent" />
+                <div className="shrink-0 border-b border-border/10 bg-surface/80 backdrop-blur-xl px-4 md:px-6 py-3 flex items-center justify-between gap-3 z-10">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-xl bg-accent/10 border border-accent/20">
+                            <MessageSquare className="w-4 h-4 text-accent" />
+                        </div>
+                        <div>
+                            <h1 className="text-sm font-black text-text-primary tracking-tight uppercase">AI Assistant</h1>
+                            <p className="text-[10px] text-text-tertiary font-bold uppercase tracking-[0.2em] leading-none mt-0.5">Autonomous Intelligence Subsystem</p>
+                        </div>
                     </div>
-                    <div>
-                        <h1 className="text-sm font-black text-text-primary tracking-tight uppercase">AI Assistant</h1>
-                        <p className="text-[10px] text-text-tertiary font-bold uppercase tracking-[0.2em] leading-none mt-0.5">Autonomous Intelligence Subsystem</p>
+                    
+                    {/* Cyberpunk Segmented Control */}
+                    <div className="flex items-center bg-foreground/[0.03] border border-border/10 rounded-xl p-0.5 gap-0.5 shadow-inner">
+                        <button
+                            onClick={() => setMode('support')}
+                            className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${
+                                mode === 'support'
+                                    ? 'bg-accent text-accent-foreground shadow-glow-cyan-sm'
+                                    : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
+                            }`}
+                        >
+                            General Support
+                        </button>
+                        <button
+                            onClick={() => {
+                                setMode('copilot');
+                                fetchAllInvestigations();
+                            }}
+                            className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${
+                                mode === 'copilot'
+                                    ? 'bg-accent text-accent-foreground shadow-glow-cyan-sm'
+                                    : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
+                            }`}
+                        >
+                            Case Co-Pilot
+                        </button>
                     </div>
-                    <div className="ml-auto flex items-center gap-2">
+
+                    <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.4)]" />
                         <span className="text-[10px] text-emerald-600 dark:text-emerald-400/70 font-black uppercase tracking-widest hidden md:inline">Neural Link Active</span>
                     </div>
@@ -470,7 +589,7 @@ export default function ChatPage() {
                                     onChange={handleInput}
                                     onKeyDown={handleKeyDown}
                                     rows={1}
-                                    placeholder="Execute new OSINT query..."
+                                    placeholder={mode === 'support' ? "Ask about Aletheia features, settings, or pricing..." : "Ask Co-Pilot to analyze or correlate active case intelligence..."}
                                     className="w-full bg-foreground/[0.02] border border-border/15 focus:border-accent/40 rounded-2xl px-4 py-3 text-sm text-text-primary placeholder:text-text-tertiary/50 outline-none resize-none transition-all leading-relaxed shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]"
                                     style={{ maxHeight: '120px' }}
                                     disabled={sending}

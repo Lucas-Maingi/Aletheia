@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, Mail, Globe, AtSign, Shield, Fingerprint, Zap } from 'lucide-react';
+import { Users, Mail, Globe, AtSign, Shield, Fingerprint, Zap, Car } from 'lucide-react';
 
 export function EntitiesTab({ entities, investigationId }: { entities: any[], investigationId: string }) {
     if (entities.length === 0) {
@@ -22,6 +22,8 @@ export function EntitiesTab({ entities, investigationId }: { entities: any[], in
             case 'domain': return <Globe className="w-3.5 h-3.5" />;
             case 'username': return <AtSign className="w-3.5 h-3.5" />;
             case 'name': return <Users className="w-3.5 h-3.5" />;
+            case 'plate':
+            case 'vehicle': return <Car className="w-3.5 h-3.5" />;
             default: return <Fingerprint className="w-3.5 h-3.5" />;
         }
     };

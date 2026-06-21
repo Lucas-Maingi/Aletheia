@@ -14,3 +14,4 @@ export * from './securityTrails';
 export * from './ecosystemSearch';
 export * from './registrationScout';
 export * from './siphonHub';
+export * from './vehicleSearch';

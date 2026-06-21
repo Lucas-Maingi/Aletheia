@@ -3,7 +3,7 @@ export const maxDuration = 60;
 import { prisma } from '@/lib/prisma';
 import { getEffectiveUserId } from '@/lib/auth-utils';
 import { isValidUuid } from '@/lib/security';
-import { summarizeFindings } from "@/lib/ai";
+import { summarizeFindings, analyzeVehicleImage } from "@/lib/ai";
 import { captureScreenshot } from "@/lib/screenshot";
 import { 
     usernameSearch, 
@@ -20,7 +20,8 @@ import {
     securityTrails,
     ecosystemSearch,
     registrationScout,
-    siphonHub
+    siphonHub,
+    vehicleSearch
 } from '@/connectors';
 import { extractExif } from '@/connectors/exifMetadata';
 import { FacialMatch, mapFaceCheckResults } from '@/connectors/visualIntel';
@@ -55,7 +56,20 @@ async function archiveUrl(url: string): Promise<string | null> {
     }
 }
 
-
+function isLicensePlate(v: string): boolean {
+    const val = v.trim().toLowerCase();
+    if (val.startsWith('plate:')) return true;
+    if (val.startsWith('vehicle:')) return true;
+    
+    const generics = new Set(['new target', 'untitled', 'unknown', 'investigation', 'target', 'subject', 'search', 'placeholder', 'case', 'dossier', 'new investigation', 'untitled investigation']);
+    const plateRegex = /^[A-Z0-9]{2,4}[-\s]?[A-Z0-9]{2,4}[-\s]?[A-Z0-9]{0,4}$/i;
+    if (val.length >= 4 && val.length <= 11 && plateRegex.test(val)) {
+        if (!val.includes('@') && !val.includes('.') && !val.includes(' ') && !generics.has(val)) {
+            return true;
+        }
+    }
+    return false;
+}
 
 export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
     const user = await getEffectiveUserId();
@@ -596,8 +610,10 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
         // ========== PHASE 1: Primary Intelligence Sweep ==========
         const phase1: Promise<any>[] = [];
 
+        const isPlateQuery = primaryTarget ? isLicensePlate(primaryTarget) : false;
+
         // 1. Username Sweep (Handle + whatsMyName + Ecosystem)
-        const usernameTarget = investigation.subjectUsername || (primaryTarget && !primaryTarget.includes('@') && !primaryTarget.includes('.') ? primaryTarget : null);
+        const usernameTarget = !isPlateQuery && (investigation.subjectUsername || (primaryTarget && !primaryTarget.includes('@') && !primaryTarget.includes('.') ? primaryTarget : null));
         const usernameIsGeneric = usernameTarget && GENERIC_TARGETS.has(usernameTarget.toLowerCase());
 
         if (usernameTarget && !usernameIsGeneric) {
@@ -607,14 +623,14 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
         }
 
         // 2. Email Sweep (Breach + Registration Scout + Reputation)
-        const emailTarget = investigation.subjectEmail || (primaryTarget?.includes('@') ? primaryTarget : null);
+        const emailTarget = !isPlateQuery && (investigation.subjectEmail || (primaryTarget?.includes('@') ? primaryTarget : null));
         if (emailTarget) {
             phase1.push(safeRun('Breach Search', () => breachSearch(emailTarget)));
             phase1.push(safeRun('Registration Scout', () => registrationScout(emailTarget)));
         }
 
         // 3. Name & Identity Sweep (Google Dorks + People Search + Interpol)
-        const nameTarget = investigation.subjectName || (usernameTarget && !investigation.subjectUsername ? usernameTarget : null);
+        const nameTarget = !isPlateQuery && (investigation.subjectName || (usernameTarget && !investigation.subjectUsername ? usernameTarget : null));
         const nameIsGeneric = nameTarget && GENERIC_TARGETS.has(nameTarget.toLowerCase());
 
         if (nameTarget && !nameIsGeneric) {
@@ -635,9 +651,59 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
         }
 
         // 4. Infrastructure & Domain Sweep
-        const domainTarget = investigation.subjectDomain || (primaryTarget?.includes('.') && !primaryTarget?.includes('@') ? primaryTarget : null) || emailTarget?.split('@')[1];
+        const domainTarget = !isPlateQuery && (investigation.subjectDomain || (primaryTarget?.includes('.') && !primaryTarget?.includes('@') ? primaryTarget : null) || emailTarget?.split('@')[1]);
         if (domainTarget && !['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'proton.me', 'protonmail.com'].includes(domainTarget)) {
             phase1.push(safeRun('Domain Search', () => domainSearch(domainTarget)));
+        }
+
+        // 7. Vehicle Registry Search (All 3 Paid Tiers)
+        if (isPlateQuery && primaryTarget) {
+            const cleanPlate = primaryTarget.replace(/^(plate:|vehicle:)/i, '').trim();
+            phase1.push(safeRun('Vehicle Registry Search', async () => {
+                const userRecord = await prisma.user.findUnique({ where: { id: userId } });
+                const isPaid = userRecord?.plan && userRecord.plan !== 'free';
+
+                if (!isPaid) {
+                    await prisma.searchLog.create({
+                        data: {
+                            investigationId,
+                            userId,
+                            connectorType: 'system',
+                            query: '[SYS] Vehicle Registry Search requires a premium plan (Analyst Pro, Command Center, or Agency Arsenal). Upgrade to unlock.'
+                        }
+                    }).catch(() => {});
+                    return { results: [] };
+                }
+
+                const vRes = await vehicleSearch(cleanPlate);
+
+                // Add plate entity
+                await prisma.entity.create({
+                    data: {
+                        investigationId,
+                        type: 'plate',
+                        value: cleanPlate.toUpperCase(),
+                        confidence: 100,
+                        notes: 'Primary investigation vehicle vector.'
+                    }
+                }).catch(() => {});
+
+                // Add owner entity if found
+                const ownerResult = vRes.results.find(r => r.category === 'vehicle_registry' && r.metadata?.owner);
+                if (ownerResult?.metadata?.owner) {
+                    await prisma.entity.create({
+                        data: {
+                            investigationId,
+                            type: 'name',
+                            value: ownerResult.metadata.owner,
+                            confidence: 85,
+                            notes: `Discovered registered owner of vehicle plate ${cleanPlate.toUpperCase()} in state records.`
+                        }
+                    }).catch(() => {});
+                }
+
+                return vRes;
+            }));
         }
 
         // 5. Visual Intelligence Swep (Image + Biometrics + EXIF + Siphon)
@@ -658,6 +724,81 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
             }));
 
             phase1.push(safeRun('EXIF Extraction', () => extractExif(investigation.subjectImageUrl)));
+
+            phase1.push(safeRun('Visual LPR Scan', async () => {
+                const userRecord = await prisma.user.findUnique({ where: { id: userId } });
+                const isPaid = userRecord?.plan && userRecord.plan !== 'free';
+                
+                if (!isPaid) {
+                    await prisma.searchLog.create({
+                        data: {
+                            investigationId,
+                            userId,
+                            connectorType: 'system',
+                            query: '[LPR] Visual LPR Scan requires a premium plan (Analyst Pro, Command Center, or Agency Arsenal). Upgrade to unlock.'
+                        }
+                    }).catch(() => {});
+                    return { results: [] };
+                }
+
+                const result = await analyzeVehicleImage(investigation.subjectImageUrl!, customApiKey);
+                if (result && result.detected && result.plate) {
+                    const cleanPlate = result.plate.toUpperCase();
+                    
+                    // Create an Entity for the plate
+                    await prisma.entity.create({
+                        data: {
+                            investigationId,
+                            type: 'plate',
+                            value: cleanPlate,
+                            confidence: Math.round((result.confidence || 0.9) * 100),
+                            notes: `Extracted via optical character recognition from target image. Jurisdiction: ${result.jurisdiction || 'Unknown'}`
+                        }
+                    }).catch(() => {});
+
+                    // Deploy vehicle registry connector to gather records
+                    const vRes = await vehicleSearch(cleanPlate, result.jurisdiction);
+                    
+                    // Create an Entity for the owner if found in the records
+                    const ownerResult = vRes.results.find(r => r.category === 'vehicle_registry' && r.metadata?.owner);
+                    if (ownerResult?.metadata?.owner) {
+                        await prisma.entity.create({
+                            data: {
+                                investigationId,
+                                type: 'name',
+                                value: ownerResult.metadata.owner,
+                                confidence: 85,
+                                notes: `Discovered registered owner of vehicle plate ${cleanPlate} in state records.`
+                            }
+                        }).catch(() => {});
+                    }
+
+                    // Save registry details as Evidence
+                    const vEvidence = vRes.results.map((res: any) => {
+                        const confidenceScore = calculateConfidence('vehicle_registry', false, res.confidenceScore);
+                        const confidenceLabel = getConfidenceLabel(confidenceScore);
+                        return {
+                            investigationId,
+                            title: (res.title || `Vehicle Registry Discovery`).slice(0, 500),
+                            content: (res.description || 'OSINT extract').slice(0, 5000),
+                            sourceUrl: res.url || null,
+                            type: 'url',
+                            tags: res.category || 'general',
+                            confidenceScore: confidenceScore / 100,
+                            confidenceLabel,
+                            provenanceHash: generateProvenanceHash(res.description || ''),
+                            captureTimestamp: new Date(),
+                        };
+                    });
+
+                    if (vEvidence.length > 0) {
+                        await (prisma.evidence as any).createMany({ data: vEvidence, skipDuplicates: true }).catch(() => {});
+                    }
+                    
+                    return vRes;
+                }
+                return { results: [] };
+            }));
         }
 
         // 6. Technical Vectors (IP, Phone)
