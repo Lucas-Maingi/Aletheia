@@ -100,6 +100,12 @@ export default async function DashboardLayout({
                                     <span className="text-[11px] font-black uppercase tracking-widest flex-1">System_Config</span>
                                     <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shadow-[0_0_8px_rgba(0,240,255,0.6)]" />
                                 </Link>
+                                <div className="pt-2 flex flex-wrap justify-between gap-x-2 gap-y-1.5 border-t border-border/10 text-[9px] font-bold text-text-tertiary uppercase tracking-wider relative z-30">
+                                    <Link href="/about" className="hover:text-accent transition-colors">About</Link>
+                                    <Link href="/ethics" className="hover:text-accent transition-colors">Ethics</Link>
+                                    <Link href="/privacy" className="hover:text-accent transition-colors">Privacy</Link>
+                                    <Link href="/terms" className="hover:text-accent transition-colors">Terms</Link>
+                                </div>
                             </div>
                         </aside>
                     </MobileSidebarToggle>

@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { LandingHeader } from "./landing-header";
+import { Footer } from "../footer";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -196,6 +197,10 @@ export function LegalPageLayout({ title, lastUpdated, sections }: LegalPageLayou
           </motion.button>
         )}
       </AnimatePresence>
+
+      <div className="mt-24 border-t border-border/10">
+        <Footer />
+      </div>
     </div>
   );
 }

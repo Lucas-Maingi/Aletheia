@@ -32,19 +32,17 @@ export function Footer() {
                     <h3 className="text-sm font-semibold text-white mb-4">Product</h3>
                     <ul className="space-y-3 text-sm text-text-secondary">
                         <li><Link href="/dashboard" className="hover:text-accent transition-colors">Dashboard</Link></li>
-                        <li><Link href="/premium" className="hover:text-accent transition-colors">Premium</Link></li>
-                        <li><Link href="/connectors" className="hover:text-accent transition-colors">Integrations</Link></li>
+                        <li><Link href="/pricing" className="hover:text-accent transition-colors">Pricing</Link></li>
+                        <li><Link href="/about" className="hover:text-accent transition-colors">About Us</Link></li>
                     </ul>
                 </div>
 
-
-
                 <div>
-                    <h3 className="text-sm font-semibold text-white mb-4">Legal</h3>
+                    <h3 className="text-sm font-semibold text-white mb-4">Compliance</h3>
                     <ul className="space-y-3 text-sm text-text-secondary">
+                        <li><Link href="/ethics" className="hover:text-accent transition-colors">Ethics Framework</Link></li>
                         <li><Link href="/privacy" className="hover:text-accent transition-colors">Privacy Policy</Link></li>
                         <li><Link href="/terms" className="hover:text-accent transition-colors">Terms of Service</Link></li>
-                        <li><Link href="/contact" className="hover:text-accent transition-colors">Contact</Link></li>
                     </ul>
                 </div>
             </div>

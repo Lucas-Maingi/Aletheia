@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { LandingHeader } from "@/components/landing/landing-header";
+import { Footer } from "@/components/footer";
 import { Card, CardContent } from "@/components/ui/card";
 
 const FloatingParticles = () => {
@@ -462,9 +463,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <footer className="py-12 border-t border-border/10 text-center text-[10px] font-black uppercase tracking-[0.3em] text-text-tertiary bg-background">
-        © 2026 Aletheia Intelligence Systems • [System_Authorized]
-      </footer>
+      <Footer />
     </div>
   );
 }
