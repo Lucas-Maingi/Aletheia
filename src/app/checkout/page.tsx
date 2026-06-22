@@ -84,40 +84,9 @@ export default function CheckoutPage() {
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Native HTML5 validation will typically block this before it fires
+    // if fields are empty, but just in case:
     if (!email || !name) return;
-    
-    setStep('processing');
-    
-    // Simulate brief processing, then trigger Gumroad overlay
-    setTimeout(() => {
-      const username = "lucas808";
-      const gumroadId = LAUNCH_CONFIG.LTD_TIERS[plan.gumroadIdKey]?.gumroadId;
-      
-      if (!gumroadId) {
-        setStep('redirect'); // Fallback error state if no ID
-        return;
-      }
-
-      // Append ?wanted=true to directly open checkout modal
-      const checkoutUrl = `https://${username}.gumroad.com/l/${gumroadId}?email=${encodeURIComponent(email)}&wanted=true`;
-      
-      // Programmatically create and click an anchor tag to trigger gumroad.js overlay
-      const link = document.createElement('a');
-      link.href = checkoutUrl;
-      link.className = 'gumroad-button hidden';
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      
-      // Trigger Gumroad overlay
-      link.click();
-      
-      // Keep state processing while modal is open, or clean up link
-      setTimeout(() => {
-        if (document.body.contains(link)) {
-          document.body.removeChild(link);
-        }
-      }, 1000);
-    }, 1500);
   };
 
   // Listen for successful sale postMessage from Gumroad overlay
@@ -247,7 +216,7 @@ export default function CheckoutPage() {
                     <p className="text-text-secondary text-sm">Secure lifetime access to {plan.name}. No recurring charges, ever.</p>
                   </div>
 
-                  <form onSubmit={handleCheckout} className="space-y-6">
+                  <form onSubmit={(e) => { e.preventDefault(); /* fallback if they press enter */ }} className="space-y-6">
                     {/* Name */}
                     <div className="space-y-2">
                       <label className="text-xs font-bold uppercase tracking-widest text-text-tertiary">Full Name</label>
@@ -296,14 +265,26 @@ export default function CheckoutPage() {
                     </div>
 
                     {/* Submit Button */}
-                    <Button
-                      type="submit"
-                      className="w-full h-14 text-sm font-black uppercase tracking-widest bg-accent hover:bg-accent/90 text-white rounded-2xl shadow-[0_0_30px_rgba(168,85,247,0.3)] hover:shadow-[0_0_50px_rgba(168,85,247,0.4)] transition-all transform hover:scale-[1.01]"
-                    >
-                      <Lock className="w-4 h-4 mr-2" />
-                      Pay ${plan.price} — Lifetime Access
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
+                    {email && name && email.includes('@') ? (
+                      <a
+                        href={`https://lucas808.gumroad.com/l/${LAUNCH_CONFIG.LTD_TIERS[plan.gumroadIdKey]?.gumroadId}?email=${encodeURIComponent(email)}&wanted=true`}
+                        className="w-full flex items-center justify-center h-14 text-sm font-black uppercase tracking-widest bg-accent hover:bg-accent/90 text-white rounded-2xl shadow-[0_0_30px_rgba(168,85,247,0.3)] hover:shadow-[0_0_50px_rgba(168,85,247,0.4)] transition-all transform hover:scale-[1.01] gumroad-button"
+                        data-gumroad-single-product="true"
+                      >
+                        <Lock className="w-4 h-4 mr-2" />
+                        Pay ${plan.price} — Lifetime Access
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </a>
+                    ) : (
+                      <button
+                        type="submit"
+                        className="w-full flex items-center justify-center h-14 text-sm font-black uppercase tracking-widest bg-accent hover:bg-accent/90 text-white rounded-2xl shadow-[0_0_30px_rgba(168,85,247,0.3)] transition-all opacity-70 cursor-not-allowed"
+                      >
+                        <Lock className="w-4 h-4 mr-2" />
+                        Pay ${plan.price} — Lifetime Access
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </button>
+                    )}
 
                     <p className="text-center text-[10px] text-text-tertiary font-bold uppercase tracking-widest">
                       🔒 30-day money-back guarantee • Instant access after payment
