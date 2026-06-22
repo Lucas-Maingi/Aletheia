@@ -16,6 +16,8 @@ import { SidebarNav } from '@/components/dashboard/sidebar-nav';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { Footer } from '@/components/footer';
 import { DashboardBackButton } from '@/components/dashboard/dashboard-back-button';
+import { FloatingChat } from '@/components/dashboard/floating-chat';
+
 export default async function DashboardLayout({
     children,
 }: {
@@ -62,7 +64,7 @@ export default async function DashboardLayout({
                     <h1 className="text-xl font-bold mb-2">Database Connection Error</h1>
                     <p className="text-text-secondary text-sm mb-6">
                         Aletheia could not sync your session with the database. This usually happens if the database schema is not up to date or the connection string is incorrect.
-                    </p>
+                     </p>
                     <div className="p-4 bg-background/50 rounded-xl font-mono text-[10px] text-left mb-6 overflow-auto max-h-32">
                         {String(error)}
                     </div>
@@ -134,6 +136,7 @@ export default async function DashboardLayout({
                 </div>
 
                 <MobileNav />
+                <FloatingChat />
             </div>
         </InvestigationProvider>
     );

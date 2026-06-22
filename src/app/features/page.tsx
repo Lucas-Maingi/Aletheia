@@ -32,6 +32,10 @@ const FEATURE_CATEGORIES = [
       {
         title: "Infrastructure & DNS sweeps",
         desc: "Query domain WHOIS history, subdomains, passive DNS records, and registrar footprints."
+      },
+      {
+        title: "Vehicle registry & LPR (Paid)",
+        desc: "Scan license plates via text registry lookup or upload a vehicle image to run automatic Gemini-powered Visual LPR OCR extracting owner details."
       }
     ]
   },

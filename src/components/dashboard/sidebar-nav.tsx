@@ -110,12 +110,6 @@ export function SidebarNav({
                 </Link>
 
                 <NavLink 
-                    href="/dashboard/chat" 
-                    label="AI Assistant" 
-                    icon={<MessageSquare className="w-4 h-4" />} 
-                />
-
-                <NavLink 
                     href="/dashboard/investigations" 
                     label="Intelligence Archive" 
                     icon={<Database className="w-4 h-4" />} 
