@@ -26,11 +26,13 @@ import {
   RotateCcw,
   EyeOff,
   Sparkles,
+  Network,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { DEMO_PERSON, DEMO_DOMAIN, CONNECTOR_DISPLAY_NAMES } from '@/lib/demo-data';
+import { IdentityGraph } from '@/components/dashboard/identity-graph';
 
 // ─── TYPES ──────────────────────────────────────────────────────
 type DemoData = typeof DEMO_PERSON | typeof DEMO_DOMAIN;
@@ -351,7 +353,7 @@ function EntityChip({ entity }: { entity: EntityItem }) {
 // ─── INVESTIGATION PANEL (per tab) ──────────────────────────────
 
 function InvestigationPanel({ data }: { data: DemoData }) {
-  const [view, setView] = useState<'evidence' | 'timeline' | 'dossier' | 'entities'>('evidence');
+  const [view, setView] = useState<'evidence' | 'timeline' | 'graph' | 'dossier' | 'entities'>('evidence');
 
   const stats = data.stats;
   const dossierHtml = useMemo(() => renderMarkdown(data.dossier), [data.dossier]);
@@ -424,6 +426,7 @@ function InvestigationPanel({ data }: { data: DemoData }) {
           [
             { key: 'evidence', label: 'Evidence', icon: <Search className="w-3.5 h-3.5" /> },
             { key: 'timeline', label: 'Timeline', icon: <Clock className="w-3.5 h-3.5" /> },
+            { key: 'graph', label: 'Network Graph', icon: <Network className="w-3.5 h-3.5" /> },
             { key: 'dossier', label: 'Dossier', icon: <Terminal className="w-3.5 h-3.5" /> },
             { key: 'entities', label: 'Entities', icon: <Database className="w-3.5 h-3.5" /> },
           ] as const
@@ -484,6 +487,31 @@ function InvestigationPanel({ data }: { data: DemoData }) {
             {data.timeline.map((entry, i) => (
               <TimelineItem key={i} entry={entry} index={i} />
             ))}
+          </motion.div>
+        )}
+
+        {/* Network Graph */}
+        {view === 'graph' && (
+          <motion.div
+            key="graph"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="bg-surface/80 border border-border rounded-xl p-5 shadow-xl backdrop-blur-sm h-[600px] flex flex-col"
+          >
+            <div className="flex items-center gap-2 mb-4 shrink-0">
+              <Network className="w-4 h-4 text-accent" />
+              <span className="text-xs uppercase tracking-widest text-text-secondary font-medium">
+                Interactive Identity Network Graph
+              </span>
+            </div>
+            <div className="flex-1 min-h-0">
+              <IdentityGraph
+                target={data.investigation.title}
+                evidence={data.evidence}
+                entities={data.entities}
+              />
+            </div>
           </motion.div>
         )}
 
@@ -646,7 +674,7 @@ function CinematicDemo() {
   const [visibleLogs, setVisibleLogs] = useState<typeof DEMO_PERSON.timeline>([]);
   const [showDossier, setShowDossier] = useState(false);
   const [dossierText, setDossierText] = useState("");
-  const [view, setView] = useState<'evidence' | 'timeline' | 'dossier' | 'entities'>('timeline');
+  const [view, setView] = useState<'evidence' | 'timeline' | 'graph' | 'dossier' | 'entities'>('timeline');
 
   const targetEmail = "john.doe@example.com";
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -727,8 +755,12 @@ function CinematicDemo() {
   useEffect(() => {
     if (currentStep === 1) {
       setView('timeline');
-    } else if (currentStep >= 2 && currentStep <= 12) {
+    } else if (currentStep >= 2 && currentStep <= 5) {
       setView('evidence');
+    } else if (currentStep >= 6 && currentStep <= 11) {
+      setView('graph');
+    } else if (currentStep >= 12 && currentStep <= 13) {
+      setView('entities');
     } else if (currentStep === 14) {
       setView('dossier');
     }
@@ -1053,6 +1085,7 @@ function CinematicDemo() {
                     [
                       { key: 'evidence', label: 'Evidence', icon: <Search className="w-3.5 h-3.5" /> },
                       { key: 'timeline', label: 'Timeline', icon: <Clock className="w-3.5 h-3.5" /> },
+                      { key: 'graph', label: 'Network Graph', icon: <Network className="w-3.5 h-3.5" /> },
                       { key: 'dossier', label: 'Dossier', icon: <Terminal className="w-3.5 h-3.5" /> },
                       { key: 'entities', label: 'Entities', icon: <Database className="w-3.5 h-3.5" /> },
                     ] as const
@@ -1127,6 +1160,37 @@ function CinematicDemo() {
                           <div className="h-full flex flex-col items-center justify-center text-text-tertiary">
                             <Clock className="w-8 h-8 mb-2 animate-pulse text-accent" />
                             <span className="text-xs font-mono uppercase tracking-wider">Awaiting scan initiation...</span>
+                          </div>
+                        )}
+                      </motion.div>
+                    )}
+
+                    {/* Network Graph Tab */}
+                    {view === 'graph' && (
+                      <motion.div
+                        key="graph"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="bg-surface/50 border border-border/10 rounded-xl p-5 shadow-xl backdrop-blur-sm h-[590px] flex flex-col"
+                      >
+                        <div className="flex items-center gap-2 mb-4 shrink-0">
+                          <Network className="w-4 h-4 text-accent animate-pulse" />
+                          <span className="text-xs uppercase tracking-widest text-text-secondary font-medium">
+                            Interactive Identity Network Graph (Real-time Ingestion)
+                          </span>
+                        </div>
+                        <div className="flex-1 min-h-0">
+                          <IdentityGraph
+                            target="john.doe@example.com"
+                            evidence={visibleEvidence}
+                            entities={visibleEntities}
+                          />
+                        </div>
+                        {visibleEvidence.length === 0 && (
+                          <div className="absolute inset-0 flex flex-col items-center justify-center text-text-tertiary bg-surface/50 backdrop-blur-sm rounded-xl">
+                            <Network className="w-8 h-8 mb-2 animate-pulse text-accent" />
+                            <span className="text-xs font-mono uppercase tracking-wider">Constructing network nodes...</span>
                           </div>
                         )}
                       </motion.div>
