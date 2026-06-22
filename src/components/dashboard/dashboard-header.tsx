@@ -5,7 +5,7 @@ import { UserNav } from "./user-nav";
 import { ChevronRight, Search, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { AlertBell } from "./alert-bell";
-import { ThemeSwitcher } from "../ui/theme-switcher";
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AletheiaLogo } from "../AletheiaLogo";
@@ -120,7 +120,6 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                     
                     <div className="flex items-center gap-4">
                         <AlertBell iconSize={20} className="p-2.5 rounded-xl hover:bg-accent/10 transition-all border border-transparent hover:border-accent/20 text-text-secondary hover:text-accent" />
-                        <ThemeSwitcher iconOnly={true} align="bottom" side="right" className="p-2.5" />
                     </div>
                     
                     <div className="h-6 w-px bg-border/20 hidden md:block" />
