@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Shield, Key, CheckCircle2, AlertCircle, Save, User as UserIcon, CreditCard, Activity, Fingerprint, ExternalLink, Brain, Database } from "lucide-react";
+import { Shield, Key, CheckCircle2, AlertCircle, Save, User as UserIcon, CreditCard, Activity, Fingerprint, ExternalLink, Brain, Database, X, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,6 +10,9 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UsageStats } from "@/components/dashboard/usage-stats";
 import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/client";
+import { useSearchParams } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState("identity");
@@ -24,9 +27,30 @@ export default function SettingsPage() {
     });
     const [isLoading, setIsLoading] = useState(true);
 
+    // Password change modal state
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmNewPassword, setConfirmNewPassword] = useState("");
+    const [passwordError, setPasswordError] = useState<string | null>(null);
+    const [passwordLoading, setPasswordLoading] = useState(false);
+    const [isRecoveryMode, setIsRecoveryMode] = useState(false);
+
+    const searchParams = useSearchParams();
+    const supabase = createClient();
+
     useEffect(() => {
         document.title = "Settings — Aletheia";
     }, []);
+
+    // Detect recovery mode from URL (password reset link click)
+    useEffect(() => {
+        const resetParam = searchParams.get('reset');
+        if (resetParam === 'true') {
+            setIsRecoveryMode(true);
+            setShowPasswordModal(true);
+            setActiveTab("security");
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         const loadData = async () => {
@@ -90,6 +114,45 @@ export default function SettingsPage() {
         toast.success("Linguistic engine key saved locally.");
     };
 
+    const handlePasswordChange = async () => {
+        setPasswordError(null);
+        
+        if (newPassword.length < 6) {
+            setPasswordError("Password must be at least 6 characters long.");
+            return;
+        }
+
+        if (newPassword !== confirmNewPassword) {
+            setPasswordError("Passwords do not match.");
+            return;
+        }
+
+        setPasswordLoading(true);
+
+        try {
+            const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+            if (error) {
+                setPasswordError(error.message);
+            } else {
+                toast.success("Password updated successfully. Your new credentials are now active.");
+                setShowPasswordModal(false);
+                setNewPassword("");
+                setConfirmNewPassword("");
+                setIsRecoveryMode(false);
+                
+                // Clean URL if we came from recovery
+                if (searchParams.get('reset') === 'true') {
+                    window.history.replaceState({}, '', '/dashboard/settings');
+                }
+            }
+        } catch (err) {
+            setPasswordError("An unexpected error occurred. Please try again.");
+        } finally {
+            setPasswordLoading(false);
+        }
+    };
+
     if (isLoading) {
         return (
             <div className="h-full flex items-center justify-center">
@@ -115,7 +178,7 @@ export default function SettingsPage() {
                 </p>
             </div>
 
-            <Tabs defaultValue="identity" className="w-full" onValueChange={setActiveTab}>
+            <Tabs defaultValue="identity" value={activeTab} className="w-full" onValueChange={setActiveTab}>
                 <TabsList className="bg-foreground/[0.03] border border-border/10 w-fit rounded-2xl h-14 p-1.5 gap-2 shadow-inner">
                     {[
                         { id: "identity", label: "Identity Profile", icon: <UserIcon className="w-3.5 h-3.5" /> },
@@ -294,8 +357,14 @@ export default function SettingsPage() {
                                 <Button 
                                     variant="outline" 
                                     className="w-full h-14 border-border/10 bg-foreground/5 hover:bg-accent/5 hover:text-accent hover:border-accent/20 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all"
-                                    onClick={() => toast.info("Vault password reset initiated via Supabase.")}
+                                    onClick={() => {
+                                        setShowPasswordModal(true);
+                                        setPasswordError(null);
+                                        setNewPassword("");
+                                        setConfirmNewPassword("");
+                                    }}
                                 >
+                                    <Lock className="w-4 h-4 mr-2" />
                                     Cycle Access Credentials
                                 </Button>
                                 <Button 
@@ -310,6 +379,164 @@ export default function SettingsPage() {
                     </div>
                 </TabsContent>
             </Tabs>
+
+            {/* Password Change Modal */}
+            <AnimatePresence>
+                {showPasswordModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-6"
+                        onClick={(e) => {
+                            // Don't allow closing during recovery mode
+                            if (!isRecoveryMode && e.target === e.currentTarget) {
+                                setShowPasswordModal(false);
+                            }
+                        }}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            className="w-full max-w-md bg-surface border border-border/20 rounded-3xl shadow-2xl overflow-hidden"
+                        >
+                            {/* Modal Header */}
+                            <div className="flex items-center justify-between p-6 border-b border-border/10 bg-foreground/[0.02]">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-accent/10 rounded-xl border border-accent/20">
+                                        <Lock className="w-5 h-5 text-accent" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-sm font-black uppercase tracking-[0.15em] text-text-primary">
+                                            {isRecoveryMode ? 'Set New Password' : 'Change Password'}
+                                        </h3>
+                                        <p className="text-[9px] font-bold uppercase tracking-widest text-text-tertiary mt-0.5">
+                                            {isRecoveryMode ? 'Password recovery in progress' : 'Credential rotation protocol'}
+                                        </p>
+                                    </div>
+                                </div>
+                                {!isRecoveryMode && (
+                                    <button
+                                        onClick={() => setShowPasswordModal(false)}
+                                        className="p-2 rounded-xl hover:bg-foreground/10 transition-colors"
+                                    >
+                                        <X className="w-4 h-4 text-text-tertiary" />
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Modal Body */}
+                            <div className="p-6 space-y-5">
+                                {isRecoveryMode && (
+                                    <div className="p-3 bg-accent/5 border border-accent/20 rounded-xl">
+                                        <p className="text-[10px] font-bold text-accent uppercase tracking-wider">
+                                            You clicked a password reset link. Please choose a new password below.
+                                        </p>
+                                    </div>
+                                )}
+
+                                {passwordError && (
+                                    <div className="p-3 bg-red-950/30 border border-red-500/30 rounded-xl">
+                                        <p className="text-[10px] font-bold text-red-300 uppercase tracking-wider">
+                                            <span className="text-red-400 mr-1">ERROR:</span> {passwordError}
+                                        </p>
+                                    </div>
+                                )}
+
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black text-text-tertiary tracking-[0.2em] uppercase pl-1">New Password</Label>
+                                    <Input
+                                        type="password"
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        placeholder="Enter new password (min. 6 chars)"
+                                        autoComplete="new-password"
+                                        className="h-14 bg-foreground/[0.03] border-border/10 font-bold text-sm px-5 rounded-2xl focus:border-accent/40"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black text-text-tertiary tracking-[0.2em] uppercase pl-1">Confirm New Password</Label>
+                                    <Input
+                                        type="password"
+                                        value={confirmNewPassword}
+                                        onChange={(e) => setConfirmNewPassword(e.target.value)}
+                                        placeholder="Re-enter new password"
+                                        autoComplete="new-password"
+                                        className="h-14 bg-foreground/[0.03] border-border/10 font-bold text-sm px-5 rounded-2xl focus:border-accent/40"
+                                    />
+                                </div>
+
+                                {/* Password strength indicator */}
+                                {newPassword.length > 0 && (
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex-1 h-1.5 bg-foreground/10 rounded-full overflow-hidden">
+                                                <div 
+                                                    className={`h-full rounded-full transition-all duration-500 ${
+                                                        newPassword.length < 6 ? 'w-1/4 bg-red-500' :
+                                                        newPassword.length < 10 ? 'w-2/4 bg-yellow-500' :
+                                                        newPassword.length < 14 ? 'w-3/4 bg-accent' :
+                                                        'w-full bg-green-500'
+                                                    }`}
+                                                />
+                                            </div>
+                                            <span className={`text-[9px] font-black uppercase tracking-widest ${
+                                                newPassword.length < 6 ? 'text-red-400' :
+                                                newPassword.length < 10 ? 'text-yellow-400' :
+                                                newPassword.length < 14 ? 'text-accent' :
+                                                'text-green-400'
+                                            }`}>
+                                                {newPassword.length < 6 ? 'Too Short' :
+                                                 newPassword.length < 10 ? 'Fair' :
+                                                 newPassword.length < 14 ? 'Strong' :
+                                                 'Very Strong'}
+                                            </span>
+                                        </div>
+                                        {newPassword.length > 0 && confirmNewPassword.length > 0 && (
+                                            <div className="flex items-center gap-1.5">
+                                                {newPassword === confirmNewPassword ? (
+                                                    <>
+                                                        <CheckCircle2 className="w-3 h-3 text-green-400" />
+                                                        <span className="text-[9px] font-bold text-green-400 uppercase tracking-widest">Passwords match</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <AlertCircle className="w-3 h-3 text-red-400" />
+                                                        <span className="text-[9px] font-bold text-red-400 uppercase tracking-widest">Passwords do not match</span>
+                                                    </>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Modal Footer */}
+                            <div className="p-6 pt-0 flex gap-3">
+                                {!isRecoveryMode && (
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setShowPasswordModal(false)}
+                                        className="flex-1 h-12 border-border/10 font-black uppercase tracking-widest text-[10px] rounded-2xl"
+                                    >
+                                        Cancel
+                                    </Button>
+                                )}
+                                <Button
+                                    onClick={handlePasswordChange}
+                                    disabled={passwordLoading || newPassword.length < 6 || newPassword !== confirmNewPassword}
+                                    className={`${isRecoveryMode ? 'w-full' : 'flex-1'} h-12 bg-accent hover:bg-accent-hover text-white font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all disabled:opacity-50`}
+                                >
+                                    {passwordLoading ? 'Updating...' : 'Update Password'}
+                                </Button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

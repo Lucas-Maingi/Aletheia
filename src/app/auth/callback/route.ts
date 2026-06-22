@@ -60,6 +60,13 @@ export async function GET(request: Request) {
             } catch (prErr: any) {
                 console.error('[Auth Callback] Prisma Sync/Migration failure:', prErr.message);
             }
+
+            // Check if this is a password recovery flow
+            // Supabase uses type=recovery in the URL hash, but after exchange,
+            // we check the 'next' param which we set to include ?reset=true
+            if (next.includes('reset=true')) {
+                console.log(`[Auth Callback] Password recovery flow detected for ${user.email}`);
+            }
         }
     }
 

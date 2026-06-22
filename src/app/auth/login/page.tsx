@@ -6,9 +6,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Login() {
-    const [mode, setMode] = useState<'login' | 'signup'>('login');
+    const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
@@ -41,7 +42,20 @@ export default function Login() {
                 router.push(next);
                 router.refresh();
             }
-        } else {
+        } else if (mode === 'signup') {
+            // Password confirmation check
+            if (password !== confirmPassword) {
+                setError('Passwords do not match. Please re-enter.');
+                setLoading(false);
+                return;
+            }
+
+            if (password.length < 6) {
+                setError('Password must be at least 6 characters long.');
+                setLoading(false);
+                return;
+            }
+
             const { error, data } = await supabase.auth.signUp({
                 email,
                 password,
@@ -60,12 +74,41 @@ export default function Login() {
                     setError(error.message);
                 }
             } else if (data.user && data.session === null) {
-                setSuccessMessage("Verification link sent! Note: If the link redirects to localhost, please manually update your Supabase Dashboard 'Site URL' to the live Vercel domain.");
+                setSuccessMessage("A verification link has been sent to your email. Please check your inbox (and spam folder) and click the link to activate your account.");
             } else {
                 router.push(next);
                 router.refresh();
             }
             setLoading(false);
+        } else if (mode === 'forgot') {
+            // Forgot Password flow
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${location.origin}/auth/callback?next=/dashboard/settings?reset=true`
+            });
+
+            if (error) {
+                setError(error.message);
+            } else {
+                setSuccessMessage("Password reset link sent! Check your email inbox (and spam folder). Click the link to set a new password.");
+            }
+            setLoading(false);
+        }
+    };
+
+    const getHeadingText = () => {
+        switch (mode) {
+            case 'login': return 'Secure Terminal Access';
+            case 'signup': return 'Create Analyst Account';
+            case 'forgot': return 'Password Recovery Protocol';
+        }
+    };
+
+    const getButtonText = () => {
+        if (loading) return 'Processing...';
+        switch (mode) {
+            case 'login': return 'Sign In';
+            case 'signup': return 'Create Account';
+            case 'forgot': return 'Send Reset Link';
         }
     };
 
@@ -97,7 +140,7 @@ export default function Login() {
                                 exit={{ opacity: 0 }}
                                 className="text-[10px] font-mono uppercase tracking-[0.3em] text-text-muted font-semibold"
                             >
-                                {mode === 'login' ? 'Secure Terminal Access' : 'Create Analyst Account'}
+                                {getHeadingText()}
                             </motion.p>
                         </AnimatePresence>
                     </div>
@@ -140,19 +183,55 @@ export default function Login() {
                                 />
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-[9px] uppercase tracking-widest text-text-secondary font-bold font-mono ml-1">Access Key (Password)</label>
-                                <input
-                                    type="password"
-                                    name="password"
-                                    autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full bg-surface-dark/50 border border-border-bright focus:border-accent-blue-bright focus:ring-1 focus:ring-accent-blue-bright/30 rounded-xl px-4 py-3 text-sm outline-none transition-all font-mono"
-                                    placeholder="••••••••••••"
-                                />
-                            </div>
+                            {/* Password field - hidden in forgot mode */}
+                            <AnimatePresence mode="wait">
+                                {mode !== 'forgot' && (
+                                    <motion.div
+                                        key="password-field"
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="space-y-1.5 overflow-hidden"
+                                    >
+                                        <label className="text-[9px] uppercase tracking-widest text-text-secondary font-bold font-mono ml-1">Access Key (Password)</label>
+                                        <input
+                                            type="password"
+                                            name="password"
+                                            autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                                            required
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            className="w-full bg-surface-dark/50 border border-border-bright focus:border-accent-blue-bright focus:ring-1 focus:ring-accent-blue-bright/30 rounded-xl px-4 py-3 text-sm outline-none transition-all font-mono"
+                                            placeholder="••••••••••••"
+                                        />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            {/* Confirm Password field - only in signup mode */}
+                            <AnimatePresence mode="wait">
+                                {mode === 'signup' && (
+                                    <motion.div
+                                        key="confirm-password-field"
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="space-y-1.5 overflow-hidden"
+                                    >
+                                        <label className="text-[9px] uppercase tracking-widest text-text-secondary font-bold font-mono ml-1">Confirm Access Key</label>
+                                        <input
+                                            type="password"
+                                            name="confirm-password"
+                                            autoComplete="new-password"
+                                            required
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            className="w-full bg-surface-dark/50 border border-border-bright focus:border-accent-blue-bright focus:ring-1 focus:ring-accent-blue-bright/30 rounded-xl px-4 py-3 text-sm outline-none transition-all font-mono"
+                                            placeholder="••••••••••••"
+                                        />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
 
                         <div className="pt-4 space-y-6">
@@ -163,21 +242,53 @@ export default function Login() {
                                 disabled={loading}
                                 className="w-full bg-accent-blue hover:bg-accent-blue-bright text-white text-[11px] uppercase tracking-[0.2em] font-black py-4 rounded-xl cursor-pointer transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {loading ? 'Processing...' : (mode === 'login' ? 'Sign In' : 'Create Account')}
+                                {getButtonText()}
                             </motion.button>
 
+                            {/* Forgot Password link (login mode only) */}
+                            {mode === 'login' && (
+                                <div className="text-center">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setMode('forgot');
+                                            setError(null);
+                                            setSuccessMessage(null);
+                                        }}
+                                        className="text-[10px] uppercase tracking-widest text-text-muted hover:text-accent-blue-bright transition-colors cursor-pointer font-semibold"
+                                    >
+                                        Forgot Password?
+                                    </button>
+                                </div>
+                            )}
+
                             <div className="text-center">
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setMode(mode === 'login' ? 'signup' : 'login');
-                                        setError(null);
-                                        setSuccessMessage(null);
-                                    }}
-                                    className="text-[10px] uppercase tracking-widest text-text-secondary hover:text-accent-blue-bright transition-colors cursor-pointer font-bold border-b border-transparent hover:border-accent-blue-bright pb-0.5"
-                                >
-                                    {mode === 'login' ? "Need an analyst account? Sign Up" : "Already have an account? Sign In"}
-                                </button>
+                                {mode === 'forgot' ? (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setMode('login');
+                                            setError(null);
+                                            setSuccessMessage(null);
+                                        }}
+                                        className="text-[10px] uppercase tracking-widest text-text-secondary hover:text-accent-blue-bright transition-colors cursor-pointer font-bold border-b border-transparent hover:border-accent-blue-bright pb-0.5"
+                                    >
+                                        Back to Sign In
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setMode(mode === 'login' ? 'signup' : 'login');
+                                            setError(null);
+                                            setSuccessMessage(null);
+                                            setConfirmPassword('');
+                                        }}
+                                        className="text-[10px] uppercase tracking-widest text-text-secondary hover:text-accent-blue-bright transition-colors cursor-pointer font-bold border-b border-transparent hover:border-accent-blue-bright pb-0.5"
+                                    >
+                                        {mode === 'login' ? "Need an analyst account? Sign Up" : "Already have an account? Sign In"}
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </form>
@@ -186,6 +297,3 @@ export default function Login() {
         </div>
     );
 }
-
-
-
