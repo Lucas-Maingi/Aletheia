@@ -75,7 +75,7 @@ export function SidebarNav({
     const isBulkLocked = plan === "free" || plan === "pro";
 
     return (
-        <div className="space-y-4 flex flex-col h-full">
+        <div className="space-y-4 flex flex-col min-h-full">
             {/* Admin Section */}
             {isAdmin && (
                 <div className="space-y-1">
