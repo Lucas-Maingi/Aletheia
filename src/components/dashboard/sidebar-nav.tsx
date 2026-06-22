@@ -196,6 +196,9 @@ export function SidebarNav({
                     <SidebarFeedbackWidget isGuest={isGuest} userEmail={userEmail} />
                 </div>
             </div>
+
+            {/* Physical spacer element to bypass browser scrollHeight padding bugs */}
+            <div className="h-16 shrink-0" />
         </div>
     );
 }

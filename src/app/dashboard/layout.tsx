@@ -56,29 +56,21 @@ export default async function DashboardLayout({
             // Clear cookie is handled in the next request or we can ignore it since guestId will match user.id or be skipped next time
         }
     } catch (error) {
-        console.error('Prisma User Sync Error:', error);
-        return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-background p-6 text-center">
-                <div className="p-8 bg-surface border border-danger/30 rounded-2xl max-w-md shadow-2xl">
-                    <AletheiaLogo className="w-12 h-12 text-danger mx-auto mb-4" />
-                    <h1 className="text-xl font-bold mb-2">Database Connection Error</h1>
-                    <p className="text-text-secondary text-sm mb-6">
-                        Aletheia could not sync your session with the database. This usually happens if the database schema is not up to date or the connection string is incorrect.
-                     </p>
-                    <div className="p-4 bg-background/50 rounded-xl font-mono text-[10px] text-left mb-6 overflow-auto max-h-32">
-                        {String(error)}
-                    </div>
-                </div>
-            </div>
-        );
+        console.error('Prisma User Sync Error (Continuing with fallback):', error);
     }
 
+    let isAdmin = false;
+    let plan = 'free';
+    try {
         const dbUser = await prisma.user.findUnique({
             where: { id: user.id },
             select: { role: true, plan: true }
         });
-        const isAdmin = dbUser?.role === 'admin';
-        const plan = dbUser?.plan || 'free';
+        isAdmin = dbUser?.role === 'admin';
+        plan = dbUser?.plan || 'free';
+    } catch (dbErr) {
+        console.warn('[Layout] Database read failed, using defaults:', dbErr);
+    }
 
         return (
             <InvestigationProvider>
@@ -89,7 +81,7 @@ export default async function DashboardLayout({
                         {/* Sidebar Navigation — hidden on mobile, shown via MobileSidebarToggle */}
                         <MobileSidebarToggle>
                             <aside className="w-64 bg-surface/80 backdrop-blur-2xl flex flex-col relative z-20 shadow-[10px_0_50px_rgba(0,0,0,0.3)] h-[calc(100vh-4rem)] overflow-hidden mt-16">
-                                <nav className="flex-1 pt-2 px-4 pb-4 overflow-y-auto no-scrollbar border-r border-border/10 relative z-30 bg-surface/40">
+                                <nav className="h-full pt-2 px-4 overflow-y-auto no-scrollbar border-r border-border/10 relative z-30 bg-surface/40">
                                     <SidebarNav isGuest={user.isGuest} isAdmin={isAdmin} plan={plan} userEmail={user.email} />
                                 </nav>
 

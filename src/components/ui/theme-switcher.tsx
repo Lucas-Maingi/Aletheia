@@ -1,7 +1,7 @@
 "use client";
 import { Palette, Check } from "lucide-react";
 import { useState } from "react";
-import { useTheme } from "../../context/theme-context";
+import { useTheme } from "@/context/theme-context";
 import { cn } from "@/lib/utils";
 
 export function ThemeSwitcher({
