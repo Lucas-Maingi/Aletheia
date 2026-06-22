@@ -8,12 +8,14 @@ export function ThemeSwitcher({
   align = "bottom",
   side = "left",
   iconOnly = false,
-  className
+  className,
+  dropdownClassName
 }: {
   align?: "top" | "bottom";
   side?: "left" | "right";
   iconOnly?: boolean;
   className?: string;
+  dropdownClassName?: string;
 }) {
   const { currentTheme, setTheme, themes } = useTheme();
   const [open, setOpen] = useState(false);
@@ -43,7 +45,8 @@ export function ThemeSwitcher({
 
           {/* Theme Dropdown */}
           <div className={cn(
-            "absolute w-72 bg-surface/95 backdrop-blur-3xl border border-border/10 rounded-2xl shadow-2xl z-50 overflow-hidden animate-scale-in",
+            "absolute bg-surface/95 backdrop-blur-3xl border border-border/10 rounded-2xl shadow-2xl z-50 overflow-hidden animate-scale-in",
+            dropdownClassName || "w-72",
             align === "top" ? "bottom-full mb-3" : "top-full mt-3",
             side === "left" ? "left-0" : "right-0"
           )}>

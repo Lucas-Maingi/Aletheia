@@ -184,7 +184,12 @@ export function SidebarNav({
                 </div>
 
                 <div className="px-1">
-                    <ThemeSwitcher align="top" side="left" className="w-full justify-start p-2 px-4 rounded-xl border border-border/10 hover:border-accent/30 bg-surface/50 text-[11px] font-black uppercase tracking-widest text-text-secondary hover:text-accent transition-all duration-300" />
+                    <ThemeSwitcher 
+                        align="top" 
+                        side="left" 
+                        dropdownClassName="w-[224px] left-0 right-0" 
+                        className="w-full justify-start p-2 px-4 rounded-xl border border-border/10 hover:border-accent/30 bg-surface/50 text-[11px] font-black uppercase tracking-widest text-text-secondary hover:text-accent transition-all duration-300" 
+                    />
                 </div>
 
                 <div className="px-1">
@@ -196,6 +201,7 @@ export function SidebarNav({
 }
 
 function SidebarFeedbackWidget({ isGuest, userEmail }: { isGuest?: boolean, userEmail?: string }) {
+    const [open, setOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'complaint' | 'feature' | 'review'>('complaint');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -240,7 +246,10 @@ function SidebarFeedbackWidget({ isGuest, userEmail }: { isGuest?: boolean, user
                 setContent('');
                 setName('');
                 setEmail('');
-                setTimeout(() => setSubmitSuccess(false), 3000);
+                setTimeout(() => {
+                    setSubmitSuccess(false);
+                    setOpen(false); // Auto-close popup on success
+                }, 2000);
             } else {
                 setError(data.error || 'Failed to submit feedback');
             }
@@ -259,95 +268,122 @@ function SidebarFeedbackWidget({ isGuest, userEmail }: { isGuest?: boolean, user
     ] as const;
 
     return (
-        <form onSubmit={handleSubmit} className="bg-surface/30 border border-border/10 rounded-2xl p-4 space-y-3 shadow-lg shadow-black/5">
-            <h5 className="text-[10px] font-black text-text-primary uppercase tracking-widest flex items-center gap-1.5">
-                <MessageSquare className="w-3 h-3 text-accent" />
-                Submit Feedback
-            </h5>
+        <div className="relative w-full">
+            {/* Toggle Button */}
+            <button
+                type="button"
+                onClick={() => setOpen(!open)}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all duration-300 ${
+                    open 
+                        ? 'border-accent text-accent bg-accent/5' 
+                        : 'border-border/10 hover:border-accent/30 bg-surface/50 text-text-secondary hover:text-accent'
+                } text-[11px] font-black uppercase tracking-widest`}
+            >
+                <MessageSquare className="w-4 h-4 text-accent" />
+                <span>Submit Feedback</span>
+            </button>
 
-            <div className="grid grid-cols-3 gap-1 bg-foreground/[0.03] p-1 rounded-xl border border-border/5">
-                {TABS.map(tab => (
-                    <button
-                        key={tab.id}
-                        type="button"
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`flex flex-col items-center justify-center gap-1 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all ${
-                            activeTab === tab.id
-                                ? 'bg-accent/10 text-accent border border-accent/20 shadow-md'
-                                : 'text-text-tertiary hover:text-text-secondary border border-transparent'
-                        } border`}
+            {open && (
+                <>
+                    {/* Backdrop */}
+                    <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+
+                    {/* Pop-up Form Container */}
+                    <form 
+                        onSubmit={handleSubmit} 
+                        className="absolute bottom-full mb-3 left-0 right-0 w-[224px] bg-surface/95 backdrop-blur-3xl border border-border/10 rounded-2xl p-4 space-y-3 shadow-2xl z-50 overflow-hidden animate-scale-in"
                     >
-                        {tab.icon}
-                        <span>{tab.label}</span>
-                    </button>
-                ))}
-            </div>
+                        <h5 className="text-[10px] font-black text-text-primary uppercase tracking-widest flex items-center gap-1.5 border-b border-border/5 pb-2">
+                            <MessageSquare className="w-3 h-3 text-accent" />
+                            Submit Feedback
+                        </h5>
 
-            {submitSuccess ? (
-                <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] uppercase font-bold tracking-widest text-center rounded-xl animate-fade-in flex flex-col items-center gap-1">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 animate-bounce" />
-                    <span>Feedback Saved</span>
-                </div>
-            ) : (
-                <div className="space-y-2">
-                    {!isGuest && userEmail ? (
-                        <div className="text-[9px] text-text-tertiary uppercase font-mono tracking-wider bg-foreground/[0.02] border border-border/5 p-2 rounded-lg truncate">
-                            Signed in: <span className="text-text-secondary font-bold">{userEmail}</span>
+                        <div className="grid grid-cols-3 gap-1 bg-foreground/[0.03] p-1 rounded-xl border border-border/5">
+                            {TABS.map(tab => (
+                                <button
+                                    key={tab.id}
+                                    type="button"
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`flex flex-col items-center justify-center gap-1 py-1.5 rounded-lg text-[8px] font-bold uppercase tracking-wider transition-all ${
+                                        activeTab === tab.id
+                                            ? 'bg-accent/10 text-accent border border-accent/20 shadow-sm'
+                                            : 'text-text-tertiary hover:text-text-secondary border border-transparent'
+                                    } border`}
+                                >
+                                    {tab.icon}
+                                    <span>{tab.label}</span>
+                                </button>
+                            ))}
                         </div>
-                    ) : (
-                        <div className="space-y-2">
-                            <input
-                                type="text"
-                                placeholder="Your Name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                className="w-full bg-background/50 border border-border/10 rounded-xl px-3 py-2 text-[10px] text-text-primary focus:outline-none focus:border-accent/40 placeholder:text-text-tertiary font-mono"
-                                required
-                            />
-                            <input
-                                type="email"
-                                placeholder="Your Email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full bg-background/50 border border-border/10 rounded-xl px-3 py-2 text-[10px] text-text-primary focus:outline-none focus:border-accent/40 placeholder:text-text-tertiary font-mono"
-                                required
-                            />
-                        </div>
-                    )}
 
-                    <textarea
-                        placeholder={
-                            activeTab === 'complaint'
-                                ? "What issue did you encounter?"
-                                : activeTab === 'feature'
-                                ? "What should we build next?"
-                                : "Write your review..."
-                        }
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        className="w-full bg-background/50 border border-border/10 rounded-xl px-3 py-2 text-[10px] text-text-primary focus:outline-none focus:border-accent/40 placeholder:text-text-tertiary resize-none h-16 font-mono"
-                        required
-                    />
-
-                    {error && (
-                        <div className="text-[9px] text-danger font-bold uppercase tracking-wider font-mono">
-                            {error}
-                        </div>
-                    )}
-
-                    <button
-                        type="submit"
-                        disabled={isSubmitting || !content.trim()}
-                        className="w-full h-8 flex items-center justify-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-white bg-accent hover:bg-accent-hover disabled:bg-foreground/[0.04] disabled:text-text-tertiary border border-accent/20 rounded-xl transition-all duration-300 active:scale-[0.98]"
-                    >
-                        {isSubmitting ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        {submitSuccess ? (
+                            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] uppercase font-bold tracking-widest text-center rounded-xl animate-fade-in flex flex-col items-center gap-1">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-400 animate-bounce" />
+                                <span>Feedback Saved</span>
+                            </div>
                         ) : (
-                            <span>Submit Feedback</span>
+                            <div className="space-y-2">
+                                {!isGuest && userEmail ? (
+                                    <div className="text-[9px] text-text-tertiary uppercase font-mono tracking-wider bg-foreground/[0.02] border border-border/5 p-2 rounded-lg truncate">
+                                        Signed in: <span className="text-text-secondary font-bold">{userEmail}</span>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2">
+                                        <input
+                                            type="text"
+                                            placeholder="Your Name"
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            className="w-full bg-background/50 border border-border/10 rounded-xl px-3 py-2 text-[10px] text-text-primary focus:outline-none focus:border-accent/40 placeholder:text-text-tertiary font-mono"
+                                            required
+                                        />
+                                        <input
+                                            type="email"
+                                            placeholder="Your Email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            className="w-full bg-background/50 border border-border/10 rounded-xl px-3 py-2 text-[10px] text-text-primary focus:outline-none focus:border-accent/40 placeholder:text-text-tertiary font-mono"
+                                            required
+                                        />
+                                    </div>
+                                )}
+
+                                <textarea
+                                    placeholder={
+                                        activeTab === 'complaint'
+                                            ? "What issue did you encounter?"
+                                            : activeTab === 'feature'
+                                            ? "What should we build next?"
+                                            : "Write your review..."
+                                    }
+                                    value={content}
+                                    onChange={(e) => setContent(e.target.value)}
+                                    className="w-full bg-background/50 border border-border/10 rounded-xl px-3 py-2 text-[10px] text-text-primary focus:outline-none focus:border-accent/40 placeholder:text-text-tertiary resize-none h-16 font-mono"
+                                    required
+                                />
+
+                                {error && (
+                                    <div className="text-[9px] text-danger font-bold uppercase tracking-wider font-mono">
+                                        {error}
+                                    </div>
+                                )}
+
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting || !content.trim()}
+                                    className="w-full h-8 flex items-center justify-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-white bg-accent hover:bg-accent-hover disabled:bg-foreground/[0.04] disabled:text-text-tertiary border border-accent/20 rounded-xl transition-all duration-300 active:scale-[0.98]"
+                                >
+                                    {isSubmitting ? (
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                    ) : (
+                                        <span>Submit Feedback</span>
+                                    )}
+                                </button>
+                            </div>
                         )}
-                    </button>
-                </div>
+                    </form>
+                </>
             )}
-        </form>
+        </div>
     );
 }
