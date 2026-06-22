@@ -252,10 +252,10 @@ export function IdentityGraph({ target, evidence, entities }: { target: string, 
                     const localNodes = prevNodes.map(n => ({ ...n }));
                     const currentAlpha = alphaRef.current;
                     
-                    const kRepel = 1200 * currentAlpha;   // Repulsion coefficient
-                    const kAttract = 0.05 * currentAlpha;  // Spring tension
-                    const dRest = 100;      // Rest distance
-                    const damping = 0.75;   // Snappy velocity damping (prevents sloppy floating)
+                    const kRepel = 4000 * currentAlpha;   // Stronger repulsion for perfect spacing
+                    const kAttract = 0.04 * currentAlpha;  // Spring tension
+                    const dRest = 120;      // Rest distance
+                    const damping = 0.80;   // Smooth velocity damping (prevents sloppy floating)
                     
                     // 1. Repulsion between all nodes
                     for (let i = 0; i < localNodes.length; i++) {
@@ -300,9 +300,10 @@ export function IdentityGraph({ target, evidence, entities }: { target: string, 
                         }
                     });
                     
-                    // 3. Central gravity pulling nodes towards center
+                    // 3. Central gravity pulling nodes towards center (scaled by currentAlpha to prevent center collapsing)
                     const cX = dimensions.width / 2;
                     const cY = dimensions.height / 2;
+                    const gravityStrength = 0.003 * currentAlpha; // Weak and decays in proportion with other forces
                     localNodes.forEach(node => {
                         if (node.id === 'target') {
                             node.x = cX;
@@ -314,8 +315,8 @@ export function IdentityGraph({ target, evidence, entities }: { target: string, 
                         const dx = cX - node.x;
                         const dy = cY - node.y;
                         
-                        node.vx += dx * 0.008;
-                        node.vy += dy * 0.008;
+                        node.vx += dx * gravityStrength;
+                        node.vy += dy * gravityStrength;
                     });
                     
                     // 4. Update coordinates & apply damping
