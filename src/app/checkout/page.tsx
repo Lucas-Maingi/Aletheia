@@ -111,7 +111,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Script src="https://gumroad.com/js/gumroad.js" strategy="lazyOnload" />
+      <Script src="https://gumroad.com/js/gumroad.js" />
       {/* Top Bar */}
       <div className="border-b border-border/10 bg-surface/30 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
