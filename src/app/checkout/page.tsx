@@ -265,26 +265,19 @@ export default function CheckoutPage() {
                     </div>
 
                     {/* Submit Button */}
-                    {email && name && email.includes('@') ? (
-                      <a
-                        href={`https://lucas808.gumroad.com/l/${LAUNCH_CONFIG.LTD_TIERS[plan.gumroadIdKey]?.gumroadId}?email=${encodeURIComponent(email)}&wanted=true`}
-                        className="w-full flex items-center justify-center h-14 text-sm font-black uppercase tracking-widest bg-accent hover:bg-accent/90 text-white rounded-2xl shadow-[0_0_30px_rgba(168,85,247,0.3)] hover:shadow-[0_0_50px_rgba(168,85,247,0.4)] transition-all transform hover:scale-[1.01] gumroad-button"
-                        data-gumroad-single-product="true"
-                      >
-                        <Lock className="w-4 h-4 mr-2" />
-                        Pay ${plan.price} — Lifetime Access
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </a>
-                    ) : (
-                      <button
-                        type="submit"
-                        className="w-full flex items-center justify-center h-14 text-sm font-black uppercase tracking-widest bg-accent hover:bg-accent/90 text-white rounded-2xl shadow-[0_0_30px_rgba(168,85,247,0.3)] transition-all opacity-70 cursor-not-allowed"
-                      >
-                        <Lock className="w-4 h-4 mr-2" />
-                        Pay ${plan.price} — Lifetime Access
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </button>
-                    )}
+                    <a
+                      href={`https://lucas808.gumroad.com/l/${LAUNCH_CONFIG.LTD_TIERS[plan.gumroadIdKey]?.gumroadId}?email=${encodeURIComponent(email)}&wanted=true`}
+                      className={`w-full flex items-center justify-center h-14 text-sm font-black uppercase tracking-widest rounded-2xl transition-all gumroad-button ${
+                        email && name && email.includes('@') 
+                          ? "bg-accent hover:bg-accent/90 text-white shadow-[0_0_30px_rgba(168,85,247,0.3)] hover:shadow-[0_0_50px_rgba(168,85,247,0.4)] transform hover:scale-[1.01]" 
+                          : "bg-accent text-white shadow-[0_0_30px_rgba(168,85,247,0.3)] opacity-70 cursor-not-allowed pointer-events-none"
+                      }`}
+                      data-gumroad-single-product="true"
+                    >
+                      <Lock className="w-4 h-4 mr-2" />
+                      Pay ${plan.price} — Lifetime Access
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </a>
 
                     <p className="text-center text-[10px] text-text-tertiary font-bold uppercase tracking-widest">
                       🔒 30-day money-back guarantee • Instant access after payment
