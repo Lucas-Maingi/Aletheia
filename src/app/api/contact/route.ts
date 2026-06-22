@@ -63,7 +63,7 @@ ${message}
         `;
 
         await sendEmail({
-            to: "lucasmaingi.tech@gmail.com",
+            to: "maingilucas0@gmail.com",
             subject: `[Aletheia Secure Uplink] Contact from ${name} (${(subject || "general").toUpperCase()})`,
             html: adminEmailHtml
         });
