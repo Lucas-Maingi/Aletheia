@@ -69,7 +69,7 @@ export function ProGateBanner({ currentCount, freeLimit, isPro }: ProGateBannerP
                         <div className="text-lg font-black text-text-primary">$299<span className="text-[10px] text-text-tertiary font-medium lowercase"> one-time</span></div>
                         <div className="text-[9px] text-success font-bold">Lifetime Deal Active</div>
                     </div>
-                    <Link href="/checkout?plan=analyst_pro" className="block">
+                    <a href="/checkout?plan=analyst_pro" className="block">
                         <motion.div
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
@@ -79,7 +79,7 @@ export function ProGateBanner({ currentCount, freeLimit, isPro }: ProGateBannerP
                             Get Lifetime Access
                             <ArrowRight className="w-3.5 h-3.5" />
                         </motion.div>
-                    </Link>
+                    </a>
                 </div>
             </div>
         </motion.div>
