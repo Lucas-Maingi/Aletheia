@@ -169,6 +169,8 @@ model SearchLog {
 model Feedback {
   id           String   @id @default(uuid())
   userId       String?
+  name         String?
+  email        String?
   content      String
   type         String   @default("general") // bug, feature, general
   version      String?

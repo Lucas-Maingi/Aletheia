@@ -227,18 +227,15 @@ function SidebarFeedbackWidget({ isGuest, userEmail }: { isGuest?: boolean, user
                 ? 'feature' 
                 : 'general';
 
-            let finalContent = content;
-            if (isGuest) {
-                finalContent = `[GUEST FEEDBACK]\nName: ${name || 'Anonymous'}\nEmail: ${email || 'Anonymous'}\n\nFeedback:\n${content}`;
-            }
-
             const response = await fetch('/api/feedback', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    content: finalContent,
+                    content: content,
                     type: apiType,
-                    version: '1.2.0'
+                    version: '1.2.0',
+                    name: isGuest ? (name || 'Anonymous') : null,
+                    email: isGuest ? (email || 'Anonymous') : null
                 })
             });
 

@@ -164,7 +164,10 @@ export default function AdminFeedbackPage() {
                                     <div className="w-5 h-5 rounded-full bg-accent/20 border border-accent/20 flex items-center justify-center">
                                         <User className="w-3 h-3 text-accent" />
                                     </div>
-                                    <span>{item.user?.email || 'Anonymous Operative'}</span>
+                                    <div className="flex flex-col text-left">
+                                        <span className="text-white font-bold normal-case tracking-normal">{item.name || item.user?.name || 'Anonymous Operative'}</span>
+                                        <span className="text-text-tertiary font-mono text-[9px] lowercase tracking-normal">{item.email || item.user?.email || 'no-email'}</span>
+                                    </div>
                                 </div>
                                 <div className="flex items-center gap-1 group-hover:text-accent transition-colors">
                                     Review Dossier <ChevronRight className="w-3 h-3" />
@@ -189,7 +192,10 @@ export default function AdminFeedbackPage() {
                                         Active Command Session
                                     </div>
                                     <h3 className="text-lg font-black text-white uppercase tracking-tight">Responding to Operative</h3>
-                                    <p className="text-xs text-text-tertiary mt-2">Replying to {selectedFeedback.user?.email || 'Anonymous'}</p>
+                                    <p className="text-xs text-text-tertiary mt-2">
+                                        Replying to: <span className="text-white font-bold">{selectedFeedback.name || selectedFeedback.user?.name || 'Anonymous'}</span>
+                                        {` <${selectedFeedback.email || selectedFeedback.user?.email || 'no-email'}>`}
+                                    </p>
                                 </div>
 
                                 <div className="p-4 rounded-xl bg-background/50 border border-white/5 italic text-sm text-text-secondary">
@@ -197,7 +203,10 @@ export default function AdminFeedbackPage() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <label className="text-[10px] font-black text-text-tertiary uppercase tracking-widest px-1">Tactical Response</label>
+                                    <label className="text-[10px] font-black text-text-tertiary uppercase tracking-widest px-1 flex items-center justify-between">
+                                        <span>Tactical Response</span>
+                                        <span className="text-accent text-[9px] font-mono normal-case">Sends email to user inbox</span>
+                                    </label>
                                     <Textarea 
                                         value={reply}
                                         onChange={(e) => setReply(e.target.value)}

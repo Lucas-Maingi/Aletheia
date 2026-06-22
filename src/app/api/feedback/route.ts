@@ -8,7 +8,7 @@ export async function POST(req: Request) {
         const { data: { user } } = await supabase.auth.getUser();
         
         const body = await req.json();
-        const { content, type, version } = body;
+        const { content, type, version, name, email } = body;
 
         if (!content) {
             return NextResponse.json({ error: 'Content is required' }, { status: 400 });
@@ -20,6 +20,8 @@ export async function POST(req: Request) {
                 type: type || 'general',
                 version: version || '1.0.0',
                 userId: user?.id || null, // Allow anonymous feedback if not logged in
+                name: name || null,
+                email: email || null,
             },
         });
 

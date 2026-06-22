@@ -23,37 +23,59 @@ export default function ContactPage() {
         e.preventDefault();
         setIsSubmitting(true);
         
-        // Simulate secure telemetry uplink dispatch
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        setIsSubmitting(false);
-        setIsSuccess(true);
+        try {
+            const response = await fetch("/api/contact", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name,
+                    email,
+                    subject,
+                    message
+                })
+            });
+
+            if (response.ok) {
+                setIsSuccess(true);
+            } else {
+                const data = await response.json();
+                alert(data.error || "Uplink dispatch failed.");
+            }
+        } catch (err) {
+            console.error("Contact submission error:", err);
+            alert("Network connection failure. Direct uplink offline.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const contactChannels = [
         {
+            id: "support",
             title: "Technical Support",
             desc: "Active operational assistance, bug reporting, and account queries.",
-            email: "support@aletheia.io",
+            badge: "Support Uplink",
             icon: LifeBuoy,
             color: "text-accent",
-            glow: "shadow-[0_0_15px_rgba(59,130,246,0.15)] bg-accent/5 border-accent/20"
+            glow: "shadow-[0_0_15px_rgba(59,130,246,0.15)] bg-accent/5 border-accent/20 cursor-pointer hover:border-accent/40"
         },
         {
+            id: "abuse",
             title: "Ethics & Compliance",
             desc: "Reports regarding platform misuse, stalking violations, or compliance guidelines.",
-            email: "ethics@aletheia.io",
+            badge: "Compliance Route",
             icon: ShieldAlert,
             color: "text-purple-400",
-            glow: "shadow-[0_0_15px_rgba(168,85,247,0.15)] bg-purple-500/5 border-purple-500/20"
+            glow: "shadow-[0_0_15px_rgba(168,85,247,0.15)] bg-purple-500/5 border-purple-500/20 cursor-pointer hover:border-purple-500/40"
         },
         {
+            id: "general",
             title: "General Inquiries",
             desc: "Press queries, partnership proposals, and founding slot availability.",
-            email: "contact@aletheia.io",
+            badge: "General Route",
             icon: MessageSquare,
             color: "text-emerald-400",
-            glow: "shadow-[0_0_15px_rgba(52,211,153,0.15)] bg-emerald-500/5 border-emerald-500/20"
+            glow: "shadow-[0_0_15px_rgba(52,211,153,0.15)] bg-emerald-500/5 border-emerald-500/20 cursor-pointer hover:border-emerald-500/40"
         }
     ];
 
@@ -90,10 +112,14 @@ export default function ContactPage() {
                         <div className="space-y-4">
                             {contactChannels.map((channel, i) => {
                                 const Icon = channel.icon;
+                                const isSelected = subject === channel.id;
                                 return (
                                     <div 
                                         key={i}
-                                        className={`p-6 rounded-2xl border backdrop-blur-xl transition-all duration-300 ${channel.glow}`}
+                                        onClick={() => setSubject(channel.id)}
+                                        className={`p-6 rounded-2xl border backdrop-blur-xl transition-all duration-300 ${channel.glow} ${
+                                            isSelected ? "ring-2 ring-accent border-accent/60 bg-accent/10" : ""
+                                        }`}
                                     >
                                         <div className="flex items-start gap-4">
                                             <div className={`p-2.5 rounded-xl bg-background border border-border/10 ${channel.color}`}>
@@ -107,12 +133,11 @@ export default function ContactPage() {
                                                     {channel.desc}
                                                 </p>
                                                 <div className="pt-2">
-                                                    <a 
-                                                        href={`mailto:${channel.email}`}
-                                                        className={`text-xs font-mono font-bold hover:underline underline-offset-4 ${channel.color}`}
-                                                    >
-                                                        {channel.email}
-                                                    </a>
+                                                    <span className={`text-[9px] font-black uppercase tracking-widest border px-2 py-0.5 rounded-md ${
+                                                        isSelected ? "border-accent text-accent bg-accent/10" : "border-border/10 text-text-tertiary"
+                                                    }`}>
+                                                        {channel.badge}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
