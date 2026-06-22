@@ -21,7 +21,7 @@ export const LAUNCH_CONFIG = {
       originalMonthly: 99,
       slots: 200,
       badge: 'Best Value',
-      gumroadId: '', // ← Fill with your Gumroad product short ID
+      gumroadId: 'ukfec', // Gumroad product short ID
     },
     command_center: {
       name: 'Command Center',
@@ -29,7 +29,7 @@ export const LAUNCH_CONFIG = {
       originalMonthly: 249,
       slots: 100,
       badge: 'Most Popular',
-      gumroadId: '', // ← Fill with your Gumroad product short ID
+      gumroadId: 'jtmtbo', // Gumroad product short ID
     },
     agency_arsenal: {
       name: 'Agency Arsenal',
@@ -37,7 +37,7 @@ export const LAUNCH_CONFIG = {
       originalMonthly: 499,
       slots: 50,
       badge: 'Maximum Power',
-      gumroadId: '', // ← Fill with your Gumroad product short ID
+      gumroadId: 'pijwmf', // Gumroad product short ID
     },
   },
 

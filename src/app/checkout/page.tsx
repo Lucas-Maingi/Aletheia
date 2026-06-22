@@ -8,6 +8,7 @@ import {
   CreditCard, Loader2, AlertCircle, ChevronLeft
 } from "lucide-react";
 import Link from "next/link";
+import Script from "next/script";
 import { Button } from "@/components/ui/button";
 import { LAUNCH_CONFIG } from "@/lib/launch-config";
 
@@ -17,14 +18,14 @@ const planDetails: Record<string, {
   originalMonthly: number;
   features: string[];
   badge: string;
-  gumroadUrl: string;
+  gumroadIdKey: keyof typeof LAUNCH_CONFIG.LTD_TIERS;
 }> = {
   analyst_pro: {
     name: 'Analyst Pro',
     price: 299,
     originalMonthly: 99,
     badge: 'Best Value',
-    gumroadUrl: '', // ← Set your Gumroad product URL
+    gumroadIdKey: 'analyst_pro',
     features: [
       'Lifetime access to Aletheia Pro',
       'Unlimited investigations',
@@ -40,7 +41,7 @@ const planDetails: Record<string, {
     price: 599,
     originalMonthly: 249,
     badge: 'Most Popular',
-    gumroadUrl: '', // ← Set your Gumroad product URL
+    gumroadIdKey: 'command_center',
     features: [
       'Everything in Analyst Pro',
       'Facial recognition analysis',
@@ -57,7 +58,7 @@ const planDetails: Record<string, {
     price: 999,
     originalMonthly: 499,
     badge: 'Maximum Power',
-    gumroadUrl: '', // ← Set your Gumroad product URL
+    gumroadIdKey: 'agency_arsenal',
     features: [
       'Everything in Command Center',
       'Unlimited team seats',
@@ -87,19 +88,61 @@ export default function CheckoutPage() {
     
     setStep('processing');
     
-    // Simulate brief processing, then redirect to Gumroad
+    // Simulate brief processing, then trigger Gumroad overlay
     setTimeout(() => {
-      setStep('redirect');
-      // If Gumroad URL is configured, redirect
-      const gumroadUrl = plan.gumroadUrl;
-      if (gumroadUrl) {
-        window.location.href = `${gumroadUrl}?email=${encodeURIComponent(email)}`;
+      const username = "lucas808";
+      const gumroadId = LAUNCH_CONFIG.LTD_TIERS[plan.gumroadIdKey]?.gumroadId;
+      
+      if (!gumroadId) {
+        setStep('redirect'); // Fallback error state if no ID
+        return;
       }
+
+      // Append ?wanted=true to directly open checkout modal
+      const checkoutUrl = `https://${username}.gumroad.com/l/${gumroadId}?email=${encodeURIComponent(email)}&wanted=true`;
+      
+      // Programmatically create and click an anchor tag to trigger gumroad.js overlay
+      const link = document.createElement('a');
+      link.href = checkoutUrl;
+      link.className = 'gumroad-button hidden';
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      
+      // Trigger Gumroad overlay
+      link.click();
+      
+      // Keep state processing while modal is open, or clean up link
+      setTimeout(() => {
+        if (document.body.contains(link)) {
+          document.body.removeChild(link);
+        }
+      }, 1000);
     }, 1500);
   };
 
+  // Listen for successful sale postMessage from Gumroad overlay
+  useEffect(() => {
+    const handleGumroadMessage = (event: MessageEvent) => {
+      if (typeof event.data === 'string') {
+        try {
+          const data = JSON.parse(event.data);
+          if (data && data.post_message_name === "sale") {
+            // Purchase successful, redirect to success page
+            window.location.href = `/success?plan=${planId}`;
+          }
+        } catch (e) {
+          // Ignore unrelated JSON parse errors
+        }
+      }
+    };
+
+    window.addEventListener("message", handleGumroadMessage);
+    return () => window.removeEventListener("message", handleGumroadMessage);
+  }, [planId]);
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <Script src="https://gumroad.com/js/gumroad.js" strategy="lazyOnload" />
       {/* Top Bar */}
       <div className="border-b border-border/10 bg-surface/30 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -300,13 +343,13 @@ export default function CheckoutPage() {
                   <h2 className="text-2xl font-black text-text-primary mt-8 mb-2">Opening Gumroad Checkout</h2>
                   <p className="text-text-secondary text-sm mb-6">If you're not redirected automatically:</p>
                   
-                  {!plan.gumroadUrl && (
+                  {!LAUNCH_CONFIG.LTD_TIERS[plan.gumroadIdKey]?.gumroadId && (
                     <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-3 max-w-md">
                       <AlertCircle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-xs text-amber-200 font-bold mb-1">Gumroad Product URL Not Configured</p>
+                        <p className="text-xs text-amber-200 font-bold mb-1">Gumroad Product ID Not Configured</p>
                         <p className="text-xs text-text-secondary">
-                          The Gumroad product link for this plan hasn't been set up yet. Please configure the <code className="text-accent">gumroadUrl</code> in the checkout page or <code className="text-accent">gumroadId</code> in launch-config.ts.
+                          The Gumroad product ID for this plan hasn't been set up yet. Please configure the <code className="text-accent">gumroadId</code> in launch-config.ts.
                         </p>
                       </div>
                     </div>

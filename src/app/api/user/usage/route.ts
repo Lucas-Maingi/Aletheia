@@ -33,8 +33,8 @@ export async function GET() {
         const limits: Record<string, { investigations: number; facial: number }> = {
             free: { investigations: 15, facial: 5 },
             pro: { investigations: 100, facial: 50 },
-            elite: { investigations: 500, facial: 250 },
-            enterprise: { investigations: 2000, facial: 1000 },
+            command: { investigations: 500, facial: 250 },
+            agency: { investigations: 2000, facial: 1000 },
         };
 
         const currentLimits = limits[user.plan] || limits.free;

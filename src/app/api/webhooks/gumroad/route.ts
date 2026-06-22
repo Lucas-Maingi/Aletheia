@@ -14,14 +14,25 @@ export async function POST(req: NextRequest) {
         const email = params.get('email');
         const subscriptionId = params.get('subscription_id') || params.get('id'); // ID is sometimes used depending on resource
         const price = params.get('price');
+        const permalink = params.get('permalink');
 
-        console.log(`[Gumroad Ping] Recieved: ${resourceName} for ${email}`);
+        console.log(`[Gumroad Ping] Recieved: ${resourceName} for ${email} (permalink: ${permalink})`);
 
         // If email isn't provided, we can't tie it to an account.
         // It's possible for tests to lack this, but production sales should always have an email.
         if (!email) {
             console.error('[Gumroad Ping] No email found in payload.');
             return NextResponse.json({ error: "No email provided" }, { status: 400 });
+        }
+
+        // Map permalink to plan tier
+        let tierToAssign = 'pro';
+        if (permalink === 'jtmtbo') {
+            tierToAssign = 'command';
+        } else if (permalink === 'pijwmf') {
+            tierToAssign = 'agency';
+        } else if (permalink === 'ukfec') {
+            tierToAssign = 'pro';
         }
 
         // Ideally, we'd verify the X-Gumroad-Signature here using HMAC-SHA256. 
@@ -33,14 +44,14 @@ export async function POST(req: NextRequest) {
         switch (resourceName) {
             case 'sale':
                 // A new sale (could be a one-off or start of a subscription)
-                // If it's the $99/mo plan, price will arrive in cents (9900)
-                console.log(`[Gumroad Ping] Sale recorded. Email: ${email}, sub_id: ${subscriptionId}`);
+                console.log(`[Gumroad Ping] Sale recorded. Email: ${email}, sub_id: ${subscriptionId}, plan: ${tierToAssign}`);
                 
                 // Update User in Supabase/Prisma
                 await prisma.user.updateMany({
                     where: { email: email.toLowerCase() },
                     data: {
-                        plan: 'pro',
+                        plan: tierToAssign,
+                        hasLifetimeAccess: true,
                         gumroadSubscriptionId: subscriptionId,
                     }
                 });
