@@ -112,7 +112,7 @@ export function IdentityGraph({ target, evidence, entities }: { target: string, 
             if (en.type === 'domain') color = '#8b5cf6'; // Purple
             
             const angle = (idx / Math.max(1, safeEntities.length)) * Math.PI * 2;
-            const dist = 120 + Math.random() * 30;
+            const dist = 130; // Spaced evenly for concentric ring layout
             
             nodes.push({
                 id,
@@ -151,7 +151,7 @@ export function IdentityGraph({ target, evidence, entities }: { target: string, 
             if (ev.tags?.includes('registry') || ev.tags?.includes('vehicle')) color = '#f59e0b'; // Amber
             
             const angle = ((idx + 0.5) / Math.max(1, topEvidence.length)) * Math.PI * 2;
-            const dist = 210 + Math.random() * 40;
+            const dist = 220; // Even spacing for the outer concentric ring
             
             nodes.push({
                 id,
@@ -213,9 +213,25 @@ export function IdentityGraph({ target, evidence, entities }: { target: string, 
 
     const [nodesState, setNodesState] = useState<GraphNode[]>([]);
     const [edgesState, setEdgesState] = useState<GraphEdge[]>([]);
+    const alphaRef = useRef(1.0);
 
     useEffect(() => {
-        setNodesState(initialNodes);
+        alphaRef.current = 1.0; // Reset cooling alpha to relax the graph on modifications
+        setNodesState(prevNodes => {
+            return initialNodes.map(initNode => {
+                const existing = prevNodes.find(p => p.id === initNode.id || p.label === initNode.label);
+                if (existing) {
+                    return {
+                        ...initNode,
+                        x: existing.x,
+                        y: existing.y,
+                        vx: existing.vx,
+                        vy: existing.vy
+                    };
+                }
+                return initNode;
+            });
+        });
         setEdgesState(initialEdges);
     }, [initialNodes, initialEdges]);
 
@@ -231,108 +247,114 @@ export function IdentityGraph({ target, evidence, entities }: { target: string, 
         let animationFrameId: number;
         
         const tick = () => {
-            setNodesState(prevNodes => {
-                const localNodes = prevNodes.map(n => ({ ...n }));
-                
-                const kRepel = 1500;   // Repulsion coefficient
-                const kAttract = 0.04;  // Spring tension
-                const dRest = 110;      // Rest distance
-                const damping = 0.82;   // Velocity damping
-                
-                // 1. Repulsion between all nodes
-                for (let i = 0; i < localNodes.length; i++) {
-                    const nA = localNodes[i];
-                    for (let j = i + 1; j < localNodes.length; j++) {
-                        const nB = localNodes[j];
-                        const dx = nB.x - nA.x;
-                        const dy = nB.y - nA.y;
-                        const distSq = dx * dx + dy * dy;
-                        const dist = Math.sqrt(distSq) || 0.1;
-                        
-                        if (dist < 260) {
-                            const force = kRepel / distSq;
+            if (alphaRef.current > 0.005) {
+                setNodesState(prevNodes => {
+                    const localNodes = prevNodes.map(n => ({ ...n }));
+                    const currentAlpha = alphaRef.current;
+                    
+                    const kRepel = 1200 * currentAlpha;   // Repulsion coefficient
+                    const kAttract = 0.05 * currentAlpha;  // Spring tension
+                    const dRest = 100;      // Rest distance
+                    const damping = 0.75;   // Snappy velocity damping (prevents sloppy floating)
+                    
+                    // 1. Repulsion between all nodes
+                    for (let i = 0; i < localNodes.length; i++) {
+                        const nA = localNodes[i];
+                        for (let j = i + 1; j < localNodes.length; j++) {
+                            const nB = localNodes[j];
+                            const dx = nB.x - nA.x;
+                            const dy = nB.y - nA.y;
+                            const distSq = dx * dx + dy * dy;
+                            const dist = Math.sqrt(distSq) || 0.1;
+                            
+                            if (dist < 260) {
+                                const force = kRepel / distSq;
+                                const fx = (dx / dist) * force;
+                                const fy = (dy / dist) * force;
+                                
+                                nA.vx -= fx;
+                                nA.vy -= fy;
+                                nB.vx += fx;
+                                nB.vy += fy;
+                            }
+                        }
+                    }
+                    
+                    // 2. Attraction along edges
+                    edgesState.forEach(edge => {
+                        const nA = localNodes.find(n => n.id === edge.source);
+                        const nB = localNodes.find(n => n.id === edge.target);
+                        if (nA && nB) {
+                            const dx = nB.x - nA.x;
+                            const dy = nB.y - nA.y;
+                            const dist = Math.sqrt(dx * dx + dy * dy) || 0.1;
+                            
+                            const force = (dist - dRest) * kAttract;
                             const fx = (dx / dist) * force;
                             const fy = (dy / dist) * force;
                             
-                            nA.vx -= fx;
-                            nA.vy -= fy;
-                            nB.vx += fx;
-                            nB.vy += fy;
+                            nA.vx += fx;
+                            nA.vy += fy;
+                            nB.vx -= fx;
+                            nB.vy -= fy;
                         }
-                    }
-                }
-                
-                // 2. Attraction along edges
-                edgesState.forEach(edge => {
-                    const nA = localNodes.find(n => n.id === edge.source);
-                    const nB = localNodes.find(n => n.id === edge.target);
-                    if (nA && nB) {
-                        const dx = nB.x - nA.x;
-                        const dy = nB.y - nA.y;
-                        const dist = Math.sqrt(dx * dx + dy * dy) || 0.1;
+                    });
+                    
+                    // 3. Central gravity pulling nodes towards center
+                    const cX = dimensions.width / 2;
+                    const cY = dimensions.height / 2;
+                    localNodes.forEach(node => {
+                        if (node.id === 'target') {
+                            node.x = cX;
+                            node.y = cY;
+                            node.vx = 0;
+                            node.vy = 0;
+                            return;
+                        }
+                        const dx = cX - node.x;
+                        const dy = cY - node.y;
                         
-                        const force = (dist - dRest) * kAttract;
-                        const fx = (dx / dist) * force;
-                        const fy = (dy / dist) * force;
+                        node.vx += dx * 0.008;
+                        node.vy += dy * 0.008;
+                    });
+                    
+                    // 4. Update coordinates & apply damping
+                    const updated = localNodes.map(node => {
+                        if (node.id === 'target') return node;
                         
-                        nA.vx += fx;
-                        nA.vy += fy;
-                        nB.vx -= fx;
-                        nB.vy -= fy;
-                    }
+                        if (draggedNodeIdRef.current === node.id) {
+                            node.x = dragPosRef.current.x;
+                            node.y = dragPosRef.current.y;
+                            node.vx = 0;
+                            node.vy = 0;
+                            return node;
+                        }
+                        
+                        let vx = node.vx * damping;
+                        let vy = node.vy * damping;
+                        
+                        const speed = Math.sqrt(vx * vx + vy * vy);
+                        if (speed > 8) {
+                            vx = (vx / speed) * 8;
+                            vy = (vy / speed) * 8;
+                        }
+                        
+                        let x = node.x + vx;
+                        let y = node.y + vy;
+                        
+                        const pad = node.radius + 15;
+                        if (x < pad) { x = pad; vx = 0; }
+                        if (x > dimensions.width - pad) { x = dimensions.width - pad; vx = 0; }
+                        if (y < pad) { y = pad; vy = 0; }
+                        if (y > dimensions.height - pad) { y = dimensions.height - pad; vy = 0; }
+                        
+                        return { ...node, x, y, vx, vy };
+                    });
+
+                    alphaRef.current *= 0.94; // Decay cooling alpha factor
+                    return updated;
                 });
-                
-                // 3. Central gravity pulling nodes towards center
-                const cX = dimensions.width / 2;
-                const cY = dimensions.height / 2;
-                localNodes.forEach(node => {
-                    if (node.id === 'target') {
-                        node.x = cX;
-                        node.y = cY;
-                        node.vx = 0;
-                        node.vy = 0;
-                        return;
-                    }
-                    const dx = cX - node.x;
-                    const dy = cY - node.y;
-                    
-                    node.vx += dx * 0.007;
-                    node.vy += dy * 0.007;
-                });
-                
-                // 4. Update coordinates & apply damping
-                return localNodes.map(node => {
-                    if (node.id === 'target') return node;
-                    
-                    if (draggedNodeIdRef.current === node.id) {
-                        node.x = dragPosRef.current.x;
-                        node.y = dragPosRef.current.y;
-                        node.vx = 0;
-                        node.vy = 0;
-                        return node;
-                    }
-                    
-                    let vx = node.vx * damping;
-                    let vy = node.vy * damping;
-                    
-                    const speed = Math.sqrt(vx * vx + vy * vy);
-                    if (speed > 8) {
-                        vx = (vx / speed) * 8;
-                        vy = (vy / speed) * 8;
-                    }
-                    
-                    let x = node.x + vx;
-                    let y = node.y + vy;
-                    
-                    const pad = node.radius + 15;
-                    if (x < pad) { x = pad; vx = 0; }
-                    if (x > dimensions.width - pad) { x = dimensions.width - pad; vx = 0; }
-                    if (y < pad) { y = pad; vy = 0; }
-                    if (y > dimensions.height - pad) { y = dimensions.height - pad; vy = 0; }
-                    
-                    return { ...node, x, y, vx, vy };
-                });
-            });
+            }
             
             animationFrameId = requestAnimationFrame(tick);
         };

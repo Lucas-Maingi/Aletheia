@@ -699,47 +699,98 @@ function CinematicDemo() {
           return next;
         }
         
-        if (next >= 2 && next <= 12) {
-          const logIndex = next - 2;
+        // Ingestion phase: next = 2 to 13
+        if (next >= 2 && next <= 13) {
+          const logIndex = next - 2; // 0 to 11
+          
+          // Add timeline log
           if (DEMO_PERSON.timeline[logIndex]) {
-            setVisibleLogs((logs) => [...logs, DEMO_PERSON.timeline[logIndex]]);
+            setVisibleLogs((logs) => {
+              if (logs.some(l => l.event === DEMO_PERSON.timeline[logIndex].event)) return logs;
+              return [...logs, DEMO_PERSON.timeline[logIndex]];
+            });
           }
 
+          // Active connectors
           if (logIndex === 1) {
             setActiveConnectors(Object.keys(CONNECTOR_DISPLAY_NAMES));
-          } else if (logIndex >= 2 && logIndex <= 10) {
+          } else if (logIndex >= 2) {
             const connectorKeys = Object.keys(CONNECTOR_DISPLAY_NAMES);
             const finishedKey = connectorKeys[logIndex - 2];
             if (finishedKey) {
               setActiveConnectors((active) => active.filter((k) => k !== finishedKey));
-              setFinishedConnectors((fin) => [...fin, finishedKey]);
+              setFinishedConnectors((fin) => {
+                if (fin.includes(finishedKey)) return fin;
+                return [...fin, finishedKey];
+              });
             }
 
-            const evidenceSlice = DEMO_PERSON.evidence.slice(0, logIndex - 1);
+            // Sync evidence count exactly with timeline progress
+            let evidenceCount = 0;
+            if (logIndex === 2) evidenceCount = 1;      // GitHub
+            else if (logIndex === 3) evidenceCount = 2; // Reddit
+            else if (logIndex === 4) evidenceCount = 3; // Twitter/X
+            else if (logIndex === 5) evidenceCount = 4; // LinkedIn
+            else if (logIndex === 6) evidenceCount = 7; // breaches (ev-005, ev-006, ev-007)
+            else if (logIndex === 7) evidenceCount = 8; // domain
+            else if (logIndex === 8) evidenceCount = 9; // ip
+            else if (logIndex === 9) evidenceCount = 10; // Pastebin
+            else if (logIndex >= 10) evidenceCount = 11; // Registration scout / all
+
+            const evidenceSlice = DEMO_PERSON.evidence.slice(0, evidenceCount);
             setVisibleEvidence(evidenceSlice);
 
-            const entitiesSlice = DEMO_PERSON.entities.slice(0, logIndex - 1);
+            // Sync entities count
+            let entityCount = Math.min(DEMO_PERSON.entities.length, logIndex);
+            if (logIndex >= 10) entityCount = DEMO_PERSON.entities.length;
+            const entitiesSlice = DEMO_PERSON.entities.slice(0, entityCount);
             setVisibleEntities(entitiesSlice);
           }
           return next;
         }
 
-        if (next === 13) {
-          setVisibleLogs((logs) => [...logs, DEMO_PERSON.timeline[11]]);
+        // Network graph view phase: next = 14 to 18
+        if (next >= 14 && next <= 18) {
+          // Finish all connectors
+          setFinishedConnectors(Object.keys(CONNECTOR_DISPLAY_NAMES));
+          setActiveConnectors([]);
+          setVisibleEvidence(DEMO_PERSON.evidence);
+          setVisibleEntities(DEMO_PERSON.entities);
+          
+          if (next === 14) {
+            // Ingestion complete, starting AI synthesis
+            setVisibleLogs((logs) => {
+              if (logs.some(l => l.event === DEMO_PERSON.timeline[11].event)) return logs;
+              return [...logs, DEMO_PERSON.timeline[11]];
+            });
+          }
           return next;
         }
 
-        if (next === 14) {
+        // Entities view phase: next = 19 to 20
+        if (next === 19) {
+          // Scan complete log
+          setVisibleLogs((logs) => {
+            if (logs.some(l => l.event === DEMO_PERSON.timeline[12].event)) return logs;
+            return [...logs, DEMO_PERSON.timeline[12]];
+          });
+          return next;
+        }
+        if (next === 20) {
+          return next;
+        }
+
+        // Dossier compilation phase: next = 21 to 22
+        if (next === 21) {
           setShowDossier(true);
           animateDossier();
-          setVisibleLogs((logs) => [...logs, DEMO_PERSON.timeline[12]]);
           return next;
         }
 
-        if (next > 14) {
+        if (next > 21) {
           setIsPlaying(false);
           if (timerRef.current) clearInterval(timerRef.current);
-          return 15;
+          return 22;
         }
 
         return next;
@@ -755,13 +806,13 @@ function CinematicDemo() {
   useEffect(() => {
     if (currentStep === 1) {
       setView('timeline');
-    } else if (currentStep >= 2 && currentStep <= 5) {
+    } else if (currentStep >= 2 && currentStep <= 13) {
       setView('evidence');
-    } else if (currentStep >= 6 && currentStep <= 11) {
+    } else if (currentStep >= 14 && currentStep <= 18) {
       setView('graph');
-    } else if (currentStep >= 12 && currentStep <= 13) {
+    } else if (currentStep >= 19 && currentStep <= 20) {
       setView('entities');
-    } else if (currentStep === 14) {
+    } else if (currentStep >= 21) {
       setView('dossier');
     }
   }, [currentStep]);
@@ -832,7 +883,7 @@ function CinematicDemo() {
 
   const skipToEnd = () => {
     setIsPlaying(false);
-    setCurrentStep(15);
+    setCurrentStep(22);
     setTypedTarget(targetEmail);
     setActiveConnectors([]);
     setFinishedConnectors(Object.keys(CONNECTOR_DISPLAY_NAMES));
@@ -1002,7 +1053,7 @@ function CinematicDemo() {
                       <p className="text-[10px] text-text-secondary truncate">Subject: john.doe@example.com</p>
                     </div>
                     <div className="shrink-0">
-                      {currentStep >= 14 ? (
+                      {currentStep >= 18 ? (
                         <Badge variant="success" size="sm" className="gap-1.5 px-2.5 py-1">
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           COMPLETE
@@ -1226,7 +1277,7 @@ function CinematicDemo() {
                           )}
                         </div>
 
-                        {currentStep >= 15 && (
+                         {currentStep >= 22 && (
                           <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
