@@ -392,10 +392,9 @@ export default function PricingPage() {
                   </div>
 
                   <div className="mt-auto relative z-20 space-y-3">
-                    <a href={`https://lucas808.gumroad.com/l/${key === 'analyst_pro' ? 'ukfec' : key === 'command_center' ? 'jtmtbo' : 'pijwmf'}`} className="block w-full gumroad-button" data-gumroad-single-product="true">
-                      <Button
-                        size="lg"
-                        className={`w-full font-black uppercase tracking-widest text-xs h-14 rounded-2xl shadow-2xl transition-all transform hover:scale-[1.02] ${
+                    <a href={`https://lucas808.gumroad.com/l/${key === 'analyst_pro' ? 'ukfec' : key === 'command_center' ? 'jtmtbo' : 'pijwmf'}`} className="gumroad-button block w-full">
+                      <span
+                        className={`w-full flex items-center justify-center font-black uppercase tracking-widest text-xs h-14 rounded-2xl shadow-2xl transition-all transform hover:scale-[1.02] ${
                           isPopular
                             ? "bg-accent hover:bg-accent-hover text-white shadow-accent/20"
                             : "bg-surface-elevated hover:bg-white hover:text-background text-text-primary border border-border/10"
@@ -403,7 +402,7 @@ export default function PricingPage() {
                       >
                         Secure {tier.name} — ${tier.price}
                         <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
+                      </span>
                     </a>
                     <p className="text-center text-[10px] text-text-tertiary font-bold uppercase tracking-widest">
                       {LAUNCH_CONFIG.MONEY_BACK_DAYS}-Day Money-Back Guarantee
@@ -628,24 +627,24 @@ export default function PricingPage() {
                     </Link>
                   </td>
                   <td className="p-5 text-center">
-                    <a href="https://lucas808.gumroad.com/l/ukfec" className="gumroad-button" data-gumroad-single-product="true">
-                      <Button variant="outline" size="sm" className="text-[10px] font-black uppercase tracking-widest">
+                    <a href="https://lucas808.gumroad.com/l/ukfec" className="gumroad-button">
+                      <span className="inline-flex items-center justify-center px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg border border-border/20 text-text-primary hover:bg-white hover:text-background transition-colors">
                         Get Pro
-                      </Button>
+                      </span>
                     </a>
                   </td>
                   <td className="p-5 text-center bg-accent/[0.03]">
-                    <a href="https://lucas808.gumroad.com/l/jtmtbo" className="gumroad-button" data-gumroad-single-product="true">
-                      <Button variant="primary" size="sm" className="text-[10px] font-black uppercase tracking-widest">
+                    <a href="https://lucas808.gumroad.com/l/jtmtbo" className="gumroad-button">
+                      <span className="inline-flex items-center justify-center px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg bg-accent text-white hover:bg-accent-hover transition-colors">
                         Get Command
-                      </Button>
+                      </span>
                     </a>
                   </td>
                   <td className="p-5 text-center">
-                    <a href="https://lucas808.gumroad.com/l/pijwmf" className="gumroad-button" data-gumroad-single-product="true">
-                      <Button variant="outline" size="sm" className="text-[10px] font-black uppercase tracking-widest">
+                    <a href="https://lucas808.gumroad.com/l/pijwmf" className="gumroad-button">
+                      <span className="inline-flex items-center justify-center px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg border border-border/20 text-text-primary hover:bg-white hover:text-background transition-colors">
                         Get Arsenal
-                      </Button>
+                      </span>
                     </a>
                   </td>
                 </tr>

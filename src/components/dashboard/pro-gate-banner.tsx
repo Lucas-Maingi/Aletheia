@@ -69,7 +69,7 @@ export function ProGateBanner({ currentCount, freeLimit, isPro }: ProGateBannerP
                         <div className="text-lg font-black text-text-primary">$299<span className="text-[10px] text-text-tertiary font-medium lowercase"> one-time</span></div>
                         <div className="text-[9px] text-success font-bold">Lifetime Deal Active</div>
                     </div>
-                    <a href="https://lucas808.gumroad.com/l/ukfec" className="block gumroad-button" data-gumroad-single-product="true">
+                    <a href="https://lucas808.gumroad.com/l/ukfec" className="gumroad-button block">
                         <motion.div
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}

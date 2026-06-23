@@ -98,7 +98,7 @@ export default function RootLayout({
             </main>
           </Suspense>
           <Analytics />
-          <Script src="https://gumroad.com/js/gumroad.js" strategy="beforeInteractive" />
+          <Script src="https://gumroad.com/js/gumroad.js" strategy="afterInteractive" />
         </ThemeProvider>
       </body>
     </html>
