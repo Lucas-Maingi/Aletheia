@@ -879,15 +879,14 @@ export default function PricingPage() {
               Once founding slots sell out, these prices are gone forever. Monthly billing starts Q4 2026 at 3–6x the cost.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/checkout?plan=command_center">
-                <Button
-                  size="lg"
-                  className="font-black uppercase tracking-widest text-xs h-14 px-10 rounded-2xl shadow-2xl bg-accent hover:bg-accent-hover text-white shadow-accent/20 transform hover:scale-[1.02] transition-all"
-                >
-                  Get Command Center — ${ltdTiers.command_center.price}
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
+              <Button
+                size="lg"
+                onClick={() => setActiveProductUrl("https://lucas808.gumroad.com/l/jtmtbo")}
+                className="font-black uppercase tracking-widest text-xs h-14 px-10 rounded-2xl shadow-2xl bg-accent hover:bg-accent-hover text-white shadow-accent/20 transform hover:scale-[1.02] transition-all"
+              >
+                Get Command Center — ${ltdTiers.command_center.price}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
               <Link href="/dashboard">
                 <Button
                   variant="ghost"
