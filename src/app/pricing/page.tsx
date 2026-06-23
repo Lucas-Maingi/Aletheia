@@ -15,9 +15,9 @@ import { Badge } from "@/components/ui/badge";
 import { LandingHeader } from "@/components/landing/landing-header";
 import { Footer } from "@/components/footer";
 import { LAUNCH_CONFIG } from "@/lib/launch-config";
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { ContentBackButton } from "@/components/landing/content-back-button";
-import { GumroadOverlay } from "@/components/gumroad-overlay";
+import { GumroadScript } from "@/components/gumroad-script";
 
 
 // ─── LTD Tier Feature Definitions ───────────────────────────────────
@@ -194,7 +194,6 @@ function calcSavings(ltdPrice: number, monthlyPrice: number): number {
 export default function PricingPage() {
   const ltdTiers = LAUNCH_CONFIG.LTD_TIERS;
   const monthlyTiers = LAUNCH_CONFIG.MONTHLY_TIERS;
-  const [overlayProductUrl, setOverlayProductUrl] = useState<string | null>(null);
 
   // Map tier keys to Gumroad product URLs
   const GUMROAD_URLS: Record<string, string> = {
@@ -203,16 +202,9 @@ export default function PricingPage() {
     agency_arsenal: "https://lucas808.gumroad.com/l/pijwmf",
   };
 
-  const openCheckout = useCallback((tierKey: string) => {
-    setOverlayProductUrl(GUMROAD_URLS[tierKey] || null);
-  }, []);
-
-  const closeCheckout = useCallback(() => {
-    setOverlayProductUrl(null);
-  }, []);
-
   return (
     <div className="w-full bg-background min-h-screen">
+      <GumroadScript />
       <LandingHeader />
 
       {/* ─── Hero ─────────────────────────────────── */}
@@ -409,7 +401,7 @@ export default function PricingPage() {
                   </div>
 
                   <div className="mt-auto relative z-20 space-y-3">
-                    <button onClick={() => openCheckout(key as string)} className="block w-full cursor-pointer">
+                    <a href={GUMROAD_URLS[key as string]} className="gumroad-button block w-full">
                       <span
                         className={`w-full flex items-center justify-center font-black uppercase tracking-widest text-xs h-14 rounded-2xl shadow-2xl transition-all transform hover:scale-[1.02] ${
                           isPopular
@@ -420,7 +412,7 @@ export default function PricingPage() {
                         Secure {tier.name} — ${tier.price}
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </span>
-                    </button>
+                    </a>
                     <p className="text-center text-[10px] text-text-tertiary font-bold uppercase tracking-widest">
                       {LAUNCH_CONFIG.MONEY_BACK_DAYS}-Day Money-Back Guarantee
                     </p>
@@ -644,25 +636,25 @@ export default function PricingPage() {
                     </Link>
                   </td>
                   <td className="p-5 text-center">
-                    <button onClick={() => openCheckout('analyst_pro')} className="cursor-pointer">
+                    <a href="https://lucas808.gumroad.com/l/ukfec" className="gumroad-button">
                       <span className="inline-flex items-center justify-center px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg border border-border/20 text-text-primary hover:bg-white hover:text-background transition-colors">
                         Get Pro
                       </span>
-                    </button>
+                    </a>
                   </td>
                   <td className="p-5 text-center bg-accent/[0.03]">
-                    <button onClick={() => openCheckout('command_center')} className="cursor-pointer">
+                    <a href="https://lucas808.gumroad.com/l/jtmtbo" className="gumroad-button">
                       <span className="inline-flex items-center justify-center px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg bg-accent text-white hover:bg-accent-hover transition-colors">
                         Get Command
                       </span>
-                    </button>
+                    </a>
                   </td>
                   <td className="p-5 text-center">
-                    <button onClick={() => openCheckout('agency_arsenal')} className="cursor-pointer">
+                    <a href="https://lucas808.gumroad.com/l/pijwmf" className="gumroad-button">
                       <span className="inline-flex items-center justify-center px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg border border-border/20 text-text-primary hover:bg-white hover:text-background transition-colors">
                         Get Arsenal
                       </span>
-                    </button>
+                    </a>
                   </td>
                 </tr>
               </tbody>
@@ -899,12 +891,6 @@ export default function PricingPage() {
       </section>
 
       <Footer />
-
-      {/* Gumroad Checkout Overlay */}
-      <GumroadOverlay
-        productUrl={overlayProductUrl}
-        onClose={closeCheckout}
-      />
     </div>
   );
 }

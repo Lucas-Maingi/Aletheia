@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 
 (async () => {
-  console.log("=== Gumroad Overlay E2E Test ===\n");
+  console.log("=== Gumroad Native Overlay E2E Test ===\n");
   
   const browser = await puppeteer.launch({ 
     headless: "new",
@@ -10,14 +10,12 @@ const puppeteer = require('puppeteer');
   const page = await browser.newPage();
   await page.setViewport({ width: 1280, height: 800 });
   
-  // Track all navigations
-  let navigatedAway = false;
+  // Track navigations
+  let navigatedToGumroad = false;
   page.on('framenavigated', (frame) => {
-    if (frame === page.mainFrame()) {
-      console.log(`  [NAV] Main frame navigated to: ${frame.url()}`);
-      if (frame.url().includes('gumroad.com')) {
-        navigatedAway = true;
-      }
+    if (frame === page.mainFrame() && frame.url().includes('gumroad.com')) {
+      navigatedToGumroad = true;
+      console.log(`  ❌ [NAV] Main frame redirected to: ${frame.url()}`);
     }
   });
   
@@ -27,111 +25,101 @@ const puppeteer = require('puppeteer');
     waitUntil: 'networkidle2',
     timeout: 30000
   });
-  console.log(`   Current URL: ${page.url()}`);
+  console.log(`   ✅ Loaded: ${page.url()}`);
   
-  // Step 2: Wait for Gumroad script to load
+  // Step 2: Wait for Gumroad script to fully initialize
   console.log("\n2. Waiting for Gumroad script to initialize...");
-  await new Promise(r => setTimeout(r, 3000));
+  await new Promise(r => setTimeout(r, 5000)); // Give it plenty of time
   
-  // Check if gumroad bundle loaded
-  const gumroadLoaded = await page.evaluate(() => {
-    const scripts = Array.from(document.querySelectorAll('script'));
-    return scripts.some(s => s.src && s.src.includes('gumroad'));
-  });
-  console.log(`   Gumroad script present in DOM: ${gumroadLoaded}`);
-  
-  // Check for gumroad shadow DOM (overlay container)
-  const hasShadowRoot = await page.evaluate(() => {
-    const divs = document.querySelectorAll('body > div');
-    for (const div of divs) {
-      if (div.shadowRoot) return true;
+  // Check for gumroad elements
+  const scriptCheck = await page.evaluate(() => {
+    const gumroadScripts = document.querySelectorAll('script[src*="gumroad"]');
+    const gumroadLinks = document.querySelectorAll('link[href*="gumroad"]');
+    
+    // Check for shadow DOM container (what gumroad-bundle.js creates)
+    let hasShadowRoot = false;
+    const bodyDivs = document.querySelectorAll('body > div');
+    for (const div of bodyDivs) {
+      if (div.shadowRoot) {
+        hasShadowRoot = true;
+        break;
+      }
     }
-    return false;
-  });
-  console.log(`   Gumroad shadow DOM (overlay container): ${hasShadowRoot}`);
-  
-  // Step 3: Find and examine gumroad buttons
-  console.log("\n3. Checking gumroad button structure...");
-  const buttonInfo = await page.evaluate(() => {
-    const links = document.querySelectorAll('a.gumroad-button');
-    return Array.from(links).map(a => ({
-      href: a.href,
-      classList: Array.from(a.classList),
-      innerHTML: a.innerHTML.substring(0, 100),
-      hasClickListener: true, // can't directly check but the overlay script should add one
-      childElements: Array.from(a.children).map(c => c.tagName.toLowerCase()),
-    }));
-  });
-  console.log(`   Found ${buttonInfo.length} gumroad buttons:`);
-  buttonInfo.forEach((b, i) => {
-    console.log(`   [${i}] href: ${b.href}`);
-    console.log(`        classes: ${b.classList.join(', ')}`);
-    console.log(`        children: ${b.childElements.join(', ')}`);
+    
+    // Check for gumroad logo spans appended to buttons
+    const logoSpans = document.querySelectorAll('.gumroad-button .logo-full');
+    
+    return {
+      scripts: gumroadScripts.length,
+      cssLinks: gumroadLinks.length,
+      shadowDomReady: hasShadowRoot,
+      buttonsProcessed: logoSpans.length, // Gumroad appends <span class="logo-full"> to processed links
+    };
   });
   
-  if (buttonInfo.length === 0) {
-    console.log("\n❌ FAIL: No gumroad buttons found!");
+  console.log(`   Scripts found: ${scriptCheck.scripts}`);
+  console.log(`   CSS links found: ${scriptCheck.cssLinks}`);
+  console.log(`   Shadow DOM ready: ${scriptCheck.shadowDomReady}`);
+  console.log(`   Buttons processed by gumroad: ${scriptCheck.buttonsProcessed}`);
+  
+  // Step 3: Find and click a gumroad button
+  console.log("\n3. Looking for gumroad buttons...");
+  const gumroadButtons = await page.$$('a.gumroad-button');
+  console.log(`   Found ${gumroadButtons.length} gumroad buttons`);
+  
+  if (gumroadButtons.length === 0) {
+    console.log("   ❌ No gumroad buttons found!");
+    await page.screenshot({ path: 'test_no_buttons.png' });
     await browser.close();
     process.exit(1);
   }
   
-  // Step 4: Click the first pricing card button
-  console.log("\n4. Clicking first 'Secure' button...");
-  const firstButton = await page.$('a.gumroad-button');
-  
-  // Take screenshot before click
+  // Click first button
+  console.log("   Clicking first button...");
   await page.screenshot({ path: 'test_before_click.png' });
-  console.log("   Screenshot saved: test_before_click.png");
   
-  await firstButton.click();
+  await gumroadButtons[0].click();
   
-  // Wait to see what happens
-  console.log("   Waiting 5 seconds for overlay to appear...");
-  await new Promise(r => setTimeout(r, 5000));
+  // Wait for overlay
+  console.log("   Waiting 6 seconds for overlay...");
+  await new Promise(r => setTimeout(r, 6000));
   
-  // Step 5: Check results
-  console.log("\n5. Checking results...");
-  const currentUrl = page.url();
-  console.log(`   Current URL: ${currentUrl}`);
-  console.log(`   Navigated to Gumroad: ${navigatedAway}`);
+  if (navigatedToGumroad) {
+    console.log("\n=== ❌ FAIL: Main frame redirected to Gumroad ===");
+    await browser.close();
+    process.exit(1);
+  }
   
-  // Check for overlay iframe in shadow DOM
-  const overlayInfo = await page.evaluate(() => {
-    const divs = document.querySelectorAll('body > div');
-    for (const div of divs) {
-      if (div.shadowRoot) {
-        const iframe = div.shadowRoot.querySelector('iframe');
-        const overlay = div.shadowRoot.querySelector('.fixed');
-        return {
-          hasShadowRoot: true,
-          hasIframe: !!iframe,
-          iframeSrc: iframe ? iframe.src : null,
-          overlayVisible: overlay ? getComputedStyle(overlay).display !== 'none' : false,
-        };
-      }
+  console.log(`   ✅ Still on: ${page.url()}`);
+  
+  // Step 4: Check for overlay
+  console.log("\n4. Checking for overlay content...");
+  
+  // Check all frames (the overlay creates an iframe)
+  const frames = page.frames();
+  console.log(`   Total frames: ${frames.length}`);
+  
+  let gumroadFrame = null;
+  for (const frame of frames) {
+    const url = frame.url();
+    if (url.includes('gumroad.com')) {
+      console.log(`   ✅ Gumroad iframe found: ${url}`);
+      gumroadFrame = frame;
     }
-    return { hasShadowRoot: false, hasIframe: false, iframeSrc: null, overlayVisible: false };
-  });
+  }
   
-  console.log(`   Shadow root found: ${overlayInfo.hasShadowRoot}`);
-  console.log(`   Iframe found: ${overlayInfo.hasIframe}`);
-  console.log(`   Iframe src: ${overlayInfo.iframeSrc}`);
-  console.log(`   Overlay visible: ${overlayInfo.overlayVisible}`);
-  
-  // Take screenshot after click
   await page.screenshot({ path: 'test_after_click.png' });
   console.log("   Screenshot saved: test_after_click.png");
   
-  // Final verdict
+  // Verdict
   console.log("\n=== VERDICT ===");
-  if (!navigatedAway && overlayInfo.hasIframe && overlayInfo.iframeSrc) {
-    console.log("✅ SUCCESS: Gumroad overlay is working! Iframe loaded without redirect.");
-  } else if (navigatedAway) {
-    console.log("❌ FAIL: Browser redirected to Gumroad instead of showing overlay.");
-  } else if (!overlayInfo.hasIframe) {
-    console.log("⚠️  PARTIAL: No redirect, but no overlay iframe detected either.");
+  if (gumroadFrame) {
+    console.log("✅ SUCCESS: Gumroad overlay is working! Checkout loaded in iframe without redirect.");
+  } else {
+    console.log("❌ FAIL: No Gumroad overlay iframe detected.");
+    console.log("   The gumroad.js script may not have initialized properly.");
   }
   
   await browser.close();
-  process.exit(navigatedAway ? 1 : 0);
+  process.exit(gumroadFrame ? 0 : 1);
 })();
