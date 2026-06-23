@@ -6,7 +6,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Analytics } from "@vercel/analytics/react";
 import { Suspense } from "react";
-import Script from "next/script";
+
 const inter = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
@@ -98,7 +98,6 @@ export default function RootLayout({
             </main>
           </Suspense>
           <Analytics />
-          <Script src="https://gumroad.com/js/gumroad.js" strategy="afterInteractive" />
         </ThemeProvider>
       </body>
     </html>

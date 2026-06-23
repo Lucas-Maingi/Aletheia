@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import { Zap, Lock, ArrowRight, Shield } from "lucide-react";
 import Link from "next/link";
+import { useState, useCallback } from "react";
+import { GumroadOverlay } from "@/components/gumroad-overlay";
 
 interface ProGateBannerProps {
     currentCount: number;
@@ -12,6 +14,8 @@ interface ProGateBannerProps {
 
 export function ProGateBanner({ currentCount, freeLimit, isPro }: ProGateBannerProps) {
     if (isPro) return null;
+
+    const [overlayUrl, setOverlayUrl] = useState<string | null>(null);
 
     const remaining = Math.max(0, freeLimit - currentCount);
     const usagePercent = Math.min(100, (currentCount / freeLimit) * 100);
@@ -69,7 +73,7 @@ export function ProGateBanner({ currentCount, freeLimit, isPro }: ProGateBannerP
                         <div className="text-lg font-black text-text-primary">$299<span className="text-[10px] text-text-tertiary font-medium lowercase"> one-time</span></div>
                         <div className="text-[9px] text-success font-bold">Lifetime Deal Active</div>
                     </div>
-                    <a href="https://lucas808.gumroad.com/l/ukfec" className="gumroad-button block">
+                    <button onClick={() => setOverlayUrl("https://lucas808.gumroad.com/l/ukfec")} className="block cursor-pointer">
                         <motion.div
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
@@ -78,9 +82,15 @@ export function ProGateBanner({ currentCount, freeLimit, isPro }: ProGateBannerP
                             <Lock className="w-3.5 h-3.5" />
                             Secure Lifetime Access
                         </motion.div>
-                    </a>
+                    </button>
                 </div>
             </div>
+
+            {/* Gumroad Checkout Overlay */}
+            <GumroadOverlay
+                productUrl={overlayUrl}
+                onClose={() => setOverlayUrl(null)}
+            />
         </motion.div>
     );
 }
