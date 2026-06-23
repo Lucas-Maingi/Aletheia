@@ -204,10 +204,8 @@ export default function SettingsPage() {
                 <p className="text-xs text-text-tertiary font-medium max-w-2xl leading-relaxed uppercase tracking-wider">
                     Manage your identity profile, resource consumption quotas, and account security.
                 </p>
-            </div>
-
-            <Tabs defaultValue="identity" value={activeTab} className="w-full" onValueChange={setActiveTab}>
-                <TabsList className="bg-foreground/[0.03] border border-border/10 w-fit rounded-2xl h-14 p-1.5 gap-2 shadow-inner">
+            </div>             <Tabs defaultValue="identity" value={activeTab} className="w-full" onValueChange={setActiveTab}>
+                <TabsList className="bg-foreground/[0.03] border border-border/10 w-full overflow-x-auto no-scrollbar flex rounded-2xl h-14 p-1.5 gap-2 shadow-inner">
                     {[
                         { id: "identity", label: "Identity Profile", icon: <UserIcon className="w-3.5 h-3.5" /> },
                         { id: "quota", label: "Resource Quotas", icon: <Database className="w-3.5 h-3.5" /> },
@@ -216,7 +214,7 @@ export default function SettingsPage() {
                         <TabsTrigger 
                             key={tab.id}
                             value={tab.id} 
-                            className="rounded-xl px-8 h-full text-[11px] font-black uppercase tracking-widest text-text-tertiary data-[state=active]:bg-surface data-[state=active]:text-accent data-[state=active]:shadow-[0_0_15px_rgba(0,240,255,0.15)] border border-transparent data-[state=active]:border-accent/20 transition-all hover:text-text-primary gap-2.5"
+                            className="rounded-xl px-4 md:px-8 h-full shrink-0 flex items-center justify-center text-[10px] md:text-[11px] font-black uppercase tracking-widest text-text-tertiary data-[state=active]:bg-surface data-[state=active]:text-accent data-[state=active]:shadow-[0_0_15px_rgba(0,240,255,0.15)] border border-transparent data-[state=active]:border-accent/20 transition-all hover:text-text-primary gap-2 md:gap-2.5"
                         >
                             {tab.icon}
                             {tab.label}
@@ -310,12 +308,12 @@ export default function SettingsPage() {
                 {/* Quota & Billing Content */}
                 <TabsContent value="quota" className="mt-10 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     <div className="space-y-8">
-                        <div className="flex items-center justify-between pb-4 border-b border-border/10">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/10">
                             <div>
                                 <h3 className="text-sm font-black uppercase tracking-[0.3em] text-accent">Resource Consumption</h3>
                                 <p className="text-xs text-text-tertiary mt-1 font-bold uppercase tracking-wider">Monitor your real-time data ingestion and processing limits</p>
                             </div>
-                            <span className="text-[10px] font-bold text-text-tertiary uppercase tracking-widest bg-foreground/5 px-3 py-1.5 rounded-full">Auto-Reset: 1st of Month</span>
+                            <span className="text-[10px] font-bold text-text-tertiary uppercase tracking-widest bg-foreground/5 px-3 py-1.5 rounded-full w-fit">Auto-Reset: 1st of Month</span>
                         </div>
                         
                         {usage && <UsageStats data={usage} />}
@@ -323,12 +321,12 @@ export default function SettingsPage() {
                         <div className="pt-8">
                             <Card className="bg-surface border border-border/10 relative overflow-hidden shadow-2xl rounded-3xl">
                                 <CardHeader className="p-8 pb-6 bg-foreground/[0.02] border-b border-border/5">
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                         <div>
                                             <CardTitle className="text-xl font-black uppercase tracking-[0.1em] text-text-primary">Billing & Subscription</CardTitle>
                                             <CardDescription className="text-xs text-text-tertiary mt-2 font-bold uppercase tracking-wider">Manage your organizational subscriptions and financial records</CardDescription>
                                         </div>
-                                        <div className="p-4 bg-accent/5 rounded-2xl border border-accent/10">
+                                        <div className="p-4 bg-accent/5 rounded-2xl border border-accent/10 w-fit shrink-0">
                                             <CreditCard className="w-6 h-6 text-accent" />
                                         </div>
                                     </div>

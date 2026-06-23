@@ -112,27 +112,27 @@ export function DashboardClient({
                             }
                         }}
                         placeholder="Search Identity, Domain, or Signal..."
-                        className="w-full h-[72px] pl-16 pr-[200px] bg-surface/60 backdrop-blur-[40px] border border-border/20 rounded-2xl text-xl font-bold text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-accent/40 focus:ring-1 focus:ring-accent/10 transition-all shadow-2xl shadow-accent/5 focus:shadow-[0_0_40px_rgba(0,240,255,0.15)]"
+                        className="w-full h-14 md:h-[72px] pl-12 md:pl-16 pr-[100px] sm:pr-[130px] md:pr-[200px] bg-surface/60 backdrop-blur-[40px] border border-border/20 rounded-2xl text-sm md:text-xl font-bold text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-accent/40 focus:ring-1 focus:ring-accent/10 transition-all shadow-2xl shadow-accent/5 focus:shadow-[0_0_40px_rgba(0,240,255,0.15)]"
                     />
                     
                     {/* Integrated action buttons inside the search bar */}
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                    <div className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 md:gap-2">
                         {/* Direct Visual Search Upload Button */}
                         <button 
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
                             title="Direct Visual Scan (Select Image)"
-                            className="p-3 rounded-xl border border-border/10 text-text-tertiary hover:text-accent hover:border-accent/30 hover:bg-accent/10 transition-all active:scale-95"
+                            className="p-1.5 md:p-3 rounded-lg md:rounded-xl border border-border/10 text-text-tertiary hover:text-accent hover:border-accent/30 hover:bg-accent/10 transition-all active:scale-95"
                         >
-                            <ImageIcon className="w-5 h-5" />
+                            <ImageIcon className="w-4 h-4 md:w-5 md:h-5" />
                         </button>
                         <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageSelect} />
 
                         <button 
                             onClick={() => searchQuery && router.push(`/dashboard/investigations/new?target=${encodeURIComponent(searchQuery)}&autostart=true`)}
-                            className="h-12 px-6 rounded-xl bg-accent text-background font-black text-[11px] uppercase tracking-widest hover:bg-white hover:text-accent transition-all shadow-[0_0_20px_rgba(0,240,255,0.3)] active:scale-95 flex items-center gap-2 group/btn"
+                            className="h-9 md:h-12 px-2.5 md:px-6 rounded-lg md:rounded-xl bg-accent text-background font-black text-[10px] md:text-[11px] uppercase tracking-widest hover:bg-white hover:text-accent transition-all shadow-[0_0_20px_rgba(0,240,255,0.3)] active:scale-95 flex items-center gap-1.5 md:gap-2 group/btn"
                         >
-                            Target_Sweep
+                            <span className="hidden sm:inline">Target_Sweep</span>
                             <Search className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
                         </button>
                     </div>
@@ -149,28 +149,28 @@ export function DashboardClient({
         </div>
 
         {/* Global Statistics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-3 gap-3 md:gap-5">
           {topStats.map((stat, i) => (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="bg-surface/30 backdrop-blur-2xl border border-white/5 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-accent/30 hover:-translate-y-1 transition-all duration-500 cursor-default"
+              className="bg-surface/30 backdrop-blur-2xl border border-white/5 rounded-xl md:rounded-2xl p-3 md:p-6 shadow-xl relative overflow-hidden group hover:border-accent/30 hover:-translate-y-1 transition-all duration-500 cursor-default"
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border border-accent/20 bg-accent/5 ${stat.color}`}>
-                    <stat.icon className={`w-5 h-5 ${(stat as any).active ? 'animate-pulse' : ''}`} />
+              <div className="flex items-center justify-between mb-2 md:mb-4">
+                <div className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center border border-accent/20 bg-accent/5 ${stat.color}`}>
+                    <stat.icon className={`w-4 h-4 md:w-5 md:h-5 ${(stat as any).active ? 'animate-pulse' : ''}`} />
                 </div>
               </div>
 
               <div>
-                <h3 className="text-text-secondary font-black text-[9px] uppercase tracking-[0.2em] mb-1">{stat.label}</h3>
-                <div className="text-3xl font-black text-text-primary tracking-tighter flex items-baseline gap-2">
+                <h3 className="text-text-secondary font-black text-[8px] md:text-[9px] uppercase tracking-[0.15em] md:tracking-[0.2em] mb-0.5 md:mb-1">{stat.label}</h3>
+                <div className="text-base sm:text-2xl md:text-3xl font-black text-text-primary tracking-tighter flex items-baseline gap-1 md:gap-2">
                     {stat.value}
-                    {stat.label.includes("Signal") && <span className="text-[10px] text-accent opacity-60 uppercase tracking-widest font-black">Artifacts</span>}
+                    {stat.label.includes("Signal") && <span className="hidden md:inline text-[10px] text-accent opacity-60 uppercase tracking-widest font-black">Artifacts</span>}
                 </div>
-                <p className="text-[10px] text-text-secondary mt-2 font-medium opacity-60">{stat.detail}</p>
+                <p className="hidden md:block text-[10px] text-text-secondary mt-2 font-medium opacity-60">{stat.detail}</p>
               </div>
             </motion.div>
           ))}
@@ -185,10 +185,10 @@ export function DashboardClient({
       />
 
       {/* Tactical Feed & Unified Activity */}
-      <div className="flex flex-col gap-8 flex-1 min-h-0">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1 min-h-0">
         
         {/* Main Activity Timeline */}
-        <section className="flex flex-col min-h-0 bg-surface/10 border border-white/5 rounded-3xl p-6 backdrop-blur-sm">
+        <section className="order-2 lg:order-1 lg:col-span-7 flex flex-col min-h-0 bg-surface/10 border border-white/5 rounded-3xl p-6 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_8px_var(--accent)]" />
@@ -265,7 +265,7 @@ export function DashboardClient({
                              "{inv.details}"
                          </div>
                          
-                         <div className="flex items-center justify-between gap-4">
+                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-border/5 mt-4">
                             <div className="flex items-center gap-3">
                                 <Badge variant="outline" className={`text-[8px] font-bold tracking-[0.2em] px-2 py-0.5 rounded border-opacity-30 ${
                                     isChat ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500' : 'bg-accent/10 border-accent/20 text-accent'
@@ -275,10 +275,10 @@ export function DashboardClient({
                                  <span className="text-[9px] font-mono text-text-tertiary font-black uppercase">Confirmed_Record</span>
                             </div>
                             
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
                                 <Link 
                                     href={isChat ? `/dashboard/chat?id=${inv.id}` : `/dashboard/investigations/${inv.id}`}
-                                    className={`h-8 px-4 rounded-lg font-bold text-[9px] uppercase tracking-widest flex items-center gap-2 transition-all ${
+                                    className={`h-8 px-4 rounded-lg font-bold text-[9px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all flex-1 sm:flex-none ${
                                         isChat ? 'bg-emerald-500 text-background hover:bg-white' : 'bg-accent text-background hover:bg-white'
                                     }`}
                                 >
@@ -286,7 +286,7 @@ export function DashboardClient({
                                 </Link>
                                  <button
                                     onClick={() => setPendingDeleteId(inv.id)}
-                                    className="p-2 rounded-lg bg-foreground/[0.05] text-text-tertiary hover:text-white hover:bg-rose-500 transition-all border border-border/10"
+                                    className="p-2 rounded-lg bg-foreground/[0.05] text-text-tertiary hover:text-white hover:bg-rose-500 transition-all border border-border/10 shrink-0"
                                 >
                                     <Trash2 className="w-4 h-4" />
                                 </button>
@@ -298,6 +298,132 @@ export function DashboardClient({
                 </motion.div>
               );
             })}
+          </div>
+        </section>
+
+        {/* Tactical Intelligence Feed (Actionable Insights) */}
+        <section className="order-1 lg:order-2 lg:col-span-5 flex flex-col min-h-0 bg-surface/10 border border-white/5 rounded-3xl p-6 backdrop-blur-sm">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_8px_var(--accent)]" />
+              <h2 className="text-[13px] font-bold text-text-secondary uppercase tracking-[0.2em]">Tactical Feed</h2>
+            </div>
+            <span className="text-[9px] font-mono text-accent uppercase tracking-[0.2em] animate-pulse">
+              Live_Telemetry
+            </span>
+          </div>
+
+          <div className="space-y-4 max-h-[480px] overflow-y-auto custom-scrollbar pb-4 pr-2 flex-1">
+            {recentDiscoveries.length === 0 ? (
+              // Simulated High-Quality Threat-Intel Alert Items when scan data is not yet resolved
+              <div className="space-y-3">
+                {[
+                  {
+                    title: "Dark Web Leak Monitoring Active",
+                    detail: "Aletheia is ready to sweep 40+ repositories for credential leaks.",
+                    badge: "HIGH CONFIDENCE",
+                    badgeColor: "bg-accent/10 border-accent/20 text-accent",
+                    time: "Ready",
+                    icon: ShieldAlert
+                  },
+                  {
+                    title: "Identity Association Tracker",
+                    detail: "Target sweeps correlate cross-platform accounts and usernames.",
+                    badge: "READY",
+                    badgeColor: "bg-emerald-500/10 border-emerald-500/20 text-emerald-500",
+                    time: "Active",
+                    icon: Fingerprint
+                  },
+                  {
+                    title: "Subdomain & DNS Exposure Node",
+                    detail: "DNS records (MX, TXT, SPF) will highlight architectural vulnerabilities.",
+                    badge: "READY",
+                    badgeColor: "bg-emerald-500/10 border-emerald-500/20 text-emerald-500",
+                    time: "Active",
+                    icon: Database
+                  },
+                  {
+                    title: "Visual Footprint Sweep Ready",
+                    detail: "Upload images to perform reverse-image threat vectors scanning.",
+                    badge: "DEMO MODE",
+                    badgeColor: "bg-purple-500/10 border-purple-500/20 text-purple-400",
+                    time: "Active",
+                    icon: ImageIcon
+                  }
+                ].map((item, index) => (
+                  <div key={index} className="p-4 rounded-2xl bg-surface/30 border border-border/10 hover:border-accent/20 transition-all duration-300">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-text-tertiary shrink-0">
+                        <item.icon className="w-4 h-4 text-text-tertiary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <span className="text-xs font-bold text-text-primary truncate">{item.title}</span>
+                          <span className="text-[8px] font-mono text-text-tertiary uppercase">{item.time}</span>
+                        </div>
+                        <p className="text-[10px] text-text-secondary leading-relaxed mb-3">{item.detail}</p>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className={`text-[8px] font-mono font-black tracking-wider px-2 py-0.5 rounded border-opacity-30 ${item.badgeColor}`}>
+                            {item.badge}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              recentDiscoveries.map((discovery: any) => {
+                let badgeColor = "bg-accent/10 border-accent/20 text-accent";
+                if (discovery.confidenceLabel === "HIGH") {
+                  badgeColor = "bg-rose-500/10 border-rose-500/30 text-rose-500";
+                } else if (discovery.confidenceLabel === "MEDIUM") {
+                  badgeColor = "bg-accent/10 border-accent/20 text-accent";
+                } else {
+                  badgeColor = "bg-text-tertiary/10 border-text-tertiary/20 text-text-tertiary";
+                }
+
+                let Icon = ShieldAlert;
+                if (discovery.type === "image" || discovery.type === "screenshot") Icon = ImageIcon;
+                else if (discovery.type === "email" || discovery.type === "username") Icon = Fingerprint;
+                else if (discovery.type === "link" || discovery.type === "url") Icon = Database;
+
+                return (
+                  <div key={discovery.id} className="p-4 rounded-2xl bg-surface/30 border border-border/10 hover:border-accent/20 transition-all duration-300">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-text-tertiary shrink-0">
+                        <Icon className="w-4 h-4 text-text-tertiary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <span className="text-xs font-bold text-text-primary truncate">{discovery.title}</span>
+                          <span className="text-[8px] font-mono text-text-tertiary uppercase">
+                            {new Date(discovery.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-text-secondary leading-relaxed mb-3 line-clamp-3">{discovery.content}</p>
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className={`text-[8px] font-mono font-black tracking-wider px-2 py-0.5 rounded border-opacity-30 ${badgeColor}`}>
+                              {discovery.confidenceLabel}_CONFIDENCE
+                            </Badge>
+                            <span className="text-[9px] font-mono font-bold text-text-tertiary max-w-[120px] truncate">
+                              in {discovery.investigation?.title || "Dossier"}
+                            </span>
+                          </div>
+                          <Link 
+                            href={`/dashboard/investigations/${discovery.investigationId}`}
+                            className="text-[9px] font-black uppercase text-accent hover:underline flex items-center gap-0.5"
+                          >
+                            Inspect <ArrowUpRight className="w-2.5 h-2.5" />
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </section>
       </div>

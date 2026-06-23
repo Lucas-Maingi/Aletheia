@@ -209,10 +209,10 @@ export function FloatingChat() {
     };
 
     return (
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        <div className="fixed md:bottom-6 bottom-20 md:right-6 right-4 z-[60] flex flex-col items-end">
             {/* Expanded Chat Overlay */}
             {isOpen && (
-                <div className="w-[420px] h-[580px] bg-surface-elevated/95 backdrop-blur-2xl border border-border/10 rounded-3xl shadow-2xl flex flex-col mb-4 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <div className="w-[calc(100vw-2rem)] max-w-[420px] md:w-[420px] h-[calc(100vh-10rem)] max-h-[580px] md:h-[580px] bg-surface-elevated/95 backdrop-blur-2xl border border-border/10 rounded-3xl shadow-2xl flex flex-col mb-4 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
                     {/* Header */}
                     <div className="shrink-0 border-b border-border/10 bg-surface/80 px-4 py-3.5 flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2.5">
@@ -226,10 +226,10 @@ export function FloatingChat() {
                         </div>
                         
                         {/* Compact Segmented Control */}
-                        <div className="flex items-center bg-foreground/[0.03] border border-border/10 rounded-xl p-0.5 gap-0.5">
+                        <div className="flex items-center bg-foreground/[0.03] border border-border/10 rounded-xl p-0.5 gap-0.5 shrink-0">
                             <button
                                 onClick={() => setMode('support')}
-                                className={`px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all ${
+                                className={`shrink-0 px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all ${
                                     mode === 'support'
                                         ? 'bg-accent text-accent-foreground'
                                         : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
@@ -242,7 +242,7 @@ export function FloatingChat() {
                                     setMode('copilot');
                                     fetchAllInvestigations();
                                 }}
-                                className={`px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all ${
+                                className={`shrink-0 px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all ${
                                     mode === 'copilot'
                                         ? 'bg-accent text-accent-foreground'
                                         : 'text-text-secondary hover:text-text-primary hover:bg-white/5'

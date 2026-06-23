@@ -162,7 +162,7 @@ export default function Landing() {
             {/* Glowing Backdrop */}
             <div className="absolute -inset-1.5 bg-gradient-to-r from-accent via-accent-blue to-accent rounded-2xl blur-lg opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-300 pointer-events-none" />
             
-            <form onSubmit={handleSearch} className="relative flex items-stretch bg-surface/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-2 shadow-3xl overflow-hidden gap-2">
+            <form onSubmit={handleSearch} className="relative flex flex-col sm:flex-row items-stretch bg-surface/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-2 shadow-3xl overflow-hidden gap-2">
               <div className="flex items-center flex-1 px-4 py-3 relative">
                 <Search className="w-5 h-5 text-text-tertiary shrink-0" />
                 <input
@@ -170,15 +170,15 @@ export default function Landing() {
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
                   placeholder="Target Identification (Alias, Email, Domain...)"
-                  className="w-full bg-transparent border-none text-text-primary text-base px-4 focus:outline-none focus:ring-0 placeholder:text-text-tertiary/50 font-bold"
+                  className="w-full bg-transparent border-none text-text-primary text-base px-2 focus:outline-none focus:ring-0 placeholder:text-text-tertiary/50 font-bold"
                 />
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between sm:justify-end gap-2 p-1 sm:p-0 border-t border-white/5 sm:border-t-0">
                 <button
                   type="button"
                   title="Visual Intelligence Sweep"
                   onClick={() => fileInputRef.current?.click()}
-                  className="p-3.5 rounded-xl border border-white/5 text-text-tertiary hover:text-accent hover:border-accent/40 bg-white/5 transition-all flex items-center justify-center group/img"
+                  className="p-3.5 rounded-xl border border-white/5 text-text-tertiary hover:text-accent hover:border-accent/40 bg-white/5 transition-all flex items-center justify-center group/img shrink-0"
                   disabled={isUploading}
                 >
                   {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <ImageIcon className="w-5 h-5 group-hover/img:scale-110 transition-transform" />}
@@ -192,7 +192,7 @@ export default function Landing() {
                 />
                 <button 
                   type="submit"
-                  className="flex items-center justify-center gap-3 bg-accent hover:bg-white hover:text-accent text-white px-8 py-4 rounded-xl font-black transition-all transform hover:scale-[1.02] shadow-xl group/btn uppercase tracking-widest text-[10px]"
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-3 bg-accent hover:bg-white hover:text-accent text-white px-8 py-4 rounded-xl font-black transition-all transform hover:scale-[1.02] shadow-xl group/btn uppercase tracking-widest text-[10px] h-full"
                 >
                   Initiate Sweep
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -430,18 +430,18 @@ export default function Landing() {
                 className="relative max-w-md mx-auto group"
               >
                   <div className="absolute -inset-1 bg-gradient-to-r from-accent to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000" />
-                  <div className="relative flex p-1.5 bg-surface border border-border/20 rounded-2xl shadow-2xl">
+                  <div className="relative flex flex-col sm:flex-row p-1.5 bg-surface border border-border/20 rounded-2xl shadow-2xl gap-2">
                       <input 
                           type="email" 
                           required 
                           placeholder="agency-email@domain.com" 
-                          className="flex-1 bg-transparent px-5 py-3 text-sm text-text-primary placeholder:text-text-tertiary/40 outline-none font-bold"
+                          className="flex-1 bg-transparent px-5 py-3 text-sm text-text-primary placeholder:text-text-tertiary/40 outline-none font-bold min-w-0"
                           value={emailToken}
                           onChange={(e) => setEmailToken(e.target.value)}
                       />
                       <button 
                           type="submit" 
-                          className="bg-accent hover:bg-white hover:text-accent text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all transform active:scale-95 shadow-xl"
+                          className="bg-accent hover:bg-white hover:text-accent text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all transform active:scale-95 shadow-xl shrink-0"
                       >
                           Join Waitlist
                       </button>

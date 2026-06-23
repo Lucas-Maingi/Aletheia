@@ -125,23 +125,23 @@ export function EvidenceTab({ evidence }: { evidence: any[] }) {
         <div className="space-y-8 pb-20">
             {/* High-Density Discovery Matrix */}
             <section className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-accent flex items-center gap-2">
                         <Sparkles className="w-3 h-3" /> Digital Footprint Matrix
                     </h3>
-                    <div className="flex items-center gap-3">
-                        <div className="relative group/search">
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                        <div className="relative group/search flex-1 sm:flex-none">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-tertiary group-focus-within/search:text-accent transition-colors" />
                             <input 
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 placeholder="Search findings..."
-                                className="bg-surface/50 border border-border/10 rounded-full pl-9 pr-4 py-1.5 text-[11px] font-mono text-text-primary outline-none focus:border-accent/40 focus:ring-1 focus:ring-accent/10 transition-all w-48 sm:w-64"
+                                className="bg-surface/50 border border-border/10 rounded-full pl-9 pr-4 py-1.5 text-[11px] font-mono text-text-primary outline-none focus:border-accent/40 focus:ring-1 focus:ring-accent/10 transition-all w-full sm:w-48 md:w-64"
                             />
                         </div>
                         <button 
                             onClick={() => setCompact(!compact)}
-                            className="p-2 rounded-xl bg-surface/50 border border-border/10 hover:border-accent/30 text-text-tertiary hover:text-accent transition-all"
+                            className="p-2 rounded-xl bg-surface/50 border border-border/10 hover:border-accent/30 text-text-tertiary hover:text-accent transition-all shrink-0"
                             title={compact ? "Switch to Detail View" : "Switch to Compact View"}
                         >
                             {compact ? <LayoutGrid className="w-4 h-4" /> : <List className="w-4 h-4" />}

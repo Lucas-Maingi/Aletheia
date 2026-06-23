@@ -104,7 +104,7 @@ export function MobileSidebarToggle({ children }: { children: React.ReactNode })
             {/* Mobile: Hamburger + slide-in */}
             <button
                 onClick={() => setOpen(true)}
-                className="md:hidden fixed top-3 left-3 z-50 p-2.5 rounded-xl bg-surface/90 backdrop-blur-xl border border-white/10 text-white/60 hover:text-white transition-colors shadow-lg"
+                className="md:hidden fixed top-3 left-3 z-[55] p-2.5 rounded-xl bg-surface/90 backdrop-blur-xl border border-white/10 text-white/60 hover:text-white transition-colors shadow-lg"
                 aria-label="Open menu"
             >
                 <Menu className="w-5 h-5" />

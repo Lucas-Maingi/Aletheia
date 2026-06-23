@@ -138,22 +138,22 @@ export function InvestigationDetailClient({
 
             <Tabs defaultValue={subjectImageUrl ? "visual" : "summary"} className="w-full">
                 <TabsList className="bg-surface/30 backdrop-blur-3xl border border-border/10 p-0.5 mb-8 rounded-xl shadow-2xl h-12 flex items-center justify-start overflow-x-auto no-scrollbar gap-0.5 relative">
-                    <TabsTrigger value="summary" className="relative gap-2 rounded-lg px-5 h-10 transition-all data-[state=active]:text-accent font-black uppercase tracking-widest text-[10px]">
+                    <TabsTrigger value="summary" className="shrink-0 relative gap-2 rounded-lg px-5 h-10 transition-all data-[state=active]:text-accent font-black uppercase tracking-widest text-[10px]">
                         <LayoutGrid className="w-3.5 h-3.5" />
                         Dossier
                     </TabsTrigger>
                     
-                    <TabsTrigger value="findings" className="relative gap-2 rounded-lg px-5 h-10 transition-all data-[state=active]:text-accent font-black uppercase tracking-widest text-[10px]">
+                    <TabsTrigger value="findings" className="shrink-0 relative gap-2 rounded-lg px-5 h-10 transition-all data-[state=active]:text-accent font-black uppercase tracking-widest text-[10px]">
                         <Database className="w-3.5 h-3.5" />
                         Findings
                     </TabsTrigger>
 
-                    <TabsTrigger value="visual" className="relative gap-2 rounded-lg px-5 h-10 transition-all data-[state=active]:text-accent font-black uppercase tracking-widest text-[10px]">
+                    <TabsTrigger value="visual" className="shrink-0 relative gap-2 rounded-lg px-5 h-10 transition-all data-[state=active]:text-accent font-black uppercase tracking-widest text-[10px]">
                         <Eye className="w-3.5 h-3.5" />
                         Analysis
                     </TabsTrigger>
 
-                    <TabsTrigger value="audit" className="relative gap-2 rounded-lg px-5 h-10 transition-all data-[state=active]:text-accent font-black uppercase tracking-widest text-[10px]">
+                    <TabsTrigger value="audit" className="shrink-0 relative gap-2 rounded-lg px-5 h-10 transition-all data-[state=active]:text-accent font-black uppercase tracking-widest text-[10px]">
                         <Shield className="w-3.5 h-3.5" />
                         Provenance
                     </TabsTrigger>

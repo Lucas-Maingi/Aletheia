@@ -53,10 +53,10 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                 initial={{ y: 0 }}
                 animate={{ y: isVisible ? 0 : -100 }}
                 transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-                className="h-16 border-b border-border/10 bg-surface/90 backdrop-blur-3xl fixed top-0 left-0 right-0 z-50 px-8 flex items-center justify-between shadow-xl vibrant-indicator"
+                className="h-16 border-b border-border/10 bg-surface/90 backdrop-blur-3xl fixed top-0 left-0 right-0 z-50 px-4 md:px-8 flex items-center justify-between shadow-xl vibrant-indicator"
             >
                 {/* Unified Branding & Breadcrumbs */}
-                <div className="flex items-center gap-8">
+                <div className="flex items-center gap-8 pl-12 md:pl-0">
                     {/* Brand Section */}
                     <div className="flex items-center gap-3.5 group/header-brand">
                         <Link href="/" className="flex items-center gap-3.5">
