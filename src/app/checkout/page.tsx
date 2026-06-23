@@ -8,7 +8,6 @@ import {
   CreditCard, Loader2, AlertCircle, ChevronLeft
 } from "lucide-react";
 import Link from "next/link";
-import Script from "next/script";
 import { Button } from "@/components/ui/button";
 import { LAUNCH_CONFIG } from "@/lib/launch-config";
 
@@ -79,14 +78,19 @@ export default function CheckoutPage() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [step, setStep] = useState<'details' | 'processing' | 'redirect'>('details');
+  const [step, setStep] = useState<'details' | 'processing' | 'checkout_modal'>('details');
   const yearlySavings = (plan.originalMonthly * 12) - plan.price;
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Native HTML5 validation will typically block this before it fires
-    // if fields are empty, but just in case:
     if (!email || !name) return;
+    
+    setStep('processing');
+    
+    // Brief processing animation before showing the modal
+    setTimeout(() => {
+      setStep('checkout_modal');
+    }, 1500);
   };
 
   // Listen for successful sale postMessage from Gumroad overlay
@@ -111,7 +115,6 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Script src="https://gumroad.com/js/gumroad.js" />
       {/* Top Bar */}
       <div className="border-b border-border/10 bg-surface/30 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -216,7 +219,7 @@ export default function CheckoutPage() {
                     <p className="text-text-secondary text-sm">Secure lifetime access to {plan.name}. No recurring charges, ever.</p>
                   </div>
 
-                  <form onSubmit={(e) => { e.preventDefault(); /* fallback if they press enter */ }} className="space-y-6">
+                  <form onSubmit={handleCheckout} className="space-y-6">
                     {/* Name */}
                     <div className="space-y-2">
                       <label className="text-xs font-bold uppercase tracking-widest text-text-tertiary">Full Name</label>
@@ -265,19 +268,19 @@ export default function CheckoutPage() {
                     </div>
 
                     {/* Submit Button */}
-                    <a
-                      href={`https://lucas808.gumroad.com/l/${LAUNCH_CONFIG.LTD_TIERS[plan.gumroadIdKey]?.gumroadId}?email=${encodeURIComponent(email)}&wanted=true`}
-                      className={`w-full flex items-center justify-center h-14 text-sm font-black uppercase tracking-widest rounded-2xl transition-all gumroad-button ${
+                    <button
+                      type="submit"
+                      disabled={!email || !name || !email.includes('@')}
+                      className={`w-full flex items-center justify-center h-14 text-sm font-black uppercase tracking-widest rounded-2xl transition-all ${
                         email && name && email.includes('@') 
                           ? "bg-accent hover:bg-accent/90 text-white shadow-[0_0_30px_rgba(168,85,247,0.3)] hover:shadow-[0_0_50px_rgba(168,85,247,0.4)] transform hover:scale-[1.01]" 
                           : "bg-accent text-white shadow-[0_0_30px_rgba(168,85,247,0.3)] opacity-70 cursor-not-allowed pointer-events-none"
                       }`}
-                      data-gumroad-single-product="true"
                     >
                       <Lock className="w-4 h-4 mr-2" />
                       Pay ${plan.price} — Lifetime Access
                       <ArrowRight className="w-4 h-4 ml-2" />
-                    </a>
+                    </button>
 
                     <p className="text-center text-[10px] text-text-tertiary font-bold uppercase tracking-widest">
                       🔒 30-day money-back guarantee • Instant access after payment
@@ -303,31 +306,43 @@ export default function CheckoutPage() {
                 </motion.div>
               )}
 
-              {step === 'redirect' && (
+              {step === 'checkout_modal' && (
                 <motion.div
-                  key="redirect"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex flex-col items-center justify-center py-20"
+                  key="checkout_modal"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-md"
                 >
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-accent/20 blur-3xl rounded-full" />
-                    <Loader2 className="w-16 h-16 text-accent animate-spin relative z-10" />
-                  </div>
-                  <h2 className="text-2xl font-black text-text-primary mt-8 mb-2">Opening Gumroad Checkout</h2>
-                  <p className="text-text-secondary text-sm mb-6">If you're not redirected automatically:</p>
-                  
-                  {!LAUNCH_CONFIG.LTD_TIERS[plan.gumroadIdKey]?.gumroadId && (
-                    <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-3 max-w-md">
-                      <AlertCircle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-xs text-amber-200 font-bold mb-1">Gumroad Product ID Not Configured</p>
-                        <p className="text-xs text-text-secondary">
-                          The Gumroad product ID for this plan hasn't been set up yet. Please configure the <code className="text-accent">gumroadId</code> in launch-config.ts.
-                        </p>
+                  <div className="w-full max-w-xl h-[700px] max-h-[90vh] bg-surface border border-border/20 rounded-3xl overflow-hidden shadow-2xl flex flex-col relative">
+                    <div className="flex items-center justify-between p-4 border-b border-border/10 bg-surface-elevated">
+                      <div className="flex items-center gap-2">
+                        <Lock className="w-4 h-4 text-emerald-400" />
+                        <span className="text-xs font-bold uppercase tracking-widest text-text-primary">Secure Checkout</span>
                       </div>
+                      <button 
+                        onClick={() => setStep('details')}
+                        className="text-[10px] px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 font-bold uppercase tracking-widest text-text-secondary hover:text-text-primary transition-colors"
+                      >
+                        Cancel
+                      </button>
                     </div>
-                  )}
+                    <div className="flex-1 w-full bg-[#f4f4f5] relative">
+                      {!LAUNCH_CONFIG.LTD_TIERS[plan.gumroadIdKey]?.gumroadId ? (
+                        <div className="p-8 text-center flex flex-col items-center justify-center h-full">
+                          <AlertCircle className="w-12 h-12 text-amber-400 mb-4" />
+                          <h3 className="text-lg font-black text-black mb-2">Product Not Configured</h3>
+                          <p className="text-gray-600 text-sm">Please set the gumroadId in launch-config.ts.</p>
+                        </div>
+                      ) : (
+                        <iframe 
+                          src={`https://lucas808.gumroad.com/l/${LAUNCH_CONFIG.LTD_TIERS[plan.gumroadIdKey].gumroadId}?email=${encodeURIComponent(email)}&wanted=true`}
+                          className="w-full h-full border-none"
+                          allow="payment"
+                        />
+                      )}
+                    </div>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
