@@ -10,6 +10,10 @@ const puppeteer = require('puppeteer');
   const page = await browser.newPage();
   await page.setViewport({ width: 1280, height: 800 });
   
+  // Capture page logs
+  page.on('console', msg => console.log(`   [PAGE LOG] ${msg.text()}`));
+  page.on('pageerror', err => console.log(`   [PAGE ERROR] ${err.toString()}`));
+  
   // Track navigations
   let navigatedToGumroad = false;
   page.on('framenavigated', (frame) => {
