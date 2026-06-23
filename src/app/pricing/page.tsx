@@ -17,7 +17,7 @@ import { Footer } from "@/components/footer";
 import { LAUNCH_CONFIG } from "@/lib/launch-config";
 import { useState } from "react";
 import { ContentBackButton } from "@/components/landing/content-back-button";
-import { GumroadScript } from "@/components/gumroad-script";
+import { GumroadOverlay } from "@/components/gumroad-overlay";
 
 
 // ─── LTD Tier Feature Definitions ───────────────────────────────────
@@ -194,6 +194,7 @@ function calcSavings(ltdPrice: number, monthlyPrice: number): number {
 export default function PricingPage() {
   const ltdTiers = LAUNCH_CONFIG.LTD_TIERS;
   const monthlyTiers = LAUNCH_CONFIG.MONTHLY_TIERS;
+  const [activeProductUrl, setActiveProductUrl] = useState<string | null>(null);
 
   // Map tier keys to Gumroad product URLs
   const GUMROAD_URLS: Record<string, string> = {
@@ -204,7 +205,6 @@ export default function PricingPage() {
 
   return (
     <div className="w-full bg-background min-h-screen">
-      <GumroadScript />
       <LandingHeader />
 
       {/* ─── Hero ─────────────────────────────────── */}
@@ -401,7 +401,10 @@ export default function PricingPage() {
                   </div>
 
                   <div className="mt-auto relative z-20 space-y-3">
-                    <a href={GUMROAD_URLS[key as string]} className="gumroad-button block w-full">
+                    <button
+                      onClick={() => setActiveProductUrl(GUMROAD_URLS[key as string])}
+                      className="block w-full text-left pricing-pay-button"
+                    >
                       <span
                         className={`w-full flex items-center justify-center font-black uppercase tracking-widest text-xs h-14 rounded-2xl shadow-2xl transition-all transform hover:scale-[1.02] ${
                           isPopular
@@ -412,7 +415,7 @@ export default function PricingPage() {
                         Secure {tier.name} — ${tier.price}
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </span>
-                    </a>
+                    </button>
                     <p className="text-center text-[10px] text-text-tertiary font-bold uppercase tracking-widest">
                       {LAUNCH_CONFIG.MONEY_BACK_DAYS}-Day Money-Back Guarantee
                     </p>
@@ -636,25 +639,34 @@ export default function PricingPage() {
                     </Link>
                   </td>
                   <td className="p-5 text-center">
-                    <a href="https://lucas808.gumroad.com/l/ukfec" className="gumroad-button">
-                      <span className="inline-flex items-center justify-center px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg border border-border/20 text-text-primary hover:bg-white hover:text-background transition-colors">
+                    <button
+                      onClick={() => setActiveProductUrl("https://lucas808.gumroad.com/l/ukfec")}
+                      className="w-full pricing-pay-button"
+                    >
+                      <span className="inline-flex items-center justify-center px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg border border-border/20 text-text-primary hover:bg-white hover:text-background transition-colors w-full">
                         Get Pro
                       </span>
-                    </a>
+                    </button>
                   </td>
                   <td className="p-5 text-center bg-accent/[0.03]">
-                    <a href="https://lucas808.gumroad.com/l/jtmtbo" className="gumroad-button">
-                      <span className="inline-flex items-center justify-center px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg bg-accent text-white hover:bg-accent-hover transition-colors">
+                    <button
+                      onClick={() => setActiveProductUrl("https://lucas808.gumroad.com/l/jtmtbo")}
+                      className="w-full pricing-pay-button"
+                    >
+                      <span className="inline-flex items-center justify-center px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg bg-accent text-white hover:bg-accent-hover transition-colors w-full">
                         Get Command
                       </span>
-                    </a>
+                    </button>
                   </td>
                   <td className="p-5 text-center">
-                    <a href="https://lucas808.gumroad.com/l/pijwmf" className="gumroad-button">
-                      <span className="inline-flex items-center justify-center px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg border border-border/20 text-text-primary hover:bg-white hover:text-background transition-colors">
+                    <button
+                      onClick={() => setActiveProductUrl("https://lucas808.gumroad.com/l/pijwmf")}
+                      className="w-full pricing-pay-button"
+                    >
+                      <span className="inline-flex items-center justify-center px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-lg border border-border/20 text-text-primary hover:bg-white hover:text-background transition-colors w-full">
                         Get Arsenal
                       </span>
-                    </a>
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -891,6 +903,8 @@ export default function PricingPage() {
       </section>
 
       <Footer />
+
+      <GumroadOverlay productUrl={activeProductUrl} onClose={() => setActiveProductUrl(null)} />
     </div>
   );
 }

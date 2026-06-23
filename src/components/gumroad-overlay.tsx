@@ -34,10 +34,23 @@ export function GumroadOverlay({ productUrl, onClose }: GumroadOverlayProps) {
         return;
       }
 
-      // Gumroad sends { type: "loaded" } when the checkout is ready
-      if (event.data && typeof event.data === "object") {
-        if (event.data.type === "loaded") {
+      // Check if event.data is a string (often serialized JSON)
+      let data = event.data;
+      if (typeof data === "string") {
+        try {
+          data = JSON.parse(data);
+        } catch {
+          // ignore
+        }
+      }
+
+      if (data && typeof data === "object") {
+        if (data.type === "loaded" || data.post_message_name === "loaded") {
           setIsLoading(false);
+        }
+        if (data.post_message_name === "sale" || data.type === "sale") {
+          console.log("[Gumroad Custom Overlay] Sale successful!");
+          window.location.href = "/success";
         }
       }
     };
@@ -74,8 +87,9 @@ export function GumroadOverlay({ productUrl, onClose }: GumroadOverlayProps) {
 
   // Build the overlay URL exactly as gumroad-bundle.js does
   const overlayUrl = new URL(productUrl);
+  overlayUrl.searchParams.set("wanted", "true"); // Skip product description landing page, show checkout form directly
   overlayUrl.searchParams.set("overlay", "true");
-  overlayUrl.searchParams.set("referrer", window.location.href);
+  overlayUrl.searchParams.set("referrer", window.location.origin);
 
   return (
     <AnimatePresence>

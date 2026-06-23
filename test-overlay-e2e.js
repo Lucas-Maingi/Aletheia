@@ -68,7 +68,7 @@ const puppeteer = require('puppeteer');
   
   // Step 3: Find and click a gumroad button
   console.log("\n3. Looking for gumroad buttons...");
-  const gumroadButtons = await page.$$('a.gumroad-button');
+  const gumroadButtons = await page.$$('.pricing-pay-button');
   console.log(`   Found ${gumroadButtons.length} gumroad buttons`);
   
   if (gumroadButtons.length === 0) {
