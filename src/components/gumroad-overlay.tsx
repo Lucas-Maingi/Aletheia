@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2 } from "lucide-react";
 
@@ -12,6 +13,9 @@ import { X, Loader2 } from "lucide-react";
  *
  * This bypasses all issues with gumroad.js failing to initialize in
  * Next.js / React SPA environments.
+ *
+ * To avoid iframe input click offsets, it is rendered directly inside
+ * document.body using a React Portal.
  */
 
 interface GumroadOverlayProps {
@@ -21,6 +25,12 @@ interface GumroadOverlayProps {
 
 export function GumroadOverlay({ productUrl, onClose }: GumroadOverlayProps) {
   const [isLoading, setIsLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   // Listen for postMessage from the Gumroad iframe (same as gumroad-bundle.js does)
   useEffect(() => {
@@ -96,7 +106,7 @@ export function GumroadOverlay({ productUrl, onClose }: GumroadOverlayProps) {
     }
   }
 
-  return (
+  const overlayContent = (
     <AnimatePresence>
       {productUrl && overlayUrl && (
         <>
@@ -156,4 +166,8 @@ export function GumroadOverlay({ productUrl, onClose }: GumroadOverlayProps) {
       )}
     </AnimatePresence>
   );
+
+  if (!mounted) return null;
+
+  return createPortal(overlayContent, document.body);
 }
