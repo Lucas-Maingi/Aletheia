@@ -69,15 +69,14 @@ export function ProGateBanner({ currentCount, freeLimit, isPro }: ProGateBannerP
                         <div className="text-lg font-black text-text-primary">$299<span className="text-[10px] text-text-tertiary font-medium lowercase"> one-time</span></div>
                         <div className="text-[9px] text-success font-bold">Lifetime Deal Active</div>
                     </div>
-                    <a href="/checkout?plan=analyst_pro" className="block">
+                    <a href="https://lucas808.gumroad.com/l/ukfec" className="block gumroad-button" data-gumroad-single-product="true">
                         <motion.div
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
-                            className="flex items-center gap-2 px-4 py-2.5 bg-accent text-black font-black text-[11px] uppercase tracking-widest rounded-xl shadow-[0_0_20px_rgba(0,240,255,0.3)] hover:shadow-[0_0_30px_rgba(0,240,255,0.5)] transition-shadow"
+                            className="w-full flex items-center justify-center gap-2 h-10 px-4 bg-accent hover:bg-accent-hover text-white text-xs font-black uppercase tracking-widest rounded-xl transition-colors shadow-[0_0_20px_rgba(168,85,247,0.3)]"
                         >
-                            {isAtLimit ? <Lock className="w-3.5 h-3.5" /> : <Shield className="w-3.5 h-3.5" />}
-                            Get Lifetime Access
-                            <ArrowRight className="w-3.5 h-3.5" />
+                            <Lock className="w-3.5 h-3.5" />
+                            Secure Lifetime Access
                         </motion.div>
                     </a>
                 </div>

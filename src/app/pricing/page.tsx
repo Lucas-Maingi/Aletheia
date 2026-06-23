@@ -391,9 +391,8 @@ export default function PricingPage() {
                     </div>
                   </div>
 
-                  {/* CTA */}
                   <div className="mt-auto relative z-20 space-y-3">
-                    <a href={`/checkout?plan=${key}`} className="block w-full">
+                    <a href={`https://lucas808.gumroad.com/l/${key === 'analyst_pro' ? 'ukfec' : key === 'command_center' ? 'jtmtbo' : 'pijwmf'}`} className="block w-full gumroad-button" data-gumroad-single-product="true">
                       <Button
                         size="lg"
                         className={`w-full font-black uppercase tracking-widest text-xs h-14 rounded-2xl shadow-2xl transition-all transform hover:scale-[1.02] ${
@@ -629,21 +628,21 @@ export default function PricingPage() {
                     </Link>
                   </td>
                   <td className="p-5 text-center">
-                    <a href="/checkout?plan=analyst_pro">
+                    <a href="https://lucas808.gumroad.com/l/ukfec" className="gumroad-button" data-gumroad-single-product="true">
                       <Button variant="outline" size="sm" className="text-[10px] font-black uppercase tracking-widest">
                         Get Pro
                       </Button>
                     </a>
                   </td>
                   <td className="p-5 text-center bg-accent/[0.03]">
-                    <a href="/checkout?plan=command_center">
+                    <a href="https://lucas808.gumroad.com/l/jtmtbo" className="gumroad-button" data-gumroad-single-product="true">
                       <Button variant="primary" size="sm" className="text-[10px] font-black uppercase tracking-widest">
                         Get Command
                       </Button>
                     </a>
                   </td>
                   <td className="p-5 text-center">
-                    <a href="/checkout?plan=agency_arsenal">
+                    <a href="https://lucas808.gumroad.com/l/pijwmf" className="gumroad-button" data-gumroad-single-product="true">
                       <Button variant="outline" size="sm" className="text-[10px] font-black uppercase tracking-widest">
                         Get Arsenal
                       </Button>
