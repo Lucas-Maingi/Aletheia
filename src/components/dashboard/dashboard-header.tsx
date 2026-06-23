@@ -15,6 +15,8 @@ interface DashboardHeaderProps {
         id: string;
         email?: string;
         isGuest?: boolean;
+        name?: string | null;
+        avatarUrl?: string | null;
     };
 }
 

@@ -61,21 +61,31 @@ export default async function DashboardLayout({
 
     let isAdmin = false;
     let plan = 'free';
+    let name: string | null = null;
+    let avatarUrl: string | null = null;
     try {
         const dbUser = await prisma.user.findUnique({
             where: { id: user.id },
-            select: { role: true, plan: true }
+            select: { role: true, plan: true, name: true, avatarUrl: true }
         });
         isAdmin = dbUser?.role === 'admin';
         plan = dbUser?.plan || 'free';
+        name = dbUser?.name || null;
+        avatarUrl = dbUser?.avatarUrl || null;
     } catch (dbErr) {
         console.warn('[Layout] Database read failed, using defaults:', dbErr);
     }
 
+    const headerUser = {
+        ...user,
+        name,
+        avatarUrl
+    };
+
         return (
             <InvestigationProvider>
                 <div className="flex flex-col h-screen overflow-hidden bg-background">
-                    <DashboardHeader user={user} />
+                    <DashboardHeader user={headerUser} />
                     
                     <div className="flex flex-1 overflow-hidden">
                         {/* Sidebar Navigation — hidden on mobile, shown via MobileSidebarToggle */}

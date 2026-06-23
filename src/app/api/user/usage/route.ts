@@ -22,6 +22,9 @@ export async function GET() {
                 plan: true,
                 investigationsCount: true,
                 facialAiCredits: true,
+                name: true,
+                avatarUrl: true,
+                email: true,
             }
         });
 

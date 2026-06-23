@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Shield, Key, CheckCircle2, AlertCircle, Save, User as UserIcon, CreditCard, Activity, Fingerprint, ExternalLink, Brain, Database, X, Lock } from "lucide-react";
+import { Shield, CheckCircle2, AlertCircle, User as UserIcon, CreditCard, Activity, ExternalLink, Brain, Database, X, Lock, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,7 +16,6 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState("identity");
-    const [openAiKey, setOpenAiKey] = useState("");
     const [isSaving, setIsSaving] = useState(false);
     const [usage, setUsage] = useState<any>(null);
     const [profile, setProfile] = useState({
@@ -31,6 +30,8 @@ export default function SettingsPage() {
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [newPassword, setNewPassword] = useState("");
     const [confirmNewPassword, setConfirmNewPassword] = useState("");
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
     const [passwordError, setPasswordError] = useState<string | null>(null);
     const [passwordLoading, setPasswordLoading] = useState(false);
     const [isRecoveryMode, setIsRecoveryMode] = useState(false);
@@ -55,10 +56,6 @@ export default function SettingsPage() {
     useEffect(() => {
         const loadData = async () => {
             try {
-                // Load BYOK from local storage
-                const storedKey = localStorage.getItem("openvector_openai_key");
-                if (storedKey) setOpenAiKey(storedKey);
-
                 // Fetch Usage & Profile data
                 const response = await fetch('/api/user/usage');
                 const data = await response.json();
@@ -95,6 +92,10 @@ export default function SettingsPage() {
             
             if (res.ok) {
                 toast.success("Identity profile updated successfully.");
+                // Dispatch event to update layout header nav profile details
+                window.dispatchEvent(new CustomEvent('ale-user-profile-updated', { 
+                    detail: { name: profile.name, avatarUrl: profile.avatarUrl } 
+                }));
             } else {
                 toast.error("Failed to sync identity profile.");
             }
@@ -105,13 +106,25 @@ export default function SettingsPage() {
         }
     };
 
-    const handleSaveKey = () => {
-        if (openAiKey.trim() === "") {
-            localStorage.removeItem("openvector_openai_key");
-        } else {
-            localStorage.setItem("openvector_openai_key", openAiKey.trim());
+    const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Size check (max 800KB for base64 database compatibility)
+        if (file.size > 800 * 1024) {
+            toast.error("Image is too large. Maximum size is 800KB.");
+            return;
         }
-        toast.success("Linguistic engine key saved locally.");
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setProfile(prev => ({
+                ...prev,
+                avatarUrl: reader.result as string
+            }));
+            toast.success("Avatar image loaded. Click 'Save Identity Changes' to persist.");
+        };
+        reader.readAsDataURL(file);
     };
 
     const handlePasswordChange = async () => {
@@ -139,6 +152,8 @@ export default function SettingsPage() {
                 setShowPasswordModal(false);
                 setNewPassword("");
                 setConfirmNewPassword("");
+                setShowNewPassword(false);
+                setShowConfirmNewPassword(false);
                 setIsRecoveryMode(false);
                 
                 // Clean URL if we came from recovery
@@ -150,6 +165,19 @@ export default function SettingsPage() {
             setPasswordError("An unexpected error occurred. Please try again.");
         } finally {
             setPasswordLoading(false);
+        }
+    };
+
+    const handleLogout = async () => {
+        setIsSaving(true);
+        try {
+            await supabase.auth.signOut();
+            toast.success("Session terminated. Logging out...");
+            window.location.href = '/auth/login';
+        } catch (err) {
+            toast.error("Logout protocol failed.");
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -174,7 +202,7 @@ export default function SettingsPage() {
                 </div>
                 <h1 className="text-4xl font-black tracking-tight text-text-primary uppercase italic">Settings</h1>
                 <p className="text-xs text-text-tertiary font-medium max-w-2xl leading-relaxed uppercase tracking-wider">
-                    Manage your identity profile, resource consumption quotas, and vault security keys on the Aletheia network.
+                    Manage your identity profile, resource consumption quotas, and account security.
                 </p>
             </div>
 
@@ -183,7 +211,7 @@ export default function SettingsPage() {
                     {[
                         { id: "identity", label: "Identity Profile", icon: <UserIcon className="w-3.5 h-3.5" /> },
                         { id: "quota", label: "Resource Quotas", icon: <Database className="w-3.5 h-3.5" /> },
-                        { id: "security", label: "Security & Keys", icon: <Shield className="w-3.5 h-3.5" /> }
+                        { id: "security", label: "Security & Session", icon: <Shield className="w-3.5 h-3.5" /> }
                     ].map((tab) => (
                         <TabsTrigger 
                             key={tab.id}
@@ -205,19 +233,53 @@ export default function SettingsPage() {
                                 Identity Profile
                             </CardTitle>
                             <CardDescription className="text-xs font-bold text-text-tertiary uppercase tracking-wider leading-relaxed pt-2">
-                                Update your public display name and avatar credentials on the Aletheia network.
+                                Update your public display name and upload a profile photo on the Aletheia network.
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="p-8 space-y-8">
                             <div className="flex items-center gap-6">
-                                <Avatar className="h-16 w-16 border-2 border-accent/20">
-                                    <AvatarFallback className="bg-accent/10 text-lg font-black text-accent uppercase">
-                                        {profile.name?.substring(0, 2).toUpperCase() || profile.email?.substring(0, 2).toUpperCase() || "AN"}
-                                    </AvatarFallback>
-                                </Avatar>
+                                <div className="relative group">
+                                    <Avatar className="h-20 w-20 border-2 border-accent/20">
+                                        {profile.avatarUrl ? (
+                                            <AvatarImage src={profile.avatarUrl} className="object-cover" />
+                                        ) : null}
+                                        <AvatarFallback className="bg-accent/10 text-xl font-black text-accent uppercase">
+                                            {profile.name?.substring(0, 2).toUpperCase() || profile.email?.substring(0, 2).toUpperCase() || "AN"}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <label className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 rounded-full cursor-pointer transition-opacity">
+                                        <span className="text-[9px] font-black uppercase text-white tracking-widest text-center px-1">Upload</span>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={handleAvatarUpload}
+                                        />
+                                    </label>
+                                </div>
                                 <div className="space-y-1">
                                     <h4 className="text-sm font-black text-text-primary uppercase">{profile.name || "Vector Analyst"}</h4>
                                     <p className="text-[10px] font-mono text-text-tertiary uppercase">{profile.email}</p>
+                                    <div className="flex gap-4 pt-1">
+                                        <label className="text-[10px] text-accent hover:text-accent-hover font-bold uppercase tracking-widest cursor-pointer border-b border-accent/20 hover:border-accent pb-0.5 transition-all">
+                                            Upload Photo
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={handleAvatarUpload}
+                                            />
+                                        </label>
+                                        {profile.avatarUrl && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setProfile(prev => ({ ...prev, avatarUrl: "" }))}
+                                                className="text-[10px] text-danger hover:text-danger-hover font-bold uppercase tracking-widest cursor-pointer border-b border-danger/20 hover:border-danger pb-0.5 transition-all"
+                                            >
+                                                Remove
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -229,17 +291,6 @@ export default function SettingsPage() {
                                         value={profile.name}
                                         onChange={(e) => setProfile(e.target.value ? { ...profile, name: e.target.value } : { ...profile, name: "" })}
                                         placeholder="Analyst Name"
-                                        className="h-14 bg-foreground/[0.03] border-border/10 font-bold text-sm px-5 rounded-2xl animate-none focus:border-accent/40"
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black text-text-tertiary tracking-[0.2em] uppercase pl-1">Avatar Image URL (Optional)</Label>
-                                    <Input
-                                        type="text"
-                                        value={profile.avatarUrl}
-                                        onChange={(e) => setProfile(e.target.value ? { ...profile, avatarUrl: e.target.value } : { ...profile, avatarUrl: "" })}
-                                        placeholder="https://..."
                                         className="h-14 bg-foreground/[0.03] border-border/10 font-bold text-sm px-5 rounded-2xl animate-none focus:border-accent/40"
                                     />
                                 </div>
@@ -274,7 +325,7 @@ export default function SettingsPage() {
                                 <CardHeader className="p-8 pb-6 bg-foreground/[0.02] border-b border-border/5">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <CardTitle className="text-xl font-black uppercase tracking-[0.1em] text-text-primary">Billing Architecture</CardTitle>
+                                            <CardTitle className="text-xl font-black uppercase tracking-[0.1em] text-text-primary">Billing & Subscription</CardTitle>
                                             <CardDescription className="text-xs text-text-tertiary mt-2 font-bold uppercase tracking-wider">Manage your organizational subscriptions and financial records</CardDescription>
                                         </div>
                                         <div className="p-4 bg-accent/5 rounded-2xl border border-accent/10">
@@ -309,48 +360,16 @@ export default function SettingsPage() {
 
                 {/* Security & Terminal Content */}
                 <TabsContent value="security" className="mt-10 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                        {/* BYOK Section */}
-                        <Card className="bg-surface border border-border/10 shadow-xl rounded-3xl overflow-hidden group">
-                            <CardHeader className="bg-foreground/[0.02] border-b border-border/5 p-8">
-                                <CardTitle className="flex items-center gap-4 text-text-primary uppercase tracking-[0.1em] text-lg font-black">
-                                    <Key className="w-6 h-6 text-accent group-hover:rotate-12 transition-transform" />
-                                    Linguistics Bypass
-                                </CardTitle>
-                                <CardDescription className="text-xs font-bold text-text-tertiary uppercase tracking-wider leading-relaxed pt-2">
-                                    Attach a custom OpenAI API Key. On the Community tier, this is required for advanced dossier synthesis and deep-analysis protocols.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="p-8 space-y-8">
-                                <div className="space-y-4">
-                                    <Label className="text-[10px] font-black text-text-tertiary tracking-[0.2em] uppercase pl-1">OpenAI Authentication Token</Label>
-                                    <Input
-                                        type="password"
-                                        value={openAiKey}
-                                        onChange={(e) => setOpenAiKey(e.target.value)}
-                                        placeholder="sk-..."
-                                        className="h-14 bg-foreground/[0.03] border-border/10 font-bold text-sm tracking-widest px-5 rounded-2xl"
-                                    />
-                                    <p className="text-[9px] text-text-tertiary font-bold uppercase tracking-widest pl-1">Authorization_Protocol: X-Bearer-Secure</p>
-                                </div>
-                                <Button
-                                    onClick={handleSaveKey}
-                                    className="w-full h-14 bg-accent/5 hover:bg-accent text-accent hover:text-white border border-accent/20 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all"
-                                >
-                                    Establish Local Secure Tunnel
-                                </Button>
-                            </CardContent>
-                        </Card>
-
+                    <div className="max-w-2xl">
                         {/* Account Actions */}
                         <Card className="bg-surface border border-border/10 shadow-xl rounded-3xl overflow-hidden group">
                             <CardHeader className="bg-foreground/[0.02] border-b border-border/5 p-8">
                                 <CardTitle className="flex items-center gap-4 text-text-primary uppercase tracking-[0.1em] text-lg font-black">
                                     <Shield className="w-6 h-6 text-accent group-hover:scale-110 transition-transform" />
-                                    Vault Security
+                                    Password Settings
                                 </CardTitle>
                                 <CardDescription className="text-xs font-bold text-text-tertiary uppercase tracking-wider leading-relaxed pt-2">
-                                    Secure your analyst workstation and manage encrypted session credentials.
+                                    Manage your authentication password and session lifetime.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="p-8 space-y-4">
@@ -362,17 +381,19 @@ export default function SettingsPage() {
                                         setPasswordError(null);
                                         setNewPassword("");
                                         setConfirmNewPassword("");
+                                        setShowNewPassword(false);
+                                        setShowConfirmNewPassword(false);
                                     }}
                                 >
                                     <Lock className="w-4 h-4 mr-2" />
-                                    Cycle Access Credentials
+                                    Change Password
                                 </Button>
                                 <Button 
                                     variant="ghost" 
                                     className="w-full h-14 text-danger hover:text-white hover:bg-danger/80 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all"
-                                    onClick={() => window.location.href = '/auth/logout'}
+                                    onClick={handleLogout}
                                 >
-                                    Terminate Analyst Session
+                                    Log Out
                                 </Button>
                             </CardContent>
                         </Card>
@@ -447,26 +468,46 @@ export default function SettingsPage() {
 
                                 <div className="space-y-2">
                                     <Label className="text-[10px] font-black text-text-tertiary tracking-[0.2em] uppercase pl-1">New Password</Label>
-                                    <Input
-                                        type="password"
-                                        value={newPassword}
-                                        onChange={(e) => setNewPassword(e.target.value)}
-                                        placeholder="Enter new password (min. 6 chars)"
-                                        autoComplete="new-password"
-                                        className="h-14 bg-foreground/[0.03] border-border/10 font-bold text-sm px-5 rounded-2xl focus:border-accent/40"
-                                    />
+                                    <div className="relative flex items-center">
+                                        <Input
+                                            type={showNewPassword ? "text" : "password"}
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            placeholder="Enter new password (min. 6 chars)"
+                                            autoComplete="new-password"
+                                            className="h-14 w-full bg-foreground/[0.03] border-border/10 font-bold text-sm px-5 pr-12 rounded-2xl focus:border-accent/40"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowNewPassword(!showNewPassword)}
+                                            className="absolute right-4 p-1 text-text-secondary hover:text-text-primary focus:outline-none transition-colors cursor-pointer"
+                                            tabIndex={-1}
+                                        >
+                                            {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div className="space-y-2">
                                     <Label className="text-[10px] font-black text-text-tertiary tracking-[0.2em] uppercase pl-1">Confirm New Password</Label>
-                                    <Input
-                                        type="password"
-                                        value={confirmNewPassword}
-                                        onChange={(e) => setConfirmNewPassword(e.target.value)}
-                                        placeholder="Re-enter new password"
-                                        autoComplete="new-password"
-                                        className="h-14 bg-foreground/[0.03] border-border/10 font-bold text-sm px-5 rounded-2xl focus:border-accent/40"
-                                    />
+                                    <div className="relative flex items-center">
+                                        <Input
+                                            type={showConfirmNewPassword ? "text" : "password"}
+                                            value={confirmNewPassword}
+                                            onChange={(e) => setConfirmNewPassword(e.target.value)}
+                                            placeholder="Re-enter new password"
+                                            autoComplete="new-password"
+                                            className="h-14 w-full bg-foreground/[0.03] border-border/10 font-bold text-sm px-5 pr-12 rounded-2xl focus:border-accent/40"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                                            className="absolute right-4 p-1 text-text-secondary hover:text-text-primary focus:outline-none transition-colors cursor-pointer"
+                                            tabIndex={-1}
+                                        >
+                                            {showConfirmNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {/* Password strength indicator */}
