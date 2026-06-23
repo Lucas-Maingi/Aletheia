@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
     const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login');
@@ -13,6 +14,10 @@ export default function Login() {
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+
+    // States for password visibility
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -115,7 +120,7 @@ export default function Login() {
     return (
         <div className="flex-1 flex flex-col items-center justify-center min-h-screen bg-background relative overflow-hidden p-6">
             {/* Background enhancement */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--color-accent-blue-dim)_0%,_transparent_70%)] opacity-20 pointer-events-none" />
+            <div className="absolute inset-0 bg-radial-glow opacity-20 pointer-events-none" />
             <div className="absolute inset-0 bg-[url('https://transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none" />
 
             <motion.div 
@@ -123,12 +128,12 @@ export default function Login() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="w-full max-w-md z-10"
             >
-                <div className="panel-glass border border-border-bright/50 shadow-[0_0_50px_rgba(0,0,0,0.5)] p-10 space-y-10 rounded-2xl">
+                <div className="glass-panel border border-border/40 shadow-[0_0_50px_rgba(0,0,0,0.5)] p-8 space-y-8 rounded-xl">
                     <div className="text-center space-y-3">
                         <motion.h1 
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-4xl font-mono text-glow-blue tracking-tight font-bold"
+                            className="text-4xl font-mono text-gradient tracking-tight font-bold"
                         >
                             Aletheia
                         </motion.h1>
@@ -138,7 +143,7 @@ export default function Login() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="text-[10px] font-mono uppercase tracking-[0.3em] text-text-muted font-semibold"
+                                className="text-[10px] font-mono uppercase tracking-[0.3em] text-text-secondary font-semibold"
                             >
                                 {getHeadingText()}
                             </motion.p>
@@ -151,9 +156,9 @@ export default function Login() {
                                 <motion.div 
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    className="p-4 text-xs bg-red-950/30 border border-red-500/40 text-red-200 rounded-lg font-mono leading-relaxed"
+                                    className="p-4 text-xs bg-error-subtle/20 border border-error/30 text-text-primary rounded-lg font-mono leading-relaxed"
                                 >
-                                    <span className="text-red-400 font-bold mr-2">ERROR_SIG:</span>{error}
+                                    <span className="text-error font-bold mr-2">ERROR:</span>{error}
                                 </motion.div>
                             )}
 
@@ -161,26 +166,29 @@ export default function Login() {
                                 <motion.div 
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="p-4 text-xs bg-accent-blue/10 border border-accent-blue/40 text-accent-blue-bright rounded-lg font-mono"
+                                    className="p-4 text-xs bg-success-subtle/20 border border-success/30 text-text-primary rounded-lg font-mono"
                                 >
-                                    <span className="text-accent-blue-bright font-bold mr-2">VERIFY:</span>{successMessage}
+                                    <span className="text-success font-bold mr-2">SUCCESS:</span>{successMessage}
                                 </motion.div>
                             )}
                         </AnimatePresence>
 
                         <div className="space-y-4">
                             <div className="space-y-1.5">
-                                <label className="text-[9px] uppercase tracking-widest text-text-secondary font-bold font-mono ml-1">Identity (Email)</label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    autoComplete="username"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full bg-surface-dark/50 border border-border-bright focus:border-accent-blue-bright focus:ring-1 focus:ring-accent-blue-bright/30 rounded-xl px-4 py-3 text-sm outline-none transition-all placeholder:text-text-muted font-mono"
-                                    placeholder="analyst@domain.com"
-                                />
+                                <label className="text-[10px] uppercase tracking-widest text-text-secondary font-bold font-mono ml-1">Identity (Email)</label>
+                                <div className="relative flex items-center">
+                                    <Mail className="absolute left-3 w-4 h-4 text-text-secondary pointer-events-none" />
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        autoComplete="username"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="w-full bg-input-bg border border-border hover:border-border-hover focus:border-accent focus:ring-1 focus:ring-accent/30 rounded-lg pl-10 pr-4 py-3 text-sm outline-none transition-all placeholder:text-text-tertiary font-mono text-text-primary"
+                                        placeholder="analyst@domain.com"
+                                    />
+                                </div>
                             </div>
 
                             {/* Password field - hidden in forgot mode */}
@@ -193,17 +201,32 @@ export default function Login() {
                                         exit={{ opacity: 0, height: 0 }}
                                         className="space-y-1.5 overflow-hidden"
                                     >
-                                        <label className="text-[9px] uppercase tracking-widest text-text-secondary font-bold font-mono ml-1">Access Key (Password)</label>
-                                        <input
-                                            type="password"
-                                            name="password"
-                                            autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-                                            required
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            className="w-full bg-surface-dark/50 border border-border-bright focus:border-accent-blue-bright focus:ring-1 focus:ring-accent-blue-bright/30 rounded-xl px-4 py-3 text-sm outline-none transition-all font-mono"
-                                            placeholder="••••••••••••"
-                                        />
+                                        <label className="text-[10px] uppercase tracking-widest text-text-secondary font-bold font-mono ml-1">Access Key (Password)</label>
+                                        <div className="relative flex items-center">
+                                            <Lock className="absolute left-3 w-4 h-4 text-text-secondary pointer-events-none" />
+                                            <input
+                                                type={showPassword ? 'text' : 'password'}
+                                                name="password"
+                                                autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                                                required
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                className="w-full bg-input-bg border border-border hover:border-border-hover focus:border-accent focus:ring-1 focus:ring-accent/30 rounded-lg pl-10 pr-10 py-3 text-sm outline-none transition-all font-mono text-text-primary"
+                                                placeholder="••••••••••••"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute right-3 p-1 text-text-secondary hover:text-text-primary focus:outline-none transition-colors cursor-pointer"
+                                                tabIndex={-1}
+                                            >
+                                                {showPassword ? (
+                                                    <EyeOff className="w-4 h-4" />
+                                                ) : (
+                                                    <Eye className="w-4 h-4" />
+                                                )}
+                                            </button>
+                                        </div>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -218,17 +241,32 @@ export default function Login() {
                                         exit={{ opacity: 0, height: 0 }}
                                         className="space-y-1.5 overflow-hidden"
                                     >
-                                        <label className="text-[9px] uppercase tracking-widest text-text-secondary font-bold font-mono ml-1">Confirm Access Key</label>
-                                        <input
-                                            type="password"
-                                            name="confirm-password"
-                                            autoComplete="new-password"
-                                            required
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
-                                            className="w-full bg-surface-dark/50 border border-border-bright focus:border-accent-blue-bright focus:ring-1 focus:ring-accent-blue-bright/30 rounded-xl px-4 py-3 text-sm outline-none transition-all font-mono"
-                                            placeholder="••••••••••••"
-                                        />
+                                        <label className="text-[10px] uppercase tracking-widest text-text-secondary font-bold font-mono ml-1">Confirm Access Key</label>
+                                        <div className="relative flex items-center">
+                                            <Lock className="absolute left-3 w-4 h-4 text-text-secondary pointer-events-none" />
+                                            <input
+                                                type={showConfirmPassword ? 'text' : 'password'}
+                                                name="confirm-password"
+                                                autoComplete="new-password"
+                                                required
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                                className="w-full bg-input-bg border border-border hover:border-border-hover focus:border-accent focus:ring-1 focus:ring-accent/30 rounded-lg pl-10 pr-10 py-3 text-sm outline-none transition-all font-mono text-text-primary"
+                                                placeholder="••••••••••••"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                className="absolute right-3 p-1 text-text-secondary hover:text-text-primary focus:outline-none transition-colors cursor-pointer"
+                                                tabIndex={-1}
+                                            >
+                                                {showConfirmPassword ? (
+                                                    <EyeOff className="w-4 h-4" />
+                                                ) : (
+                                                    <Eye className="w-4 h-4" />
+                                                )}
+                                            </button>
+                                        </div>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -236,11 +274,11 @@ export default function Login() {
 
                         <div className="pt-4 space-y-6">
                             <motion.button
-                                whileHover={{ scale: 1.01, boxShadow: "0 0 25px rgba(59, 130, 246, 0.3)" }}
+                                whileHover={{ scale: 1.01, boxShadow: "0 0 20px rgba(59, 130, 246, 0.3)" }}
                                 whileTap={{ scale: 0.98 }}
                                 type="submit"
                                 disabled={loading}
-                                className="w-full bg-accent-blue hover:bg-accent-blue-bright text-white text-[11px] uppercase tracking-[0.2em] font-black py-4 rounded-xl cursor-pointer transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full bg-accent hover:bg-accent-hover text-text-on-accent text-xs uppercase tracking-[0.2em] font-semibold py-3.5 rounded-lg cursor-pointer transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed font-mono"
                             >
                                 {getButtonText()}
                             </motion.button>
@@ -255,7 +293,7 @@ export default function Login() {
                                             setError(null);
                                             setSuccessMessage(null);
                                         }}
-                                        className="text-[10px] uppercase tracking-widest text-text-muted hover:text-accent-blue-bright transition-colors cursor-pointer font-semibold"
+                                        className="text-[10px] uppercase tracking-widest text-text-muted hover:text-accent transition-colors cursor-pointer font-semibold"
                                     >
                                         Forgot Password?
                                     </button>
@@ -271,7 +309,7 @@ export default function Login() {
                                             setError(null);
                                             setSuccessMessage(null);
                                         }}
-                                        className="text-[10px] uppercase tracking-widest text-text-secondary hover:text-accent-blue-bright transition-colors cursor-pointer font-bold border-b border-transparent hover:border-accent-blue-bright pb-0.5"
+                                        className="text-[10px] uppercase tracking-widest text-text-secondary hover:text-accent transition-colors cursor-pointer font-bold border-b border-transparent hover:border-accent pb-0.5"
                                     >
                                         Back to Sign In
                                     </button>
@@ -284,7 +322,7 @@ export default function Login() {
                                             setSuccessMessage(null);
                                             setConfirmPassword('');
                                         }}
-                                        className="text-[10px] uppercase tracking-widest text-text-secondary hover:text-accent-blue-bright transition-colors cursor-pointer font-bold border-b border-transparent hover:border-accent-blue-bright pb-0.5"
+                                        className="text-[10px] uppercase tracking-widest text-text-secondary hover:text-accent transition-colors cursor-pointer font-bold border-b border-transparent hover:border-accent pb-0.5"
                                     >
                                         {mode === 'login' ? "Need an analyst account? Sign Up" : "Already have an account? Sign In"}
                                     </button>
