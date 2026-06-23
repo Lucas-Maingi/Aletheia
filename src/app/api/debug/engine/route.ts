@@ -15,7 +15,7 @@ export async function GET(request: Request) {
 
     const allTests = [
         { id: 'username', name: 'Username', func: usernameSearch, target: 'bitget' },
-        { id: 'domain', name: 'Domain', func: domainSearch, target: 'aletheia-live.vercel.app' },
+        { id: 'domain', name: 'Domain', func: domainSearch, target: 'aletheia.software' },
         { id: 'interpol', name: 'Interpol', func: interpolSearch, target: 'Smith' },
         { id: 'crypto', name: 'Crypto', func: cryptoSearch, target: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa' },
         { id: 'darkweb', name: 'Dark Web', func: darkWebSearch, target: 'aletheia' },

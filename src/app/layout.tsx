@@ -25,7 +25,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://aletheia.intel'),
+  metadataBase: new URL('https://aletheia.software'),
   title: {
     default: "Aletheia | Agentic Truth Engine",
     template: "%s | Aletheia"

@@ -289,7 +289,7 @@ export async function siphonHub(imageUrl: string): Promise<ConnectorResult> {
             query: isDataUrl ? 'local_upload' : imageUrl,
             results: [{
                 title: 'Visual Search — API Configuration Required',
-                url: 'https://aletheia-live.vercel.app',
+                url: 'https://aletheia.software',
                 description: [
                     '**Visual intelligence engines are locked.** To enable automated reverse image search, set one or more of these in your Vercel project settings:\n',
                     '**1. GOOGLE_VISION_API_KEY** — Best option. Free 1000/month. Identifies people, finds all pages containing the image.',

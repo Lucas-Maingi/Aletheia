@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ url: "https://app.lemonsqueezy.com/checkout/mock" });
         }
 
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://aletheia-live.vercel.app";
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://aletheia.software";
 
         const checkoutPayload = {
             data: {
