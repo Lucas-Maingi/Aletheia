@@ -48,7 +48,21 @@ interface GraphEdge {
     color: string;
 }
 
-export function IdentityGraph({ target, evidence, entities }: { target: string, evidence: any[], entities?: any[] }) {
+export function IdentityGraph({
+    target,
+    evidence,
+    entities,
+    investigationId,
+    parentInvestigation = null,
+    childInvestigations = []
+}: {
+    target: string;
+    evidence: any[];
+    entities?: any[];
+    investigationId?: string;
+    parentInvestigation?: { id: string; title: string } | null;
+    childInvestigations?: { id: string; title: string }[];
+}) {
     const [dimensions, setDimensions] = useState({ width: 800, height: 500 });
     const containerRef = useRef<HTMLDivElement>(null);
     const svgRef = useRef<SVGSVGElement>(null);
@@ -96,6 +110,58 @@ export function IdentityGraph({ target, evidence, entities }: { target: string, 
             vx: 0,
             vy: 0,
             details: { value: target, notes: 'Primary target vector under analysis.' }
+        });
+
+        // 1.5 Add Related Investigations (Parent & Children)
+        if (parentInvestigation) {
+            nodes.push({
+                id: `investigation-${parentInvestigation.id}`,
+                label: parentInvestigation.title,
+                type: 'target',
+                subType: 'parent',
+                radius: 24,
+                color: '#a855f7', // Purple
+                icon: GitBranch,
+                x: width / 2 - 180,
+                y: height / 2 - 120,
+                vx: 0,
+                vy: 0,
+                details: { id: parentInvestigation.id, value: parentInvestigation.title, notes: 'Parent investigation of current target.' }
+            });
+            edges.push({
+                source: `investigation-${parentInvestigation.id}`,
+                target: 'target',
+                type: 'provenance',
+                label: 'Parent Case',
+                color: 'rgba(168, 85, 247, 0.35)'
+            });
+        }
+
+        const safeChildren = childInvestigations || [];
+        safeChildren.forEach((child, idx) => {
+            const angle = Math.PI * 0.75 + (idx / Math.max(1, safeChildren.length)) * Math.PI * 0.5; // Bottom arc
+            const dist = 180;
+            nodes.push({
+                id: `investigation-${child.id}`,
+                label: child.title,
+                type: 'target',
+                subType: 'child',
+                radius: 22,
+                color: '#c084fc', // Light purple
+                icon: GitBranch,
+                x: width / 2 + Math.cos(angle) * dist,
+                y: height / 2 + Math.sin(angle) * dist,
+                vx: 0,
+                vy: 0,
+                details: { id: child.id, value: child.title, notes: 'Child investigation generated from pivot entity.' }
+            });
+            edges.push({
+                source: 'target',
+                target: `investigation-${child.id}`,
+                type: 'provenance',
+                label: 'Pivoted Case',
+                color: 'rgba(192, 132, 252, 0.35)'
+            });
         });
         
         // 2. Add Entities
@@ -209,7 +275,7 @@ export function IdentityGraph({ target, evidence, entities }: { target: string, 
         });
         
         return { initialNodes: nodes, initialEdges: edges };
-    }, [target, evidence, entities, dimensions.width, dimensions.height]);
+    }, [target, evidence, entities, dimensions.width, dimensions.height, parentInvestigation, childInvestigations]);
 
     const [nodesState, setNodesState] = useState<GraphNode[]>([]);
     const [edgesState, setEdgesState] = useState<GraphEdge[]>([]);
@@ -583,6 +649,29 @@ export function IdentityGraph({ target, evidence, entities }: { target: string, 
                                 )}
                             </div>
                         )}
+
+                        {selectedNode.type === 'target' && (
+                            <div className="space-y-3 font-mono text-xs">
+                                {selectedNode.details.notes && (
+                                    <div className="space-y-1">
+                                        <span className="text-text-tertiary text-[10px]">ANALYSIS NOTES:</span>
+                                        <p className="text-text-secondary leading-relaxed bg-foreground/[0.02] p-2.5 rounded-lg border border-white/5 text-[11px] font-sans">
+                                            {selectedNode.details.notes}
+                                        </p>
+                                    </div>
+                                )}
+                                {selectedNode.details.id && (
+                                    <div className="pt-2">
+                                        <a
+                                            href={`/dashboard/investigations/${selectedNode.details.id}`}
+                                            className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black text-[10px] uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)] border border-purple-500/20"
+                                        >
+                                            <GitBranch className="w-3.5 h-3.5" /> Access Dossier / Open Case
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
@@ -658,7 +747,7 @@ export function IdentityGraph({ target, evidence, entities }: { target: string, 
                                             y1={sourceNode.y}
                                             x2={targetNode.x}
                                             y2={targetNode.y}
-                                            stroke={edge.type === 'provenance' ? '#00ffc8' : (edge.type === 'mention' ? '#fb923c' : '#38bdf8')}
+                                            stroke={edge.type === 'provenance' ? (edge.color.includes('168') || edge.color.includes('192') ? '#c084fc' : '#00ffc8') : (edge.type === 'mention' ? '#fb923c' : '#38bdf8')}
                                             strokeWidth={1.5}
                                             opacity={0.6}
                                             className="edge-pulse"

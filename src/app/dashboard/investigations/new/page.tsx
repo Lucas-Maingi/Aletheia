@@ -108,6 +108,8 @@ export default function NewInvestigationPage() {
         const defaultTitle = subjectName || subjectUsername || subjectEmail || omniValue?.split(',')[0] || 'New Target';
         const finalTitle = manualTitle?.trim() || defaultTitle;
 
+        const parentId = searchParams.get('parentId');
+
         try {
             const createRes = await fetch("/api/investigations", {
                 method: "POST",
@@ -121,6 +123,7 @@ export default function NewInvestigationPage() {
                     subjectDomain: subjectDomain || null,
                     subjectImageUrl: imagePreview || (formData.get("subjectImageUrl") as string) || null,
                     description: (formData.get("description") as string) || null,
+                    parentId: parentId || null,
                 }),
             });
 

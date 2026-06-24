@@ -56,6 +56,8 @@ export default async function InvestigationDetailPage({
                 evidence: { orderBy: { createdAt: 'desc' } },
                 entities: { orderBy: { createdAt: 'desc' } },
                 reports: { orderBy: { createdAt: 'desc' }, take: 1 },
+                parentInvestigation: { select: { id: true, title: true } },
+                childInvestigations: { select: { id: true, title: true } },
                 _count: { select: { evidence: true, entities: true } }
             }
         });
@@ -70,6 +72,9 @@ export default async function InvestigationDetailPage({
                     id: true, title: true, description: true, status: true, userId: true,
                     createdAt: true, updatedAt: true, subjectName: true, subjectUsername: true,
                     subjectEmail: true, subjectPhone: true,
+                    parentId: true,
+                    parentInvestigation: { select: { id: true, title: true } },
+                    childInvestigations: { select: { id: true, title: true } },
                     evidence: { select: { id: true, title: true, type: true, content: true, createdAt: true } },
                     entities: { select: { id: true, type: true, value: true, createdAt: true } },
                     reports: { select: { id: true, title: true, content: true, createdAt: true }, take: 1 },
@@ -176,6 +181,8 @@ export default async function InvestigationDetailPage({
                 title={safeInvestigation.title}
                 subjectImageUrl={safeInvestigation.subjectImageUrl}
                 isScanning={isScanning}
+                parentInvestigation={safeInvestigation.parentInvestigation}
+                childInvestigations={safeInvestigation.childInvestigations}
             />
         </div >
     );

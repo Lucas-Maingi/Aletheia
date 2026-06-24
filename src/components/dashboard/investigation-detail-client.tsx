@@ -28,6 +28,8 @@ interface Props {
     title: string;
     subjectImageUrl?: string | null;
     isScanning: boolean;
+    parentInvestigation?: { id: string; title: string } | null;
+    childInvestigations?: { id: string; title: string }[];
 }
 
 export function InvestigationDetailClient({
@@ -38,7 +40,9 @@ export function InvestigationDetailClient({
     initialCount,
     title,
     subjectImageUrl,
-    isScanning
+    isScanning,
+    parentInvestigation = null,
+    childInvestigations = []
 }: Props) {
     const { 
         evidence, 
@@ -172,7 +176,14 @@ export function InvestigationDetailClient({
                         exifData={displayEvidence.filter(e => e.type === 'metadata')}
                         subjectImageUrl={subjectImageUrl}
                     />
-                    <IdentityGraph target={title} evidence={displayEvidence} entities={displayEntities} />
+                    <IdentityGraph 
+                        target={title} 
+                        evidence={displayEvidence} 
+                        entities={displayEntities} 
+                        investigationId={investigationId}
+                        parentInvestigation={parentInvestigation}
+                        childInvestigations={childInvestigations}
+                    />
                     <AssociatesTab reportContent={reports[0]?.content || initialReports?.[0]?.content || ''} />
                 </TabsContent>
 

@@ -75,6 +75,10 @@ model Investigation {
   subjectDomain   String?
   subjectImageUrl String?
 
+  parentId            String?
+  parentInvestigation Investigation? @relation("RelatedInvestigations", fields: [parentId], references: [id], onDelete: SetNull)
+  childInvestigations Investigation[] @relation("RelatedInvestigations")
+
   user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   entities Entity[]
   evidence Evidence[]
@@ -82,6 +86,7 @@ model Investigation {
   logs     SearchLog[]
 
   @@index([userId])
+  @@index([parentId])
   @@map("investigations")
 }
 

@@ -25,6 +25,8 @@ export async function GET(
                 evidence: { orderBy: { createdAt: 'desc' }, take: 100 },
                 reports: { orderBy: { createdAt: 'desc' }, take: 1 },
                 logs: { orderBy: { createdAt: 'asc' }, take: 500 },
+                parentInvestigation: { select: { id: true, title: true } },
+                childInvestigations: { select: { id: true, title: true } },
                 _count: { select: { evidence: true, entities: true } },
             }
         });

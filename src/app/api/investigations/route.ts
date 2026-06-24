@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getEffectiveUserId } from '@/lib/auth-utils';
 import { rateLimit, getRateLimitKey } from '@/lib/rate-limit';
-import { sanitize, isSafeQuery } from '@/lib/security';
+import { sanitize, isSafeQuery, isValidUuid } from '@/lib/security';
 
 async function ensureUserExists(userId: string, email: string) {
     await prisma.user.upsert({
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { title, description, subjectName, subjectUsername, subjectEmail, subjectPhone, subjectDomain, subjectImageUrl } = body;
+        const { title, description, subjectName, subjectUsername, subjectEmail, subjectPhone, subjectDomain, subjectImageUrl, parentId } = body;
 
         if (!title?.trim()) {
             return NextResponse.json({ error: 'Investigation title is required.' }, { status: 400 });
@@ -57,6 +57,10 @@ export async function POST(request: Request) {
 
         if (!isSafeQuery(title) || !isSafeQuery(description || '')) {
             return NextResponse.json({ error: 'Potentially malicious input detected.' }, { status: 400 });
+        }
+
+        if (parentId && (typeof parentId !== 'string' || !isValidUuid(parentId))) {
+            return NextResponse.json({ error: 'Invalid parent identifier format.' }, { status: 400 });
         }
 
         // Ensure the user record exists
@@ -82,6 +86,7 @@ export async function POST(request: Request) {
         const investigation = await prisma.investigation.create({
             data: {
                 ...safeData,
+                parentId: parentId && typeof parentId === 'string' && isValidUuid(parentId) ? parentId : null,
                 status: 'pending'
             },
         });
