@@ -7,7 +7,7 @@ import {
   Hexagon, CheckCircle2, Zap, Shield, Search, Database, Fingerprint, 
   Eye, GitCommit, ChevronRight, Activity, Terminal, Sparkles, ArrowRight, Flame,
   ImageIcon, Loader2, Coins, BellRing, Layers, ShieldAlert, UserSearch, Globe,
-  ShieldCheck, MapPin, Share2, Target
+  ShieldCheck, MapPin, Share2, Target, Play
 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -62,6 +62,7 @@ export default function Landing() {
   const [isUploading, setIsUploading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [emailToken, setEmailToken] = useState("");
+  const [showVideo, setShowVideo] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   
@@ -199,12 +200,45 @@ export default function Landing() {
                 </button>
               </div>
             </form>
-            <div className="mt-4 flex justify-center">
+            <div className="mt-4 flex justify-center gap-6">
               <Link href="/dashboard/demo" className="text-[10px] font-bold uppercase tracking-widest text-text-tertiary hover:text-accent transition-colors flex items-center gap-2">
                 <Eye className="w-3.5 h-3.5" />
                 See Live Demo — No Sign-Up Required
               </Link>
+              <button 
+                type="button" 
+                onClick={() => setShowVideo(true)}
+                className="text-[10px] font-bold uppercase tracking-widest text-accent hover:text-white transition-colors flex items-center gap-2"
+              >
+                <Play className="w-3.5 h-3.5 text-accent" />
+                Watch 2-Min Walkthrough
+              </button>
             </div>
+
+            {showVideo && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-8 rounded-2xl border border-accent/20 overflow-hidden bg-surface relative shadow-2xl z-30"
+              >
+                <div className="aspect-video w-full relative">
+                  <iframe 
+                    src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" 
+                    title="Aletheia OSINT Walkthrough Demo" 
+                    className="absolute inset-0 w-full h-full border-none"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                  <button 
+                    onClick={() => setShowVideo(false)}
+                    className="absolute top-4 right-4 bg-background/80 hover:bg-white hover:text-background text-text-primary px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors z-30"
+                  >
+                    Close Demo
+                  </button>
+                </div>
+              </motion.div>
+            )}
             <div className="mt-8 flex items-center justify-center gap-6 text-[10px] font-black uppercase tracking-[0.3em] text-text-tertiary">
                 <div className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_5px_var(--success)]" />
