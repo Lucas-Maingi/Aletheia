@@ -567,12 +567,23 @@ function InvestigationPanel({ data }: { data: DemoData }) {
 }
 
 export default function DemoPage() {
+  const [isEmbed, setIsEmbed] = useState(false);
   const [demoMode, setDemoMode] = useState<'interactive' | 'cinematic'>('interactive');
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const embed = params.get('embed') === 'true';
+    setIsEmbed(embed);
+    if (embed) {
+      setDemoMode('cinematic');
+    }
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className={`min-h-screen bg-background pb-24 ${isEmbed ? 'p-0 bg-transparent min-h-0 pb-0' : ''}`}>
       {/* ── Demo Mode Switcher ── */}
-      <div className="max-w-7xl mx-auto px-6 pt-12 flex justify-center">
+      {!isEmbed && (
+        <div className="max-w-7xl mx-auto px-6 pt-12 flex justify-center">
         <div className="bg-surface/50 border border-border/10 p-1.5 rounded-2xl flex items-center gap-2">
           <button
             onClick={() => setDemoMode('interactive')}
@@ -598,9 +609,10 @@ export default function DemoPage() {
           </button>
         </div>
       </div>
+      )}
 
       {/* ── Main Content ── */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className={`max-w-7xl mx-auto px-6 py-8 ${isEmbed ? 'p-0 max-w-none py-0' : ''}`}>
         {demoMode === 'interactive' ? (
           <Tabs defaultValue="person">
             {/* Tab Switcher */}
@@ -634,7 +646,7 @@ export default function DemoPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45 }}
           >
-            <CinematicDemo />
+            <CinematicDemo autoStart={isEmbed} />
           </motion.div>
         )}
       </div>
@@ -662,8 +674,15 @@ function Loader(props: any) {
   );
 }
 
-function CinematicDemo() {
-  const [isPlaying, setIsPlaying] = useState(false);
+function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
+  const [isPlaying, setIsPlaying] = useState(autoStart);
+
+  useEffect(() => {
+    if (autoStart) {
+      setIsPlaying(true);
+    }
+  }, [autoStart]);
+
   const [speed, setSpeed] = useState(1.2); // Speed multiplier
   const [currentStep, setCurrentStep] = useState(0); 
   const [typedTarget, setTypedTarget] = useState("");

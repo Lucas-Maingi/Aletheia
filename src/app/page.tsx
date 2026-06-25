@@ -244,13 +244,12 @@ export default function Landing() {
                   </button>
                 </div>
                 
-                <div className="aspect-video w-full relative bg-[#020617]">
+                <div className="w-full relative bg-[#020617] h-[720px] overflow-hidden">
                   <iframe 
-                    src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1" 
+                    src="/dashboard/demo?embed=true" 
                     title="Aletheia OSINT Walkthrough Demo" 
                     className="absolute inset-0 w-full h-full border-none"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
                   />
                 </div>
               </motion.div>
