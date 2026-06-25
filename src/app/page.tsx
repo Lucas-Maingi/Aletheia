@@ -423,8 +423,17 @@ export default function Landing() {
               </motion.div>
             ) : (
               <form 
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
+                  try {
+                    await fetch('/api/waitlist', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ email: emailToken })
+                    });
+                  } catch (err) {
+                    console.error("Waitlist submit error:", err);
+                  }
                   setSubmitted(true);
                 }}
                 className="relative max-w-md mx-auto group"
