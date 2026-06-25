@@ -47,14 +47,8 @@ export async function ecosystemSearch(target: string): Promise<ConnectorResult> 
         { name: 'StackOverflow', site: 'stackoverflow.com/users' },
         { name: 'LinkedIn', site: 'linkedin.com/in' },
         { name: 'GitLab', site: 'gitlab.com' },
-        { name: 'Bitbucket', site: 'bitbucket.org' },
-        { name: 'Behance', site: 'behance.net' },
-        { name: 'Dribbble', site: 'dribbble.com' },
         { name: 'Medium', site: 'medium.com/@' },
-        { name: 'Substack', site: 'substack.com/@' },
-        { name: 'ProductHunt', site: 'producthunt.com/@' },
         { name: 'Dev.to', site: 'dev.to' },
-        { name: 'AngelList', site: 'wellfound.com/u' },
 
         // Social/Content
         { name: 'Twitter/X', site: 'x.com' },
@@ -62,47 +56,25 @@ export async function ecosystemSearch(target: string): Promise<ConnectorResult> 
         { name: 'Reddit', site: 'reddit.com/user' },
         { name: 'Pinterest', site: 'pinterest.com' },
         { name: 'TikTok', site: 'tiktok.com/@' },
-        { name: 'Quora', site: 'quora.com/profile' },
-        { name: 'Tumblr', site: 'tumblr.com/blog' },
-        { name: 'Flickr', site: 'flickr.com/people' },
-        { name: 'Vimeo', site: 'vimeo.com' },
         { name: 'YouTube', site: 'youtube.com/@' },
         { name: 'Twitch', site: 'twitch.tv' },
-        { name: 'SoundCloud', site: 'soundcloud.com' },
 
         // Lifestyle/Tools
         { name: 'Spotify', site: 'open.spotify.com/user' },
-        { name: 'Goodreads', site: 'goodreads.com' },
-        { name: 'Letterboxd', site: 'letterboxd.com' },
-        { name: 'AllTrails', site: 'alltrails.com/members' },
-        { name: 'Strava', site: 'strava.com/athletes' },
-        { name: 'Airbnb', site: 'airbnb.com/users/show' },
         { name: 'Linktree', site: 'linktr.ee' },
         { name: 'Patreon', site: 'patreon.com' },
         { name: 'BuyMeACoffee', site: 'buymeacoffee.com' },
-        { name: 'About.me', site: 'about.me' },
 
         // Gaming/Community
         { name: 'Steam', site: 'steamcommunity.com/id' },
-        { name: 'Epic Games', site: 'epicgames.com' },
-        { name: 'Roblox', site: 'roblox.com/users' },
         { name: 'Discord', site: 'discord.com' },
         { name: 'Telegram', site: 't.me' },
-        { name: 'Chess.com', site: 'chess.com/member' },
-        
-        // Regional/Specific
-        { name: 'VK', site: 'vk.com' },
-        { name: 'OK.ru', site: 'ok.ru' },
-        { name: 'Weibo', site: 'weibo.com' },
-        { name: 'Xing', site: 'xing.com/profile' },
-        { name: 'SlideShare', site: 'slideshare.net' },
-        { name: 'Issuu', site: 'issuu.com' },
-        { name: 'Scribd', site: 'scribd.com' }
+        { name: 'Chess.com', site: 'chess.com/member' }
     ];
 
     const quickFetch = async (url: string) => {
         const controller = new AbortController();
-        const id = setTimeout(() => controller.abort(), 12000);
+        const id = setTimeout(() => controller.abort(), 4000);
         try {
             return await fetch(url, {
                 headers: { 'User-Agent': getRandomUserAgent() },
@@ -157,15 +129,8 @@ export async function ecosystemSearch(target: string): Promise<ConnectorResult> 
         }
     };
 
-    // Execute in parallel chunks
-    const chunks = [];
-    for (let i = 0; i < platforms.length; i += 6) {
-        chunks.push(platforms.slice(i, i + 6));
-    }
-
-    for (const chunk of chunks) {
-        await Promise.allSettled(chunk.map(searchPlatform));
-    }
+    // Execute in parallel for maximum performance
+    await Promise.allSettled(platforms.map(searchPlatform));
 
     return {
         connectorType: 'ecosystem_discovery',

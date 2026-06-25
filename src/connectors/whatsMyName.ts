@@ -47,7 +47,7 @@ export async function whatsMyName(username: string): Promise<ConnectorResult> {
     const checkPlatformStrictly = async (p: { name: string, url: string }) => {
         try {
             const controller = new AbortController();
-            const id = setTimeout(() => controller.abort(), 8000);
+            const id = setTimeout(() => controller.abort(), 4000);
             
             const res = await fetch(p.url, { 
                 method: 'GET',
@@ -83,15 +83,8 @@ export async function whatsMyName(username: string): Promise<ConnectorResult> {
         } catch { /* skip */ }
     };
 
-    // Execute in parallel chunks of 4 for speed
-    const chunks = [];
-    for (let i = 0; i < platforms.length; i += 4) {
-        chunks.push(platforms.slice(i, i + 4));
-    }
-
-    for (const chunk of chunks) {
-        await Promise.allSettled(chunk.map(checkPlatformStrictly));
-    }
+    // Execute in parallel for maximum performance
+    await Promise.allSettled(platforms.map(checkPlatformStrictly));
 
     return {
         connectorType: 'whatsmyname',

@@ -5,8 +5,10 @@ export async function extractExif(imageUrl: string): Promise<ConnectorResult> {
   const results: SearchResult[] = [];
   
   try {
-    // 1. Fetch image buffer
-    const response = await fetch(imageUrl);
+    // 1. Fetch image buffer with 6s timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const response = await fetch(imageUrl, { signal: controller.signal }).finally(() => clearTimeout(timeoutId));
     if (!response.ok) throw new Error("Failed to fetch image for forensic analysis.");
     const buffer = await response.arrayBuffer();
     const nodeBuffer = Buffer.from(buffer);

@@ -24,7 +24,7 @@ export async function registrationScout(email: string): Promise<ConnectorResult>
 
     const quickFetch = async (url: string, opts: RequestInit = {}) => {
         const controller = new AbortController();
-        const id = setTimeout(() => controller.abort(), 10000);
+        const id = setTimeout(() => controller.abort(), 4000);
         try {
             return await fetch(url, {
                 ...opts,
@@ -40,6 +40,17 @@ export async function registrationScout(email: string): Promise<ConnectorResult>
         }
     };
 
+    const safeJson = async (res: Response | null) => {
+        if (!res) return null;
+        try {
+            const contentType = res.headers.get('content-type') || '';
+            if (!contentType.toLowerCase().includes('application/json')) return null;
+            return await res.json();
+        } catch {
+            return null;
+        }
+    };
+
     const platforms = [
         // 1. Pinterest
         {
@@ -47,10 +58,8 @@ export async function registrationScout(email: string): Promise<ConnectorResult>
             check: async () => {
                 const url = `https://www.pinterest.com/resource/UserRegisterResource/get/?data=${encodeURIComponent(JSON.stringify({ options: { email: cleanEmail } }))}`;
                 const res = await quickFetch(url);
-                if (res?.ok) {
-                    const data = await res.json();
-                    if (data?.resource_response?.data === true) return true;
-                }
+                const data = await safeJson(res);
+                if (data && data.resource_response?.data === true) return true;
                 return false;
             }
         },
@@ -73,10 +82,8 @@ export async function registrationScout(email: string): Promise<ConnectorResult>
             check: async () => {
                 const url = `https://imgur.com/signin/ajax/check_email?email=${encodeURIComponent(cleanEmail)}`;
                 const res = await quickFetch(url);
-                if (res?.ok) {
-                    const data = await res.json();
-                    if (data?.data?.available === false) return true;
-                }
+                const data = await safeJson(res);
+                if (data && data.data?.available === false) return true;
                 return false;
             }
         },
@@ -86,10 +93,8 @@ export async function registrationScout(email: string): Promise<ConnectorResult>
             check: async () => {
                 const url = `https://archive.org/services/account/email_check.php?email=${encodeURIComponent(cleanEmail)}`;
                 const res = await quickFetch(url);
-                if (res?.ok) {
-                    const data = await res.json();
-                    if (data?.status === 'error') return true; // status error usually means "Already in use"
-                }
+                const data = await safeJson(res);
+                if (data && data.status === 'error') return true; // status error usually means "Already in use"
                 return false;
             }
         },
@@ -111,8 +116,8 @@ export async function registrationScout(email: string): Promise<ConnectorResult>
                 const url = `https://spclient.wg.spotify.com/signup/v1/check-email?email=${encodeURIComponent(cleanEmail)}`;
                 const res = await quickFetch(url);
                 if (res?.status === 200) {
-                    const data = await res.json();
-                    if (data.status === 20) return true; // status 20 = Email in use
+                    const data = await safeJson(res);
+                    if (data && data.status === 20) return true; // status 20 = Email in use
                 }
                 return false;
             }
@@ -123,10 +128,8 @@ export async function registrationScout(email: string): Promise<ConnectorResult>
             check: async () => {
                 const url = `https://www.patreon.com/api/user/email_check?email=${encodeURIComponent(cleanEmail)}`;
                 const res = await quickFetch(url);
-                if (res?.ok) {
-                     const data = await res.json();
-                     if (data.exists === true) return true;
-                }
+                const data = await safeJson(res);
+                if (data && data.exists === true) return true;
                 return false;
             }
         },
@@ -136,10 +139,8 @@ export async function registrationScout(email: string): Promise<ConnectorResult>
             check: async () => {
                 const url = `https://www.buymeacoffee.com/api/email-check?email=${encodeURIComponent(cleanEmail)}`;
                 const res = await quickFetch(url);
-                if (res?.ok) {
-                    const data = await res.json();
-                    if (data.is_existing === true) return true;
-                }
+                const data = await safeJson(res);
+                if (data && data.is_existing === true) return true;
                 return false;
             }
         },
@@ -174,8 +175,8 @@ export async function registrationScout(email: string): Promise<ConnectorResult>
                     body: JSON.stringify({ email: cleanEmail })
                 });
                 if (res?.status === 400) {
-                    const data = await res.json();
-                    if (data.email?._errors?.[0]?.code === 'EMAIL_ALREADY_REGISTERED') return true;
+                    const data = await safeJson(res);
+                    if (data && data.email?._errors?.[0]?.code === 'EMAIL_ALREADY_REGISTERED') return true;
                 }
                 return false;
             }
@@ -199,13 +200,10 @@ export async function registrationScout(email: string): Promise<ConnectorResult>
         {
             name: 'Twitter/X',
             check: async () => {
-                // X (Twitter) has complex headers, using a fallback search mention if registration check fails
                 const url = `https://api.twitter.com/i/users/email_available.json?email=${encodeURIComponent(cleanEmail)}`;
                 const res = await quickFetch(url);
-                if (res?.ok) {
-                    const data = await res.json();
-                    if (data.taken === true) return true;
-                }
+                const data = await safeJson(res);
+                if (data && data.taken === true) return true;
                 return false;
             }
         },
@@ -213,10 +211,6 @@ export async function registrationScout(email: string): Promise<ConnectorResult>
         {
             name: 'Facebook',
             check: async () => {
-                // Facebook recovery check (very throttled, using low-latency attempt)
-                const url = `https://www.facebook.com/api/graphql/`;
-                const res = await quickFetch(url, { method: 'POST' }); // Dummy check to trigger registration response if we had more headers
-                // Fallback: If it's a known email type, FB registration is highly likely for these targets
                 return false; // FB is hard to check without session, skipping for now to maintain fidelity
             }
         },
@@ -230,39 +224,32 @@ export async function registrationScout(email: string): Promise<ConnectorResult>
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `email=${encodeURIComponent(cleanEmail)}`
                 });
-                if (res?.ok) {
-                    const data = await res.json();
-                    if (data.errors?.email) return true;
-                }
+                const data = await safeJson(res);
+                if (data && data.errors?.email) return true;
                 return false;
             }
         }
     ];
 
-    // Execute in parallel chunks of 5
-    const chunks = [];
-    for (let i = 0; i < platforms.length; i += 5) chunks.push(platforms.slice(i, i + 5));
-
-    for (const chunk of chunks) {
-        await Promise.allSettled(chunk.map(async (p) => {
-            try {
-                const isRegistered = await p.check();
-                if (isRegistered) {
-                    results.push({
-                        title: `${p.name} — Potential Registry Presence`,
-                        url: `https://${p.name.toLowerCase()}.com`,
-                        description: `**Platform:** ${p.name}\n**Status:** Registry Presence Detected\n\nIntelligence node confirms this identity handle or email is registered on **${p.name}**. \n\n> This discovery represents a **Registry Signal** only. Direct ownership by the target is unconfirmed without secondary behavioral or visual correlation.`,
-                        category: 'social',
-                        platform: p.name,
-                        confidenceScore: 0.40,
-                        confidenceLabel: 'MEDIUM'
-                    });
-                }
-            } catch (e) {
-                console.error(`[Scout] Failed check for ${p.name}:`, e);
+    // Execute in parallel for maximum performance
+    await Promise.allSettled(platforms.map(async (p) => {
+        try {
+            const isRegistered = await p.check();
+            if (isRegistered) {
+                results.push({
+                    title: `${p.name} — Potential Registry Presence`,
+                    url: `https://${p.name.toLowerCase()}.com`,
+                    description: `**Platform:** ${p.name}\n**Status:** Registry Presence Detected\n\nIntelligence node confirms this identity handle or email is registered on **${p.name}**. \n\n> This discovery represents a **Registry Signal** only. Direct ownership by the target is unconfirmed without secondary behavioral or visual correlation.`,
+                    category: 'social',
+                    platform: p.name,
+                    confidenceScore: 0.40,
+                    confidenceLabel: 'MEDIUM'
+                });
             }
-        }));
-    }
+        } catch (e) {
+            console.error(`[Scout] Failed check for ${p.name}:`, e);
+        }
+    }));
 
     return {
         connectorType: 'registration_scout',

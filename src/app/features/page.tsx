@@ -55,6 +55,10 @@ const FEATURE_CATEGORIES = [
       {
         title: "Dynamic entity extraction",
         desc: "Identify, categorize, and link target details (e.g. IPs, names, accounts) dynamically."
+      },
+      {
+        title: "Deep Investigation Pivoting",
+        desc: "Instantly deploy fresh scans targeting discovered footprint artifacts. Parent and child cases are recursively threaded in the database, automatically linking relationship graphs together for a comprehensive view of the target's footprint."
       }
     ]
   },
@@ -156,6 +160,85 @@ export default function FeaturesPage() {
               </div>
             </div>
           ))}
+        </div>
+
+
+        {/* Deep Investigation Pivoting Workflow Section */}
+        <div className="mt-32 space-y-12">
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-[10px] font-bold text-purple-400 tracking-widest uppercase">
+              Core Paradigm Shift
+            </div>
+            <h2 className="text-2xl md:text-3xl font-black text-white uppercase italic tracking-tight">
+              Deep Investigation <span className="text-purple-400">Pivoting</span>
+            </h2>
+            <p className="text-text-secondary text-xs md:text-sm leading-relaxed">
+              Manual target footprinting requires constant copying, pasting, and keeping track of separate files. Aletheia turns entity discovery into a recursive, multi-threaded intelligence loop.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 relative">
+            {/* Step 1 */}
+            <div className="p-8 rounded-2xl bg-surface/30 border border-border/10 space-y-4 hover:border-purple-500/30 transition-all duration-300">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 font-black text-lg">
+                01
+              </div>
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                Discovery & Extraction
+              </h3>
+              <p className="text-xs text-text-secondary leading-relaxed font-medium">
+                Primary scans automatically extract candidate assets—including usernames, domains, emails, and crypto wallets. These are highlighted as clickable nodes in your live Identity Graph.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="p-8 rounded-2xl bg-surface/30 border border-border/10 space-y-4 hover:border-purple-500/30 transition-all duration-300">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 font-black text-lg">
+                02
+              </div>
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                One-Click Traversal
+              </h3>
+              <p className="text-xs text-text-secondary leading-relaxed font-medium">
+                Click any discovered entity node to instantly deploy a nested child investigation. No manual search setups, no context loss. The scan inherits the parent case query contexts.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="p-8 rounded-2xl bg-surface/30 border border-border/10 space-y-4 hover:border-purple-500/30 transition-all duration-300">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 font-black text-lg">
+                03
+              </div>
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                Stitched Relationship Graphs
+              </h3>
+              <p className="text-xs text-text-secondary leading-relaxed font-medium">
+                The database links cases via self-referential relations. Discovered assets are plotted in a force-directed network, allowing you to trace target footprints across multiple hops.
+              </p>
+            </div>
+          </div>
+
+          {/* Interactive visual block simulating terminal/node links */}
+          <div className="p-6 rounded-2xl border border-border/10 bg-surface/20 font-mono text-[11px] leading-relaxed text-text-secondary space-y-3 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-3 text-[10px] text-purple-500/30 font-bold uppercase tracking-wider select-none">
+              Recursive Hub Simulation
+            </div>
+            <div className="flex items-center gap-2 text-purple-400 font-bold">
+              <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+              <span>[ALETHEIA ENGINE - RECURSIVE THREADING ACTIVE]</span>
+            </div>
+            <div className="space-y-1">
+              <div><span className="text-text-tertiary"># Target Case:</span> <span className="text-white font-bold">investigation_01</span> (Mark Mbithi)</div>
+              <div className="pl-4 text-accent">└── Discovered Username: <span className="text-white">"bitget"</span></div>
+              <div className="pl-8 text-purple-400">└── [PIVOT] Launching Child Case: <span className="text-white font-bold">investigation_02</span> (bitget)</div>
+              <div className="pl-12 text-text-tertiary">├── GitHub Profile: <span className="text-white font-semibold">github.com/Bitget</span> (Active Repos: 4)</div>
+              <div className="pl-12 text-text-tertiary">└── Reddit Profile: <span className="text-white font-semibold">reddit.com/user/bitget</span></div>
+              <div className="pl-4 text-purple-400">└── Graph Node Relations: linked child_id <span className="text-white">"investigation_02"</span> to parent_id <span className="text-white">"investigation_01"</span></div>
+            </div>
+            <div className="text-text-tertiary pt-2 border-t border-border/5 text-[10px]">
+              &gt;&gt; Stitched 2 nodes into forces layout. Rendered 1 parent relationship link [Purple #a855f7]
+            </div>
+          </div>
         </div>
 
         {/* CTA Bar */}
