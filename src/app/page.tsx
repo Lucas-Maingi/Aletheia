@@ -217,25 +217,41 @@ export default function Landing() {
 
             {showVideo && (
               <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-8 rounded-2xl border border-accent/20 overflow-hidden bg-surface relative shadow-2xl z-30"
+                initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="mt-8 rounded-2xl border border-accent/30 overflow-hidden bg-surface relative shadow-[0_0_50px_rgba(168,85,247,0.15)] z-30 max-w-4xl mx-auto"
               >
-                <div className="aspect-video w-full relative">
+                {/* Mock Browser Header Bar */}
+                <div className="h-10 border-b border-border/10 bg-background/80 flex items-center px-5 gap-2.5 select-none">
+                  <button 
+                    onClick={() => setShowVideo(false)}
+                    title="Close Demo"
+                    className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 transition-colors border border-red-600/30 flex items-center justify-center text-[8px] text-red-950 font-bold font-sans"
+                  >
+                    ×
+                  </button>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/40 border border-yellow-600/20" />
+                  <div className="w-3 h-3 rounded-full bg-green-500/40 border border-green-600/20" />
+                  <div className="ml-4 text-[10px] text-text-tertiary font-bold tracking-wider uppercase font-mono">aletheia-walkthrough.mp4</div>
+                  
+                  <button 
+                    onClick={() => setShowVideo(false)}
+                    className="ml-auto text-[9px] font-mono text-text-tertiary hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1 bg-white/5 px-2.5 py-1 rounded border border-white/5"
+                  >
+                    Close Demo
+                  </button>
+                </div>
+                
+                <div className="aspect-video w-full relative bg-[#020617]">
                   <iframe 
-                    src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" 
+                    src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1" 
                     title="Aletheia OSINT Walkthrough Demo" 
                     className="absolute inset-0 w-full h-full border-none"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
-                  <button 
-                    onClick={() => setShowVideo(false)}
-                    className="absolute top-4 right-4 bg-background/80 hover:bg-white hover:text-background text-text-primary px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors z-30"
-                  >
-                    Close Demo
-                  </button>
                 </div>
               </motion.div>
             )}
