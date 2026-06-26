@@ -674,7 +674,7 @@ function Loader(props: any) {
   );
 }
 
-function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
+export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
   const [isPlaying, setIsPlaying] = useState(autoStart);
 
   useEffect(() => {

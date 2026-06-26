@@ -14,6 +14,9 @@ import { Badge } from "@/components/ui/badge";
 import { LandingHeader } from "@/components/landing/landing-header";
 import { Footer } from "@/components/footer";
 import { Card, CardContent } from "@/components/ui/card";
+import dynamic from 'next/dynamic';
+
+const DynamicCinematicDemo = dynamic(() => import('@/app/dashboard/demo/page').then(mod => mod.CinematicDemo), { ssr: false });
 
 const FloatingParticles = () => {
   const [particles, setParticles] = useState<{ id: number; x: number; y: number; scale: number; duration: number }[]>([]);
@@ -244,13 +247,8 @@ export default function Landing() {
                   </button>
                 </div>
                 
-                <div className="w-full relative bg-[#020617] h-[720px] overflow-hidden">
-                  <iframe 
-                    src="/dashboard/demo?embed=true" 
-                    title="Aletheia OSINT Walkthrough Demo" 
-                    className="absolute inset-0 w-full h-full border-none"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  />
+                <div className="w-full relative bg-[#020617] h-[720px] overflow-hidden p-0 m-0">
+                  <DynamicCinematicDemo autoStart={true} />
                 </div>
               </motion.div>
             )}
