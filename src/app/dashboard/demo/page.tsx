@@ -917,7 +917,7 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
   const dossierHtml = useMemo(() => renderMarkdown(dossierText), [dossierText]);
 
   return (
-    <div className="w-full min-h-[680px] bg-surface/20 border border-border/10 rounded-2xl flex flex-col relative p-6">
+    <div className="w-full h-full bg-surface/20 border border-border/10 rounded-2xl flex flex-col relative p-4 overflow-hidden">
       {/* Background glow effects */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-900/5 blur-[120px] pointer-events-none" />
@@ -966,71 +966,9 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
 
         {/* Stage 2: Active Investigation Board */}
         {currentStep > 0 && (
-          <div className="flex-1 flex flex-col gap-6">
-            {/* Inline controls bar instead of floating header */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl border border-border bg-surface/50 shadow-md">
-              <div className="flex items-center gap-2">
-                <Video className="w-4 h-4 text-accent animate-pulse" />
-                <span className="text-xs font-bold tracking-wider text-text-secondary uppercase">Autoplay Controls</span>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setIsPlaying(!isPlaying)}
-                  className="h-8 px-3 rounded-full hover:bg-foreground/5 text-text-primary text-[10px] font-black uppercase tracking-widest"
-                  title={isPlaying ? "Pause Scan" : "Resume Scan"}
-                >
-                  {isPlaying ? (
-                    <span className="text-warning font-bold">PAUSE</span>
-                  ) : (
-                    <span className="text-success font-bold flex items-center gap-1">
-                      <Play className="w-3 h-3 fill-current text-success" /> PLAY
-                    </span>
-                  )}
-                </Button>
-
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={resetSimulation}
-                  className="h-8 w-8 rounded-full p-0 hover:bg-foreground/5 text-text-secondary hover:text-text-primary"
-                  title="Reset Scan"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                </Button>
-
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={skipToEnd}
-                  className="h-8 px-3 rounded-full hover:bg-foreground/5 text-xs text-text-secondary hover:text-text-primary font-bold uppercase tracking-wider"
-                >
-                  Skip to End
-                </Button>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-text-tertiary uppercase font-mono">Speed:</span>
-                <div className="flex gap-1">
-                  {[0.5, 1, 1.2, 2.0].map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => setSpeed(s)}
-                      className={`text-[10px] px-2 py-0.5 rounded font-mono transition-colors ${
-                        speed === s ? "bg-accent text-white" : "text-text-tertiary hover:text-text-primary"
-                      }`}
-                    >
-                      {s}x
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
+          <div className="flex-1 flex flex-col gap-4 min-h-0 overflow-hidden">
             {/* Real-time stats row */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 shrink-0">
               <StatCard
                 index={0}
                 label="Connectors Run"
@@ -1058,11 +996,11 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
             </div>
 
             {/* Split layout: left column status, right column results */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 min-h-0 overflow-hidden">
               {/* Left Column: Live Scan Status & Activity Feed */}
-              <div className="lg:col-span-1 flex flex-col gap-6">
+              <div className="md:col-span-1 flex flex-col gap-4 min-h-0 overflow-hidden">
                 {/* Active scan status */}
-                <div className="bg-surface/50 border border-border/10 rounded-xl p-5 shadow-xl backdrop-blur-sm">
+                <div className="bg-surface/50 border border-border/10 rounded-xl p-3 shadow-xl backdrop-blur-sm shrink-0">
                   <h3 className="text-xs font-bold text-text-tertiary uppercase tracking-widest mb-3">Scanning Node</h3>
                   <div className="flex items-center justify-between gap-4 mb-4">
                     <div className="min-w-0 flex-1">
@@ -1115,8 +1053,8 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
                 </div>
 
                 {/* Live log feed box */}
-                <div className="bg-surface/50 border border-border/10 rounded-xl p-5 shadow-xl backdrop-blur-sm flex flex-col flex-1 h-[280px]">
-                  <h3 className="text-xs font-bold text-text-tertiary uppercase tracking-widest mb-3">Live Log Feed</h3>
+                <div className="bg-surface/50 border border-border/10 rounded-xl p-3 shadow-xl backdrop-blur-sm flex flex-col flex-1 min-h-0 overflow-hidden">
+                  <h3 className="text-[10px] font-bold text-text-tertiary uppercase tracking-widest mb-2 shrink-0">Live Log Feed</h3>
                   <div 
                     ref={logFeedRef}
                     className="flex-1 font-mono text-[10px] space-y-2.5 overflow-y-auto custom-scrollbar pr-1"
@@ -1148,7 +1086,7 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
               </div>
 
               {/* Right Column: Uniform Tab content */}
-              <div className="lg:col-span-2 flex flex-col gap-6">
+              <div className="md:col-span-2 flex flex-col gap-4 min-h-0 overflow-hidden">
                 {/* Content Switcher */}
                 <div className="flex flex-wrap gap-2 bg-foreground/[0.03] border border-border/10 p-1 rounded-xl w-fit">
                   {(
@@ -1182,7 +1120,7 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
                 </div>
 
                 {/* Tab content panel */}
-                <div className="flex-1 flex flex-col">
+                <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                   <AnimatePresence mode="wait">
                     {/* Evidence Tab */}
                     {view === 'evidence' && (
@@ -1192,9 +1130,10 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="bg-surface/50 border border-border/10 rounded-xl p-5 shadow-xl backdrop-blur-sm h-[590px] overflow-y-auto pr-2 custom-scrollbar"
+                        className="bg-surface/50 border border-border/10 rounded-xl p-4 shadow-xl backdrop-blur-sm flex flex-col flex-1 min-h-0 overflow-hidden"
                       >
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="overflow-y-auto pr-2 custom-scrollbar flex-1 min-h-0" ref={evidenceContainerRef}>
+                          <div className="grid grid-cols-1 gap-3">
                           {visibleEvidence.map((ev) => (
                             <EvidenceCard key={ev.id} item={ev} />
                           ))}
@@ -1215,13 +1154,13 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="bg-surface/50 border border-border/10 rounded-xl p-5 shadow-xl backdrop-blur-sm h-[590px] overflow-y-auto custom-scrollbar"
+                        className="bg-surface/50 border border-border/10 rounded-xl p-4 shadow-xl backdrop-blur-sm flex flex-col flex-1 min-h-0 overflow-hidden"
                       >
-                        <h3 className="text-xs uppercase tracking-widest text-text-secondary font-medium mb-6 flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-accent" />
+                        <h3 className="text-[10px] uppercase tracking-widest text-text-secondary font-medium mb-4 flex items-center gap-2 shrink-0">
+                          <Clock className="w-3.5 h-3.5 text-accent" />
                           Scan Timeline
                         </h3>
-                        <div className="space-y-1">
+                        <div className="space-y-1 overflow-y-auto custom-scrollbar flex-1 min-h-0 pr-2">
                           {visibleLogs.map((entry, i) => (
                             <TimelineItem key={i} entry={entry} index={i} />
                           ))}
@@ -1242,9 +1181,9 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="bg-surface/50 border border-border/10 rounded-xl p-5 shadow-xl backdrop-blur-sm h-[590px] flex flex-col"
+                        className="bg-surface/50 border border-border/10 rounded-xl p-4 shadow-xl backdrop-blur-sm flex flex-col flex-1 min-h-0 overflow-hidden"
                       >
-                        <div className="flex items-center gap-2 mb-4 shrink-0">
+                        <div className="flex items-center gap-2 mb-3 shrink-0">
                           <Network className="w-4 h-4 text-accent animate-pulse" />
                           <span className="text-xs uppercase tracking-widest text-text-secondary font-medium">
                             Interactive Identity Network Graph (Real-time Ingestion)
@@ -1273,9 +1212,9 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
-                        className="bg-surface/50 border border-border/10 rounded-xl p-5 shadow-xl backdrop-blur-sm h-[590px] flex flex-col"
+                        className="bg-surface/50 border border-border/10 rounded-xl p-4 shadow-xl backdrop-blur-sm flex flex-col flex-1 min-h-0 overflow-hidden"
                       >
-                        <div className="flex items-center gap-2 mb-6 pb-4 border-b border-border shrink-0">
+                        <div className="flex items-center gap-2 mb-4 pb-3 border-b border-border shrink-0">
                           <Terminal className="w-4 h-4 text-accent" />
                           <span className="text-xs uppercase tracking-widest text-text-secondary font-medium">
                             AI Executive Dossier Synthesis
@@ -1325,15 +1264,15 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="bg-surface/50 border border-border/10 rounded-xl p-5 shadow-xl backdrop-blur-sm h-[590px] overflow-y-auto custom-scrollbar"
+                        className="bg-surface/50 border border-border/10 rounded-xl p-4 shadow-xl backdrop-blur-sm flex flex-col flex-1 min-h-0 overflow-hidden"
                       >
-                        <div className="flex items-center gap-2 mb-4">
+                        <div className="flex items-center gap-2 mb-3 shrink-0">
                           <Database className="w-4 h-4 text-accent" />
-                          <span className="text-xs uppercase tracking-widest text-text-secondary font-medium">
+                          <span className="text-[10px] uppercase tracking-widest text-text-secondary font-medium">
                             Discovered Entities ({visibleEntities.length})
                           </span>
                         </div>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap gap-2 overflow-y-auto custom-scrollbar flex-1 min-h-0 pr-2">
                           {visibleEntities.map((entity, i) => (
                             <EntityChip key={i} entity={entity} />
                           ))}
@@ -1342,7 +1281,7 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
                               <Database className="w-8 h-8 mb-2 animate-pulse text-accent" />
                               <span className="text-xs font-mono uppercase tracking-wider">Awaiting entity extraction...</span>
                             </div>
-                          )}
+                          </div>
                         </div>
                       </motion.div>
                     )}

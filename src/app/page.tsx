@@ -246,14 +246,9 @@ export default function Landing() {
                     Close Demo
                   </button>
                 </div>
-                <div className="w-full relative bg-[#020617] overflow-hidden" style={{ containerType: 'inline-size', aspectRatio: '1280/760' }}>
-                  <div 
-                    className="absolute top-0 left-0 w-[1280px] h-[760px] origin-top-left bg-transparent" 
-                    style={{ transform: 'scale(calc(100cqw / 1280))' }}
-                  >
-                    <div className="w-full h-full p-4 pb-12 pointer-events-auto">
-                      <DynamicCinematicDemo autoStart={true} />
-                    </div>
+                <div className="w-full relative bg-[#020617] overflow-hidden aspect-[16/10] sm:aspect-video flex flex-col">
+                  <div className="w-full h-full p-4 pointer-events-auto overflow-hidden">
+                    <DynamicCinematicDemo autoStart={true} />
                   </div>
                 </div>
               </motion.div>
