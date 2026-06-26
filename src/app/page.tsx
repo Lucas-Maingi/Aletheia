@@ -223,7 +223,7 @@ export default function Landing() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -20 }}
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="mt-8 rounded-2xl border border-accent/30 overflow-hidden bg-surface relative shadow-[0_0_50px_rgba(168,85,247,0.15)] z-30 max-w-4xl mx-auto"
+                className="mt-8 rounded-2xl border border-accent/30 overflow-hidden bg-surface relative shadow-[0_0_50px_rgba(168,85,247,0.15)] z-30 max-w-[1200px] w-full mx-auto"
               >
                 {/* Mock Browser Header Bar */}
                 <div className="h-10 border-b border-border/10 bg-background/80 flex items-center px-5 gap-2.5 select-none">
@@ -245,8 +245,8 @@ export default function Landing() {
                     Close Demo
                   </button>
                 </div>
-                <div className="w-full relative bg-[#020617] overflow-hidden aspect-[16/10] sm:aspect-video flex flex-col">
-                  <div className="w-full h-full p-4 pointer-events-auto overflow-hidden">
+                <div className="w-full relative bg-[#020617] overflow-hidden aspect-[4/3] lg:aspect-[16/10] flex flex-col min-h-[600px]">
+                  <div className="w-full h-full p-2 sm:p-4 pointer-events-auto overflow-hidden">
                     <DynamicCinematicDemo autoStart={true} />
                   </div>
                 </div>
