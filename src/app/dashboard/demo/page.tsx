@@ -708,8 +708,6 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
       return;
     }
 
-    const intervalTime = 1000 / speed;
-
     timerRef.current = setInterval(() => {
       setCurrentStep((prev) => {
         const next = prev + 1;
@@ -814,12 +812,12 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
 
         return next;
       });
-    }, intervalTime);
+    }, 1000);
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPlaying, speed]);
+  }, [isPlaying]);
 
   // Autotabbing controller based on scanning step progress
   useEffect(() => {
@@ -865,7 +863,7 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
       if (index >= text.length) {
         clearInterval(typingTimer);
       }
-    }, 50 / speed);
+    }, 50);
   };
 
   const animateDossier = () => {
@@ -878,15 +876,10 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
       if (index >= fullText.length) {
         clearInterval(dossierTimer);
       }
-    }, 30 / speed);
+    }, 30);
   };
 
   const startSimulation = () => {
-    resetSimulation();
-    setIsPlaying(true);
-  };
-
-  const resetSimulation = () => {
     setIsPlaying(false);
     setCurrentStep(0);
     setTypedTarget("");
@@ -898,20 +891,7 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
     setShowDossier(false);
     setDossierText("");
     setView('timeline');
-  };
-
-  const skipToEnd = () => {
-    setIsPlaying(false);
-    setCurrentStep(22);
-    setTypedTarget(targetEmail);
-    setActiveConnectors([]);
-    setFinishedConnectors(Object.keys(CONNECTOR_DISPLAY_NAMES));
-    setVisibleEvidence(DEMO_PERSON.evidence);
-    setVisibleEntities(DEMO_PERSON.entities);
-    setVisibleLogs(DEMO_PERSON.timeline);
-    setShowDossier(true);
-    setDossierText(DEMO_PERSON.dossier);
-    setView('dossier');
+    setTimeout(() => setIsPlaying(true), 100);
   };
 
   const dossierHtml = useMemo(() => renderMarkdown(dossierText), [dossierText]);
@@ -1134,9 +1114,10 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
                       >
                         <div className="overflow-y-auto pr-2 custom-scrollbar flex-1 min-h-0" ref={evidenceContainerRef}>
                           <div className="grid grid-cols-1 gap-3">
-                          {visibleEvidence.map((ev) => (
-                            <EvidenceCard key={ev.id} item={ev} />
-                          ))}
+                            {visibleEvidence.map((ev) => (
+                              <EvidenceCard key={ev.id} item={ev} />
+                            ))}
+                          </div>
                         </div>
                         {visibleEvidence.length === 0 && (
                           <div className="h-full flex flex-col items-center justify-center text-text-tertiary">
@@ -1281,7 +1262,7 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
                               <Database className="w-8 h-8 mb-2 animate-pulse text-accent" />
                               <span className="text-xs font-mono uppercase tracking-wider">Awaiting entity extraction...</span>
                             </div>
-                          </div>
+                          )}
                         </div>
                       </motion.div>
                     )}
