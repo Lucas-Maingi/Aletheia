@@ -903,10 +903,10 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-900/5 blur-[120px] pointer-events-none" />
 
       {/* Main Studio Viewport */}
-      <div className="flex-1 flex flex-col w-full">
+      <div className="flex-1 flex flex-col w-full min-h-0">
         {/* Stage 1: Terminal Input Prompt */}
         {currentStep === 0 && (
-          <div className="flex-1 flex flex-col items-center justify-center py-16">
+          <div className="flex-1 flex flex-col items-center justify-center py-16 min-h-0">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -1068,7 +1068,7 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
               {/* Right Column: Uniform Tab content */}
               <div className="md:col-span-2 flex flex-col gap-4 min-h-0 overflow-hidden">
                 {/* Content Switcher */}
-                <div className="flex flex-wrap gap-2 bg-foreground/[0.03] border border-border/10 p-1 rounded-xl w-fit">
+                <div className="flex flex-wrap gap-2 bg-foreground/[0.03] border border-border/10 p-1 rounded-xl w-fit shrink-0">
                   {(
                     [
                       { key: 'evidence', label: 'Evidence', icon: <Search className="w-3.5 h-3.5" /> },
