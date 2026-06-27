@@ -183,18 +183,18 @@ function StatCard({
     <motion.div
       variants={itemVariants}
       custom={index}
-      className="relative group rounded-xl border border-border bg-surface/80 backdrop-blur-sm p-5 overflow-hidden"
+      className="relative group rounded-xl border border-border bg-surface/80 backdrop-blur-sm p-3 overflow-hidden"
     >
       {/* Subtle glow on hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       <div className="relative z-10">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-accent">{icon}</span>
-          <span className="text-xs uppercase tracking-widest text-text-secondary font-medium">
+        <div className="flex items-center gap-2 mb-1.5">
+          <span className="text-accent scale-90">{icon}</span>
+          <span className="text-[10px] uppercase tracking-widest text-text-secondary font-medium">
             {label}
           </span>
         </div>
-        <p className="text-3xl font-black text-text-primary">{value}</p>
+        <p className="text-2xl font-black text-text-primary">{value}</p>
       </div>
     </motion.div>
   );
@@ -228,19 +228,19 @@ function EvidenceCard({ item }: { item: EvidenceItem }) {
         }`}
       />
 
-      <div className="p-5">
+      <div className="p-3">
         {/* Header */}
-        <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="flex items-start justify-between gap-3 mb-2">
           <div className="flex items-center gap-2 min-w-0">
             {connector && (
-              <span className="text-lg shrink-0" title={connector.name}>
+              <span className="text-base shrink-0" title={connector.name}>
                 {connector.icon}
               </span>
             )}
-            <h4 className="text-sm font-semibold text-text-primary truncate">{item.title}</h4>
+            <h4 className="text-xs font-semibold text-text-primary truncate">{item.title}</h4>
           </div>
           <span
-            className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${
+            className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border ${
               CONFIDENCE_COLORS[item.confidenceLabel]
             }`}
           >
@@ -251,7 +251,7 @@ function EvidenceCard({ item }: { item: EvidenceItem }) {
 
         {/* Content */}
         <div
-          className={`text-sm text-text-secondary leading-relaxed mb-3 ${
+          className={`text-xs text-text-secondary leading-relaxed mb-2 ${
             !expanded ? 'line-clamp-3' : ''
           }`}
         >
@@ -261,7 +261,7 @@ function EvidenceCard({ item }: { item: EvidenceItem }) {
         {item.content.length > 150 && (
           <button
             onClick={() => setExpanded(!expanded)}
-            className="text-xs text-accent hover:text-accent-hover flex items-center gap-1 mb-3 transition-colors"
+            className="text-[10px] text-accent hover:text-accent-hover flex items-center gap-1 mb-2 transition-colors"
           >
             <ChevronDown
               className={`w-3 h-3 transition-transform duration-200 ${
@@ -273,12 +273,12 @@ function EvidenceCard({ item }: { item: EvidenceItem }) {
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-3 border-t border-border/50">
+        <div className="flex items-center justify-between pt-2 border-t border-border/50">
           <div className="flex items-center gap-3">
-            <span className="text-[10px] uppercase tracking-wider text-text-tertiary font-medium px-1.5 py-0.5 rounded bg-surface-elevated">
+            <span className="text-[9px] uppercase tracking-wider text-text-tertiary font-medium px-1.5 py-0.5 rounded bg-surface-elevated">
               {item.platform}
             </span>
-            <span className="text-[10px] text-text-tertiary font-mono">{ts}</span>
+            <span className="text-[9px] text-text-tertiary font-mono">{ts}</span>
           </div>
           {item.sourceUrl && item.sourceUrl !== '#' && (
             <a
@@ -848,6 +848,13 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
     }
   }, [visibleLogs]);
 
+  // Auto-scroll evidence container to bottom as it streams
+  useEffect(() => {
+    if (evidenceContainerRef.current) {
+      evidenceContainerRef.current.scrollTop = evidenceContainerRef.current.scrollHeight;
+    }
+  }, [visibleEvidence]);
+
   // Auto-scroll evidence container to bottom as new evidence is collected
   useEffect(() => {
     if (evidenceContainerRef.current) {
@@ -1106,11 +1113,10 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
                     {view === 'evidence' && (
                       <motion.div
                         key="evidence"
-                        ref={evidenceContainerRef}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="bg-surface/50 border border-border/10 rounded-xl p-4 shadow-xl backdrop-blur-sm flex flex-col flex-1 min-h-0 overflow-hidden"
+                        className="bg-surface/50 border border-border/10 rounded-xl p-3 shadow-xl backdrop-blur-sm flex flex-col flex-1 min-h-0 overflow-hidden"
                       >
                         <div className="overflow-y-auto pr-2 custom-scrollbar flex-1 min-h-0" ref={evidenceContainerRef}>
                           <div className="grid grid-cols-1 gap-3">
@@ -1137,7 +1143,7 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
                         exit={{ opacity: 0 }}
                         className="bg-surface/50 border border-border/10 rounded-xl p-4 shadow-xl backdrop-blur-sm flex flex-col flex-1 min-h-0 overflow-hidden"
                       >
-                        <h3 className="text-[10px] uppercase tracking-widest text-text-secondary font-medium mb-4 flex items-center gap-2 shrink-0">
+                        <h3 className="text-[10px] uppercase tracking-widest text-text-secondary font-medium mb-3 flex items-center gap-2 shrink-0">
                           <Clock className="w-3.5 h-3.5 text-accent" />
                           Scan Timeline
                         </h3>
