@@ -64,7 +64,6 @@ const FloatingParticles = () => {
 export default function Landing() {
   const [searchValue, setSearchValue] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const [showVideo, setShowVideo] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   
@@ -202,56 +201,20 @@ export default function Landing() {
                 </button>
               </div>
             </form>
-            <div className="mt-4 flex justify-center gap-6">
-              <Link href="/dashboard/demo" className="text-[10px] font-bold uppercase tracking-widest text-text-tertiary hover:text-accent transition-colors flex items-center gap-2">
-                <Eye className="w-3.5 h-3.5" />
-                See Live Demo — No Sign-Up Required
-              </Link>
-              <button 
-                type="button" 
-                onClick={() => setShowVideo(true)}
-                className="text-[10px] font-bold uppercase tracking-widest text-accent hover:text-white transition-colors flex items-center gap-2"
-              >
-                <Play className="w-3.5 h-3.5 text-accent" />
-                Watch 2-Min Walkthrough
-              </button>
+            <div className="mt-8 rounded-2xl border border-accent/30 overflow-hidden bg-surface relative shadow-[0_0_50px_rgba(168,85,247,0.15)] z-30 max-w-[1200px] w-full mx-auto">
+              {/* Mock Browser Header Bar */}
+              <div className="h-10 border-b border-border/10 bg-background/80 flex items-center px-5 gap-2.5 select-none">
+                <div className="w-3 h-3 rounded-full bg-red-500/40 border border-red-600/20" />
+                <div className="w-3 h-3 rounded-full bg-yellow-500/40 border border-yellow-600/20" />
+                <div className="w-3 h-3 rounded-full bg-green-500/40 border border-green-600/20" />
+                <div className="ml-4 text-[10px] text-text-tertiary font-bold tracking-wider uppercase font-mono">aletheia-sandbox-demo.mp4</div>
+              </div>
+              <div className="w-full relative bg-[#020617] overflow-hidden aspect-[4/3] lg:aspect-[16/10] flex flex-col min-h-[600px]">
+                <div className="w-full h-full p-2 sm:p-4 pointer-events-auto overflow-hidden">
+                  <DynamicCinematicDemo autoStart={false} />
+                </div>
+              </div>
             </div>
-
-            {showVideo && (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95, y: -20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="mt-8 rounded-2xl border border-accent/30 overflow-hidden bg-surface relative shadow-[0_0_50px_rgba(168,85,247,0.15)] z-30 max-w-[1200px] w-full mx-auto"
-              >
-                {/* Mock Browser Header Bar */}
-                <div className="h-10 border-b border-border/10 bg-background/80 flex items-center px-5 gap-2.5 select-none">
-                  <button 
-                    onClick={() => setShowVideo(false)}
-                    title="Close Demo"
-                    className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 transition-colors border border-red-600/30 flex items-center justify-center text-[8px] text-red-950 font-bold font-sans"
-                  >
-                    ×
-                  </button>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/40 border border-yellow-600/20" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/40 border border-green-600/20" />
-                  <div className="ml-4 text-[10px] text-text-tertiary font-bold tracking-wider uppercase font-mono">aletheia-walkthrough.mp4</div>
-                  
-                  <button 
-                    onClick={() => setShowVideo(false)}
-                    className="ml-auto text-[9px] font-mono text-text-tertiary hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1 bg-white/5 px-2.5 py-1 rounded border border-white/5"
-                  >
-                    Close Demo
-                  </button>
-                </div>
-                <div className="w-full relative bg-[#020617] overflow-hidden aspect-[4/3] lg:aspect-[16/10] flex flex-col min-h-[600px]">
-                  <div className="w-full h-full p-2 sm:p-4 pointer-events-auto overflow-hidden">
-                    <DynamicCinematicDemo autoStart={true} />
-                  </div>
-                </div>
-              </motion.div>
-            )}
             <div className="mt-8 flex items-center justify-center gap-6 text-[10px] font-black uppercase tracking-[0.3em] text-text-tertiary">
                 <div className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_5px_var(--success)]" />

@@ -637,7 +637,7 @@ export default function DemoPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
         >
-          <CinematicDemo autoStart={true} />
+          <CinematicDemo autoStart={false} />
         </motion.div>
       </div>
     </div>
@@ -925,20 +925,26 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
               </div>
 
               <div className="space-y-4">
-                <div className="text-sm font-semibold text-text-secondary uppercase tracking-wider">Initiate footprint sweep for target:</div>
-                <div className="flex items-center gap-3 p-4 bg-background/50 border border-border/10 rounded-xl">
-                  <Terminal className="w-4 h-4 text-accent" />
-                  <span className="font-mono text-accent text-sm font-bold">timothy.gonzalez@example.com</span>
-                  <span className="w-1.5 h-4 bg-accent animate-pulse" />
+                <div className="text-sm font-semibold text-text-secondary uppercase tracking-wider">Select target for sandbox intelligence sweep:</div>
+                
+                <div className="relative flex items-center gap-3 bg-background/50 border border-border/10 rounded-xl px-4 py-3.5 focus-within:border-accent/40 transition-all duration-300">
+                  <Search className="w-5 h-5 text-accent shrink-0" />
+                  <input
+                    type="text"
+                    value="Timothy Gonzalez"
+                    readOnly
+                    className="bg-transparent flex-1 text-sm text-text-primary outline-none font-bold uppercase tracking-tight"
+                  />
+                  <span className="text-[8px] font-black uppercase tracking-widest text-accent bg-accent/10 border border-accent/20 px-2 py-0.5 rounded">PRE-SEEDED</span>
                 </div>
 
-                <div className="pt-4 flex justify-end">
+                <div className="pt-2 flex justify-end">
                   <Button
                     onClick={startSimulation}
-                    className="bg-accent hover:bg-accent-hover text-white font-bold px-6 py-2 rounded-xl gap-2 shadow-[0_0_20px_rgba(0,240,255,0.3)] uppercase text-[10px] tracking-widest"
+                    className="bg-accent hover:bg-accent-hover text-white font-bold px-6 py-3 rounded-xl gap-2 shadow-[0_0_20px_rgba(0,240,255,0.2)] uppercase text-[10px] tracking-widest transition-all transform hover:scale-[1.02]"
                   >
                     <Play className="w-4 h-4 fill-current" />
-                    Start Autoplay Scan
+                    Initialize Scan
                   </Button>
                 </div>
               </div>
