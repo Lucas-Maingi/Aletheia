@@ -118,11 +118,9 @@ async function runSandboxScan(investigation: any) {
         await prisma.entity.create({
             data: {
                 investigationId,
-                name: ent.name,
                 type: ent.type,
                 value: ent.value,
-                confidence: ent.confidenceScore,
-                metadata: { tags: ent.tags } as any
+                confidence: ent.confidence || 70,
             }
         });
         await new Promise(resolve => setTimeout(resolve, 200));
