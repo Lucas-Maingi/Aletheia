@@ -36,8 +36,32 @@ import { IdentityGraph } from '@/components/dashboard/identity-graph';
 
 // ─── TYPES ──────────────────────────────────────────────────────
 type DemoData = typeof DEMO_PERSON | typeof DEMO_DOMAIN;
-type EvidenceItem = typeof DEMO_PERSON['evidence'][number];
-type EntityItem = typeof DEMO_PERSON['entities'][number];
+
+interface EvidenceItem {
+  id: string;
+  title: string;
+  content: string;
+  connector: string;
+  platform: string;
+  category: string;
+  tags?: string[];
+  confidenceScore: number;
+  confidenceLabel: 'VERIFIED' | 'HIGH' | 'MEDIUM' | 'LOW';
+  sourceUrl?: string;
+  timestamp: string;
+}
+
+interface EntityItem {
+  type: string;
+  value: string;
+  source: string;
+  notes?: string;
+  confidence: number;
+  tags?: string[];
+  confidenceScore?: number;
+  name?: string;
+}
+
 type TimelineEntry = typeof DEMO_PERSON['timeline'][number];
 
 // ─── CONSTANTS ──────────────────────────────────────────────────
