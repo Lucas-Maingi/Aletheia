@@ -183,18 +183,18 @@ function StatCard({
     <motion.div
       variants={itemVariants}
       custom={index}
-      className="relative group rounded-xl border border-border bg-surface/80 backdrop-blur-sm p-3 overflow-hidden"
+      className="relative group rounded-xl border border-border bg-surface/80 backdrop-blur-sm p-2 overflow-hidden"
     >
       {/* Subtle glow on hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       <div className="relative z-10">
-        <div className="flex items-center gap-2 mb-1.5">
-          <span className="text-accent scale-90">{icon}</span>
-          <span className="text-[10px] uppercase tracking-widest text-text-secondary font-medium">
+        <div className="flex items-center gap-1.5 mb-1">
+          <span className="text-accent scale-75">{icon}</span>
+          <span className="text-[9px] uppercase tracking-wider text-text-secondary font-medium truncate">
             {label}
           </span>
         </div>
-        <p className="text-2xl font-black text-text-primary">{value}</p>
+        <p className="text-lg font-black text-text-primary leading-none">{value}</p>
       </div>
     </motion.div>
   );
@@ -228,43 +228,67 @@ function EvidenceCard({ item }: { item: EvidenceItem }) {
         }`}
       />
 
-      <div className="p-3">
+      <div className="p-2">
         {/* Header */}
-        <div className="flex items-start justify-between gap-3 mb-2">
-          <div className="flex items-center gap-2 min-w-0">
+        <div className="flex items-start justify-between gap-2 mb-1.5">
+          <div className="flex items-center gap-1.5 min-w-0">
             {connector && (
-              <span className="text-base shrink-0" title={connector.name}>
+              <span className="text-sm shrink-0" title={connector.name}>
                 {connector.icon}
               </span>
             )}
-            <h4 className="text-xs font-semibold text-text-primary truncate">{item.title}</h4>
+            <h4 className="text-[10px] font-semibold text-text-primary truncate">{item.title}</h4>
           </div>
           <span
-            className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border ${
+            className={`shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider border ${
               CONFIDENCE_COLORS[item.confidenceLabel]
             }`}
           >
-            {item.confidenceLabel === 'VERIFIED' && <CheckCircle2 className="w-3 h-3 mr-1" />}
+            {item.confidenceLabel === 'VERIFIED' && <CheckCircle2 className="w-2.5 h-2.5 mr-1" />}
             {item.confidenceLabel}
           </span>
         </div>
 
-        {/* Content */}
-        <div
-          className={`text-xs text-text-secondary leading-relaxed mb-2 ${
-            !expanded ? 'line-clamp-3' : ''
-          }`}
-        >
-          {item.content}
+        <div className="flex flex-wrap gap-1.5 mb-1.5">
+          {(item.tags || []).map((tag, i) => (
+            <Badge
+              key={i}
+              variant="outline"
+              className="text-[8px] uppercase tracking-wider text-text-tertiary bg-surface/50 px-1 py-0 border-border/50"
+            >
+              {tag}
+            </Badge>
+          ))}
         </div>
 
-        {item.content.length > 150 && (
+        {/* Content Snippet */}
+        <div className="relative mb-1.5">
+          <p
+            className={`text-[9px] text-text-secondary leading-relaxed font-mono ${
+              !expanded && 'line-clamp-2'
+            }`}
+          >
+            {item.content}
+          </p>
+          {!expanded && item.content.length > 100 && (
+            <div className="absolute bottom-0 right-0 bg-gradient-to-l from-surface/80 to-transparent pl-4 pb-0">
+              <button
+                onClick={() => setExpanded(true)}
+                className="text-[9px] text-accent hover:text-accent-hover font-bold flex items-center gap-1"
+              >
+                Expand <ChevronDown className="w-2.5 h-2.5" />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {item.content.length > 100 && (
           <button
             onClick={() => setExpanded(!expanded)}
-            className="text-[10px] text-accent hover:text-accent-hover flex items-center gap-1 mb-2 transition-colors"
+            className="text-[9px] text-accent hover:text-accent-hover flex items-center gap-1 mb-1.5 transition-colors"
           >
             <ChevronDown
-              className={`w-3 h-3 transition-transform duration-200 ${
+              className={`w-2.5 h-2.5 transition-transform duration-200 ${
                 expanded ? 'rotate-180' : ''
               }`}
             />
@@ -568,87 +592,29 @@ function InvestigationPanel({ data }: { data: DemoData }) {
 
 export default function DemoPage() {
   const [isEmbed, setIsEmbed] = useState(false);
-  const [demoMode, setDemoMode] = useState<'interactive' | 'cinematic'>('interactive');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const embed = params.get('embed') === 'true';
     setIsEmbed(embed);
-    if (embed) {
-      setDemoMode('cinematic');
-    }
   }, []);
 
   return (
     <div className={`min-h-screen bg-background pb-24 ${isEmbed ? 'p-0 bg-transparent min-h-0 pb-0' : ''}`}>
-      {/* ── Demo Mode Switcher ── */}
       {!isEmbed && (
-        <div className="max-w-7xl mx-auto px-6 pt-12 flex justify-center">
-        <div className="bg-surface/50 border border-border/10 p-1.5 rounded-2xl flex items-center gap-2">
-          <button
-            onClick={() => setDemoMode('interactive')}
-            className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2.5 transition-all ${
-              demoMode === 'interactive'
-                ? 'bg-accent text-white shadow-lg shadow-accent/20 border border-accent'
-                : 'text-text-secondary hover:text-text-primary border border-transparent'
-            }`}
-          >
-            <Activity className="w-4 h-4" />
-            Interactive Demo
-          </button>
-          <button
-            onClick={() => setDemoMode('cinematic')}
-            className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2.5 transition-all ${
-              demoMode === 'cinematic'
-                ? 'bg-accent text-white shadow-lg shadow-accent/20 border border-accent'
-                : 'text-text-secondary hover:text-text-primary border border-transparent'
-            }`}
-          >
-            <Video className="w-4 h-4" />
-            Watch Autoplay Demo
-          </button>
+        <div className="max-w-7xl mx-auto px-6 pt-12 text-center">
+          <h1 className="text-3xl font-black text-text-primary uppercase tracking-tight mb-2">Live Intelligence Demo</h1>
+          <p className="text-sm text-text-secondary font-medium mb-8">Watch Aletheia run a real-time OSINT scan on a pre-seeded target persona</p>
         </div>
-      </div>
       )}
-
-      {/* ── Main Content ── */}
-      <div className={`max-w-7xl mx-auto px-6 py-8 ${isEmbed ? 'p-0 max-w-none py-0' : ''}`}>
-        {demoMode === 'interactive' ? (
-          <Tabs defaultValue="person">
-            {/* Tab Switcher */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-            >
-              <TabsList className="mb-8">
-                <TabsTrigger value="person">
-                  <User className="w-4 h-4" />
-                  Person Investigation
-                </TabsTrigger>
-                <TabsTrigger value="domain">
-                  <Globe className="w-4 h-4" />
-                  Domain Investigation
-                </TabsTrigger>
-              </TabsList>
-            </motion.div>
-
-            <TabsContent value="person">
-              <InvestigationPanel data={DEMO_PERSON} />
-            </TabsContent>
-            <TabsContent value="domain">
-              <InvestigationPanel data={DEMO_DOMAIN} />
-            </TabsContent>
-          </Tabs>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45 }}
-          >
-            <CinematicDemo autoStart={isEmbed} />
-          </motion.div>
-        )}
+      <div className={`max-w-7xl mx-auto px-6 py-4 ${isEmbed ? 'p-0 max-w-none py-0' : ''}`}>
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+        >
+          <CinematicDemo autoStart={true} />
+        </motion.div>
       </div>
     </div>
   );
@@ -695,7 +661,7 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
   const [dossierText, setDossierText] = useState("");
   const [view, setView] = useState<'evidence' | 'timeline' | 'graph' | 'dossier' | 'entities'>('timeline');
 
-  const targetEmail = "john.doe@example.com";
+  const targetEmail = "timothy.gonzalez@example.com";
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const dossierContainerRef = useRef<HTMLDivElement>(null);
   const logFeedRef = useRef<HTMLDivElement>(null);
@@ -837,28 +803,33 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
   // Auto-scroll dossier container to bottom as it compiles
   useEffect(() => {
     if (dossierContainerRef.current) {
-      dossierContainerRef.current.scrollTop = dossierContainerRef.current.scrollHeight;
+      setTimeout(() => {
+        if (dossierContainerRef.current) {
+          dossierContainerRef.current.scrollTop = dossierContainerRef.current.scrollHeight;
+        }
+      }, 50);
     }
   }, [dossierText]);
 
   // Auto-scroll log feed container to bottom as it logs
   useEffect(() => {
     if (logFeedRef.current) {
-      logFeedRef.current.scrollTop = logFeedRef.current.scrollHeight;
+      setTimeout(() => {
+        if (logFeedRef.current) {
+          logFeedRef.current.scrollTop = logFeedRef.current.scrollHeight;
+        }
+      }, 50);
     }
   }, [visibleLogs]);
-
-  // Auto-scroll evidence container to bottom as it streams
-  useEffect(() => {
-    if (evidenceContainerRef.current) {
-      evidenceContainerRef.current.scrollTop = evidenceContainerRef.current.scrollHeight;
-    }
-  }, [visibleEvidence]);
 
   // Auto-scroll evidence container to bottom as new evidence is collected
   useEffect(() => {
     if (evidenceContainerRef.current) {
-      evidenceContainerRef.current.scrollTop = evidenceContainerRef.current.scrollHeight;
+      setTimeout(() => {
+        if (evidenceContainerRef.current) {
+          evidenceContainerRef.current.scrollTop = evidenceContainerRef.current.scrollHeight;
+        }
+      }, 50);
     }
   }, [visibleEvidence]);
 
@@ -933,7 +904,7 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
                 <div className="text-sm font-semibold text-text-secondary uppercase tracking-wider">Initiate footprint sweep for target:</div>
                 <div className="flex items-center gap-3 p-4 bg-background/50 border border-border/10 rounded-xl">
                   <Terminal className="w-4 h-4 text-accent" />
-                  <span className="font-mono text-accent text-sm font-bold">john.doe@example.com</span>
+                  <span className="font-mono text-accent text-sm font-bold">timothy.gonzalez@example.com</span>
                   <span className="w-1.5 h-4 bg-accent animate-pulse" />
                 </div>
 
@@ -994,7 +965,7 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
                       <h2 className="text-sm font-bold truncate text-text-primary" title={DEMO_PERSON.investigation.title}>
                         {DEMO_PERSON.investigation.title}
                       </h2>
-                      <p className="text-[10px] text-text-secondary truncate">Subject: john.doe@example.com</p>
+                      <p className="text-[10px] text-text-secondary truncate">Subject: timothy.gonzalez@example.com</p>
                     </div>
                     <div className="shrink-0">
                       {currentStep >= 18 ? (
@@ -1178,7 +1149,7 @@ export function CinematicDemo({ autoStart = false }: { autoStart?: boolean }) {
                         </div>
                         <div className="flex-1 min-h-0">
                           <IdentityGraph
-                            target="john.doe@example.com"
+                            target="timothy.gonzalez@example.com"
                             evidence={visibleEvidence}
                             entities={visibleEntities}
                           />

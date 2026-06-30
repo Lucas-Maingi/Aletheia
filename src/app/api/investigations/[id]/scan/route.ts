@@ -26,6 +26,7 @@ import {
 import { extractExif } from '@/connectors/exifMetadata';
 import { FacialMatch, mapFaceCheckResults } from '@/connectors/visualIntel';
 import { calculateConfidence, getConfidenceLabel } from '@/lib/osint/registry';
+import { DEMO_PERSON } from '@/lib/demo-data';
 import { createHash } from 'crypto';
 
 // Generate SHA-256 hash of evidence content for immutability verification
@@ -69,6 +70,74 @@ function isLicensePlate(v: string): boolean {
         }
     }
     return false;
+}
+
+async function runSandboxScan(investigation: any) {
+    const investigationId = investigation.id;
+    const userId = investigation.userId;
+    console.log(`[SANDBOX] Starting sandbox scan for ${investigationId}`);
+    
+    // Simulate initial delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Add logs
+    for (const log of DEMO_PERSON.timeline) {
+        await prisma.searchLog.create({
+            data: {
+                investigationId,
+                userId,
+                query: log.event,
+                connectorType: log.type === 'complete' ? 'system_complete' : 'system'
+            }
+        });
+        await new Promise(resolve => setTimeout(resolve, 400));
+    }
+    
+    // Add evidence
+    for (const ev of DEMO_PERSON.evidence) {
+        await prisma.evidence.create({
+            data: {
+                investigationId,
+                title: ev.title,
+                content: ev.content,
+                type: 'text',
+                confidenceScore: ev.confidenceScore,
+                confidenceLabel: ev.confidenceLabel,
+                metadata: {
+                    platform: ev.platform,
+                    tags: ev.tags,
+                    sourceUrl: ev.sourceUrl
+                } as any
+            }
+        });
+        await new Promise(resolve => setTimeout(resolve, 300));
+    }
+    
+    // Add entities
+    for (const ent of DEMO_PERSON.entities) {
+        await prisma.entity.create({
+            data: {
+                investigationId,
+                name: ent.name,
+                type: ent.type,
+                value: ent.value,
+                confidence: ent.confidenceScore,
+                metadata: { tags: ent.tags } as any
+            }
+        });
+        await new Promise(resolve => setTimeout(resolve, 200));
+    }
+    
+    // Complete investigation and add dossier
+    await prisma.investigation.update({
+        where: { id: investigationId },
+        data: {
+            status: 'completed',
+            dossier: DEMO_PERSON.dossier
+        }
+    });
+    
+    console.log(`[SANDBOX] Completed sandbox scan for ${investigationId}`);
 }
 
 export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
@@ -160,6 +229,17 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
             where: { id: investigationId },
             data: { status: 'active' },
         });
+
+        // IF TIMOTHY GONZALEZ SANDBOX
+        if (investigation.target.toLowerCase() === 'timothy gonzalez') {
+            console.log(`[SCAN] Sandbox mode triggered for Timothy Gonzalez`);
+            runSandboxScan(investigation);
+            return NextResponse.json({ 
+                success: true, 
+                message: 'Sandbox scan initiated.',
+                mode: 'sandbox'
+            }, { status: 202 });
+        }
 
         // IF FORCE: Run only visual siphoning and return early
         if (isForce && investigation.subjectImageUrl) {

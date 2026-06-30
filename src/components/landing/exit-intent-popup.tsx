@@ -9,19 +9,46 @@ export function ExitIntentPopup() {
   const [hasTriggered, setHasTriggered] = useState(false);
 
   useEffect(() => {
+    let scrollPos = window.scrollY;
+    
     const handleMouseLeave = (e: MouseEvent) => {
       // Trigger if mouse leaves top of screen
       if (e.clientY <= 0 && !hasTriggered) {
-        setIsVisible(true);
-        setHasTriggered(true);
+        triggerPopup();
       }
     };
 
-    // Add event listener to the document
+    const handleScroll = () => {
+      const currentScroll = window.scrollY;
+      const scrollSpeed = scrollPos - currentScroll;
+      
+      // Fast scroll up on mobile devices (speed > 50) near top
+      if (scrollSpeed > 50 && currentScroll < 200 && !hasTriggered && window.innerWidth < 768) {
+        triggerPopup();
+      }
+      scrollPos = currentScroll;
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden && !hasTriggered) {
+        triggerPopup();
+      }
+    };
+
+    const triggerPopup = () => {
+      setIsVisible(true);
+      setHasTriggered(true);
+    };
+
+    // Add event listeners
     document.addEventListener('mouseleave', handleMouseLeave);
+    document.addEventListener('scroll', handleScroll, { passive: true });
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     
     return () => {
       document.removeEventListener('mouseleave', handleMouseLeave);
+      document.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [hasTriggered]);
 
