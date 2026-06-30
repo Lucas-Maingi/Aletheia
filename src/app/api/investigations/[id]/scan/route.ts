@@ -126,12 +126,21 @@ async function runSandboxScan(investigation: any) {
         await new Promise(resolve => setTimeout(resolve, 200));
     }
     
-    // Complete investigation and add dossier
+    // Create the dossier report
+    await prisma.report.create({
+        data: {
+            investigationId,
+            title: `Intelligence Dossier — Timothy Gonzalez`,
+            content: DEMO_PERSON.dossier,
+            format: 'markdown'
+        }
+    });
+
+    // Complete investigation status
     await prisma.investigation.update({
         where: { id: investigationId },
         data: {
-            status: 'completed',
-            dossier: DEMO_PERSON.dossier
+            status: 'closed'
         }
     });
     
