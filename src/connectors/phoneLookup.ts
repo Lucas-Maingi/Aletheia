@@ -40,7 +40,7 @@ export async function phoneLookup(phone: string): Promise<ConnectorResult> {
                 ].filter(Boolean);
 
                 results.push({
-                    title: `Phone Intelligence — ${data.intl_format || phone}`,
+                    title: `Phone Intelligence — ${data.international_format || phone}`,
                     url: `https://numlookupapi.com/`,
                     description: descriptionParts.length > 0 ? descriptionParts.join(' · ') : 'Valid phone number, no carrier details returned.',
                     category: 'phone_intel',
