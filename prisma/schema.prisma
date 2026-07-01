@@ -35,6 +35,10 @@ model User {
   createdAt                  DateTime @default(now())
   updatedAt                  DateTime @default(now()) @updatedAt
 
+  // Integrations
+  siemWebhookUrl             String?
+  siemWebhookSecret          String?
+
   investigations Investigation[]
   searchLogs     SearchLog[]
   notifications  Notification[]

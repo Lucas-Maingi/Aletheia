@@ -25,6 +25,8 @@ export async function GET() {
                 name: true,
                 avatarUrl: true,
                 email: true,
+                siemWebhookUrl: true,
+                siemWebhookSecret: true,
             }
         });
 

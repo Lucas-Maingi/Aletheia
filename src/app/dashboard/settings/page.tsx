@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Shield, CheckCircle2, AlertCircle, User as UserIcon, CreditCard, Activity, ExternalLink, Brain, Database, X, Lock, Eye, EyeOff } from "lucide-react";
+import { Shield, CheckCircle2, AlertCircle, User as UserIcon, CreditCard, Activity, ExternalLink, Brain, Database, X, Lock, Eye, EyeOff, Terminal, Webhook } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,6 +25,12 @@ export default function SettingsPage() {
         plan: "free"
     });
     const [isLoading, setIsLoading] = useState(true);
+
+    // Integrations / Webhook State
+    const [webhookUrl, setWebhookUrl] = useState("");
+    const [webhookSecret, setWebhookSecret] = useState("");
+    const [isSavingWebhook, setIsSavingWebhook] = useState(false);
+    const [isTestingWebhook, setIsTestingWebhook] = useState(false);
 
     // Password change modal state
     const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -68,6 +74,8 @@ export default function SettingsPage() {
                         avatarUrl: data.avatarUrl || "",
                         plan: data.plan || "free"
                     });
+                    setWebhookUrl(data.siemWebhookUrl || "");
+                    setWebhookSecret(data.siemWebhookSecret || "");
                 }
             } catch (err) {
                 console.error("Failed to load settings data", err);
@@ -125,6 +133,58 @@ export default function SettingsPage() {
             toast.success("Avatar image loaded. Click 'Save Identity Changes' to persist.");
         };
         reader.readAsDataURL(file);
+    };
+
+    const handleSaveWebhook = async () => {
+        setIsSavingWebhook(true);
+        try {
+            const res = await fetch('/api/settings/webhook', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'save',
+                    siemWebhookUrl: webhookUrl,
+                    siemWebhookSecret: webhookSecret,
+                })
+            });
+            if (res.ok) {
+                toast.success("SIEM/SOAR webhook configuration saved.");
+            } else {
+                toast.error("Failed to save webhook configuration.");
+            }
+        } catch (err) {
+            toast.error("Protocol error saving webhook.");
+        } finally {
+            setIsSavingWebhook(false);
+        }
+    };
+
+    const handleTestWebhook = async () => {
+        if (!webhookUrl) {
+            toast.error("Please enter a webhook URL first.");
+            return;
+        }
+        setIsTestingWebhook(true);
+        try {
+            const res = await fetch('/api/settings/webhook', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'test',
+                    siemWebhookUrl: webhookUrl,
+                    siemWebhookSecret: webhookSecret,
+                })
+            });
+            if (res.ok) {
+                toast.success("Test event dispatched successfully.");
+            } else {
+                toast.error("Failed to dispatch test event.");
+            }
+        } catch (err) {
+            toast.error("Protocol error testing webhook.");
+        } finally {
+            setIsTestingWebhook(false);
+        }
     };
 
     const handlePasswordChange = async () => {
@@ -209,7 +269,8 @@ export default function SettingsPage() {
                     {[
                         { id: "identity", label: "Identity Profile", icon: <UserIcon className="w-3.5 h-3.5" /> },
                         { id: "quota", label: "Resource Quotas", icon: <Database className="w-3.5 h-3.5" /> },
-                        { id: "security", label: "Security & Session", icon: <Shield className="w-3.5 h-3.5" /> }
+                        { id: "security", label: "Security & Session", icon: <Shield className="w-3.5 h-3.5" /> },
+                        { id: "integrations", label: "Integrations", icon: <Webhook className="w-3.5 h-3.5" /> }
                     ].map((tab) => (
                         <TabsTrigger 
                             key={tab.id}
@@ -396,6 +457,69 @@ export default function SettingsPage() {
                             </CardContent>
                         </Card>
                     </div>
+                </TabsContent>
+
+                {/* Integrations Content */}
+                <TabsContent value="integrations" className="mt-10 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <Card className="bg-surface border border-border/10 shadow-xl rounded-3xl overflow-hidden group max-w-2xl">
+                        <CardHeader className="bg-foreground/[0.02] border-b border-border/5 p-8">
+                            <CardTitle className="flex items-center gap-4 text-text-primary uppercase tracking-[0.1em] text-lg font-black">
+                                <Webhook className="w-6 h-6 text-accent group-hover:scale-110 transition-transform" />
+                                SIEM / SOAR Integrations
+                            </CardTitle>
+                            <CardDescription className="text-xs font-bold text-text-tertiary uppercase tracking-wider leading-relaxed pt-2">
+                                Configure webhooks to pipe high-fidelity OSINT intelligence directly into your external security systems.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-8 space-y-8">
+                            <div className="space-y-6">
+                                <div className="space-y-3">
+                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary flex items-center gap-2">
+                                        Webhook URL
+                                    </Label>
+                                    <Input
+                                        type="url"
+                                        placeholder="https://siem.yourcompany.com/api/webhooks/aletheia"
+                                        value={webhookUrl}
+                                        onChange={(e) => setWebhookUrl(e.target.value)}
+                                        className="h-14 bg-background border-border/10 text-white placeholder:text-text-tertiary/50 font-mono text-sm px-6 rounded-2xl focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
+                                    />
+                                    <p className="text-[10px] text-text-tertiary font-mono">Endpoint must accept POST requests. Dispatches occur automatically when scans complete.</p>
+                                </div>
+                                <div className="space-y-3">
+                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary flex items-center gap-2">
+                                        HMAC Secret (Optional)
+                                    </Label>
+                                    <Input
+                                        type="password"
+                                        placeholder="Enter a secret to sign payloads..."
+                                        value={webhookSecret}
+                                        onChange={(e) => setWebhookSecret(e.target.value)}
+                                        className="h-14 bg-background border-border/10 text-white placeholder:text-text-tertiary/50 font-mono text-sm px-6 rounded-2xl focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
+                                    />
+                                    <p className="text-[10px] text-text-tertiary font-mono">If provided, payloads are signed with HMAC SHA-256 in the <span className="text-accent">X-Aletheia-Signature</span> header.</p>
+                                </div>
+                            </div>
+                            
+                            <div className="flex gap-4 pt-4 border-t border-white/5">
+                                <Button 
+                                    onClick={handleSaveWebhook}
+                                    disabled={isSavingWebhook}
+                                    className="h-14 px-8 bg-accent hover:bg-accent-hover text-white font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all disabled:opacity-50"
+                                >
+                                    {isSavingWebhook ? 'Saving...' : 'Save Configuration'}
+                                </Button>
+                                <Button 
+                                    onClick={handleTestWebhook}
+                                    disabled={isTestingWebhook || !webhookUrl}
+                                    variant="outline"
+                                    className="h-14 px-8 border-border/20 text-text-secondary hover:text-white hover:bg-white/5 hover:border-white/20 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all"
+                                >
+                                    {isTestingWebhook ? 'Sending...' : 'Send Test Ping'}
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </TabsContent>
             </Tabs>
 

@@ -26,9 +26,11 @@ import {
 } from '@/connectors';
 import { extractExif } from '@/connectors/exifMetadata';
 import { FacialMatch, mapFaceCheckResults } from '@/connectors/visualIntel';
+import { extractEntities, summarizeFindings as _summarizeFindings } from '@/lib/ai/gemini';
 import { calculateConfidence, getConfidenceLabel } from '@/lib/osint/registry';
 import { DEMO_PERSON } from '@/lib/demo-data';
 import { createHash } from 'crypto';
+import { dispatchWebhook } from '@/lib/osint/webhook';
 
 // Generate SHA-256 hash of evidence content for immutability verification
 function generateProvenanceHash(content: string): string {
@@ -200,6 +202,9 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
             console.warn(`[Security] Unauthorized scan attempt on ${investigationId} by ${user.id}`);
             return NextResponse.json({ error: 'Access denied' }, { status: 403 });
         }
+        
+        // Fetch User's Webhook Config for SIEM Integration
+        const dbUser = await prisma.user.findUnique({ where: { id: user.id }, select: { siemWebhookUrl: true, siemWebhookSecret: true } });
         // Dossier v87: Intelligent Re-scan Failsafe
         // If a scan is 'active' but hasn't been updated in 3 minutes, assume it's a dead process and allow reset.
         const STALE_THRESHOLD = 3 * 60 * 1000; // 3 minutes
@@ -1045,6 +1050,25 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
                 format: 'markdown'
             }
         });
+
+        // Fire SIEM Webhook
+        if (dbUser?.siemWebhookUrl) {
+            const highConfidenceEv = allEvidence.filter(e => e.confidenceScore > 0.85).slice(0, 20); // Top 20 actionable hits
+            await dispatchWebhook(dbUser.siemWebhookUrl, dbUser.siemWebhookSecret, {
+                event: 'investigation.completed',
+                timestamp: new Date().toISOString(),
+                data: {
+                    investigationId,
+                    target: investigation.target,
+                    metrics: {
+                        totalFound: allEvidence.length,
+                        highFidelity: highConfidenceEv.length,
+                        facialMatches: facialMatches.length
+                    },
+                    highConfidenceEvidence: highConfidenceEv.map(e => ({ type: e.type, title: e.title, confidence: e.confidenceScore }))
+                }
+            });
+        }
 
         return {
             found: allEvidence.length,
