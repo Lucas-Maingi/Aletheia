@@ -34,7 +34,7 @@ export function Footer({ className }: FooterProps) {
                     <ul className="space-y-3 text-sm text-text-secondary">
                         <li><Link href="/dashboard" className="hover:text-accent transition-colors">Dashboard</Link></li>
                         <li><Link href="/pricing" className="hover:text-accent transition-colors">Pricing</Link></li>
-                        <li><Link href="/about" className="hover:text-accent transition-colors">About Us</Link></li>
+                        <li><Link href="/founder" className="hover:text-accent transition-colors">Founder & Vision</Link></li>
                     </ul>
                 </div>
 

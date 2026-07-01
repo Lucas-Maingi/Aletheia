@@ -78,7 +78,7 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
     title: 'Aletheia',
   },
-  manifest: '/manifest.webmanifest',
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({

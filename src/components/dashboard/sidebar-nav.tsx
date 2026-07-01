@@ -119,6 +119,12 @@ export function SidebarNav({
                     label="Intelligence Archive" 
                     icon={<Database className="w-4 h-4" />} 
                 />
+
+                <NavLink 
+                    href="/dashboard/roadmap" 
+                    label="Platform Roadmap" 
+                    icon={<Activity className="w-4 h-4" />} 
+                />
             </div>
 
             {/* Automated Systems Section */}
