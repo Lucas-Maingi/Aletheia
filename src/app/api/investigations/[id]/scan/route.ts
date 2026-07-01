@@ -202,8 +202,6 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
             return NextResponse.json({ error: 'Access denied' }, { status: 403 });
         }
         
-        // Fetch User's Webhook Config for SIEM Integration
-        const dbUser = await prisma.user.findUnique({ where: { id: user.id }, select: { siemWebhookUrl: true, siemWebhookSecret: true } });
         // Dossier v87: Intelligent Re-scan Failsafe
         // If a scan is 'active' but hasn't been updated in 3 minutes, assume it's a dead process and allow reset.
         const STALE_THRESHOLD = 3 * 60 * 1000; // 3 minutes
@@ -1051,6 +1049,7 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
         });
 
         // Fire SIEM Webhook
+        const dbUser = await prisma.user.findUnique({ where: { id: userId }, select: { siemWebhookUrl: true, siemWebhookSecret: true } });
         if (dbUser?.siemWebhookUrl) {
             const highConfidenceEv = allEvidence.filter(e => e.confidenceScore > 0.85).slice(0, 20); // Top 20 actionable hits
             await dispatchWebhook(dbUser.siemWebhookUrl, dbUser.siemWebhookSecret, {
