@@ -26,7 +26,6 @@ import {
 } from '@/connectors';
 import { extractExif } from '@/connectors/exifMetadata';
 import { FacialMatch, mapFaceCheckResults } from '@/connectors/visualIntel';
-import { extractEntities, summarizeFindings as _summarizeFindings } from '@/lib/ai/gemini';
 import { calculateConfidence, getConfidenceLabel } from '@/lib/osint/registry';
 import { DEMO_PERSON } from '@/lib/demo-data';
 import { createHash } from 'crypto';
