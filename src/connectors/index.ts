@@ -15,3 +15,4 @@ export * from './ecosystemSearch';
 export * from './registrationScout';
 export * from './siphonHub';
 export * from './vehicleSearch';
+export * from './phoneLookup';

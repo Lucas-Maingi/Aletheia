@@ -21,7 +21,8 @@ import {
     ecosystemSearch,
     registrationScout,
     siphonHub,
-    vehicleSearch
+    vehicleSearch,
+    phoneLookup
 } from '@/connectors';
 import { extractExif } from '@/connectors/exifMetadata';
 import { FacialMatch, mapFaceCheckResults } from '@/connectors/visualIntel';
@@ -380,6 +381,7 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
             domains: new Set<{ value: string; sourceId?: string }>(),
             crypto: new Set<{ value: string; sourceId?: string }>(),
             names: new Set<{ value: string; sourceId?: string }>(),
+            phones: new Set<{ value: string; sourceId?: string }>(),
         };
 
         // FIDELITY & DE-DUPLICATION REGISTRY
@@ -482,6 +484,16 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
                     batch.push({ type: 'name', value: cleanName });
                 }
             }
+
+            // 6. Phone Numbers
+            const phonesRaw = text.match(/\+?[1-9][0-9\s-]{8,14}\d/g) || [];
+            phonesRaw.forEach(p => {
+                const value = p.replace(/[\s-]/g, '');
+                if (value.length >= 10 && value.length <= 15) {
+                    correlatedIdentifiers.phones.add({ value, sourceId });
+                    batch.push({ type: 'phone', value });
+                }
+            });
 
             return batch;
         };
@@ -891,8 +903,7 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
         // 6. Technical Vectors (IP, Phone)
         const phoneTarget = investigation.subjectPhone;
         if (phoneTarget) {
-            // Add phone specialized connector if exists, or use dorks
-            phase1.push(safeRun('Phone Intelligence', () => googleDorks({ name: phoneTarget })));
+            phase1.push(safeRun('Phone Intelligence', () => phoneLookup(phoneTarget)));
         }
 
         if (primaryTarget && primaryTarget.match(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/)) {
@@ -971,7 +982,8 @@ async function runFullScan(investigation: any, userId: string, isPro: boolean, c
 
             ...Array.from(correlatedIdentifiers.usernames).map(u => ({ label: `Pivot: @${u.value}`, task: () => usernameSearch(u.value), pivotId: u.sourceId, skip: u.value === investigation.subjectUsername || u.value === primaryTarget })),
             ...Array.from(correlatedIdentifiers.names).map(n => ({ label: `Pivot: ${n.value}`, task: () => googleDorks({ name: n.value }), pivotId: n.sourceId, skip: false })),
-            ...Array.from(correlatedIdentifiers.emails).map(e => ({ label: `Pivot: ${e.value}`, task: () => breachSearch(e.value), pivotId: e.sourceId, skip: e.value === investigation.subjectEmail }))
+            ...Array.from(correlatedIdentifiers.emails).map(e => ({ label: `Pivot: ${e.value}`, task: () => breachSearch(e.value), pivotId: e.sourceId, skip: e.value === investigation.subjectEmail })),
+            ...Array.from(correlatedIdentifiers.phones).map(p => ({ label: `Pivot: ${p.value}`, task: () => phoneLookup(p.value), pivotId: p.sourceId, skip: p.value === investigation.subjectPhone }))
         ];
 
         for (const p of pivotQueue) {

@@ -13,7 +13,8 @@ import {
     ipinfo,
     whatsMyName,
     ecosystemSearch,
-    registrationScout
+    registrationScout,
+    phoneLookup
 } from '@/connectors';
 import { calculateConfidence, getConfidenceLabel } from '@/lib/osint/registry';
 
@@ -168,6 +169,11 @@ export async function POST(req: NextRequest, props: { params: Promise<{ id: stri
         if (primaryTarget && !primaryTarget.includes('@')) {
             // Note: Ecosystem Discovery takes ~15 seconds.
             phase1.push(safeRun('Ecosystem Discovery', () => ecosystemSearch(primaryTarget)));
+        }
+
+        const phoneTarget = investigation.subjectPhone;
+        if (phoneTarget) {
+            phase1.push(safeRun('Phone Intelligence', () => phoneLookup(phoneTarget)));
         }
 
         // Chunk execution
