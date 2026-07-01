@@ -17,6 +17,8 @@ interface Investigation {
     subjectUsername?: string;
     status: 'active' | 'archived' | 'closed' | 'pending';
     updatedAt: string;
+    tags?: string;
+    notes?: string | null;
 }
 
 export function InvestigationList({ investigations }: { investigations: Investigation[] }) {
@@ -147,12 +149,19 @@ export function InvestigationList({ investigations }: { investigations: Investig
                                             v.1.0-RPT
                                         </span>
                                     </div>
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-3 flex-wrap">
                                         <p className="text-[10px] text-text-tertiary uppercase tracking-widest">
                                             {inv.subjectUsername ? `@${inv.subjectUsername}` : 'Anonymous Subject'}
                                         </p>
-                                        <div className="h-1 w-1 rounded-full bg-border/20" />
-                                        <div className="text-[10px] text-text-tertiary font-bold uppercase mb-1">Report ID</div>
+                                        {inv.tags && inv.tags.split(',').filter(Boolean).length > 0 && (
+                                            <div className="flex items-center gap-1 flex-wrap">
+                                                {inv.tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 3).map(tag => (
+                                                    <span key={tag} className="text-[8px] font-bold text-accent/70 border border-accent/20 bg-accent/5 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -179,10 +188,12 @@ export function InvestigationList({ investigations }: { investigations: Investig
                                 <div className="flex items-center gap-2 pointer-events-auto z-50">
                                     <Badge className={`text-[9px] font-bold uppercase tracking-widest border ${
                                         inv.status === 'active' 
-                                            ? 'bg-accent/20 text-accent border-accent/30' 
-                                            : inv.status === 'archived'
-                                                ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
-                                                : 'bg-background/20 text-text-secondary border-border/20 group-hover:bg-background/40 group-hover:text-text-primary group-hover:border-border/40 transition-all'
+                                            ? 'bg-emerald-400/15 text-emerald-400 border-emerald-400/30' 
+                                            : inv.status === 'pending'
+                                                ? 'bg-amber-400/15 text-amber-400 border-amber-400/30'
+                                                : inv.status === 'closed'
+                                                    ? 'bg-cyan-400/15 text-cyan-400 border-cyan-400/30'
+                                                    : 'bg-zinc-400/10 text-zinc-400 border-zinc-400/20'
                                     }`}>
                                         {inv.status}
                                     </Badge>

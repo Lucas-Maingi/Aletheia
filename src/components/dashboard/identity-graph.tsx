@@ -54,7 +54,8 @@ export function IdentityGraph({
     entities,
     investigationId,
     parentInvestigation = null,
-    childInvestigations = []
+    childInvestigations = [],
+    readOnly = false
 }: {
     target: string;
     evidence: any[];
@@ -62,6 +63,7 @@ export function IdentityGraph({
     investigationId?: string;
     parentInvestigation?: { id: string; title: string } | null;
     childInvestigations?: { id: string; title: string }[];
+    readOnly?: boolean;
 }) {
     const [dimensions, setDimensions] = useState({ width: 800, height: 500 });
     const containerRef = useRef<HTMLDivElement>(null);

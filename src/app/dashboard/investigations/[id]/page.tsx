@@ -27,6 +27,7 @@ import { LiveTerminalFeed } from '@/components/dashboard/live-terminal';
 import { ScanButton } from '@/components/dashboard/scan-button';
 import { InvestigationActions } from '@/components/dashboard/investigation-actions';
 import { InvestigationDetailClient } from '@/components/dashboard/investigation-detail-client';
+import { CaseControlPanel } from '@/components/dashboard/case-control-panel';
 import { serializeData } from '@/lib/serialization';
 import { ReportPrintHeader } from '@/components/dashboard/report-print-header';
 
@@ -171,20 +172,33 @@ export default async function InvestigationDetailPage({
                 </CardContent>
             </Card>
 
-            {/* Content Tabs (Live Refreshed) - Now Full Width */}
-            <InvestigationDetailClient 
-                investigationId={id}
-                initialEvidence={safeInvestigation.evidence}
-                initialEntities={safeInvestigation.entities}
-                initialReports={safeInvestigation.reports}
-                initialCount={safeInvestigation._count}
-                title={safeInvestigation.title}
-                subjectImageUrl={safeInvestigation.subjectImageUrl}
-                isScanning={isScanning}
-                parentInvestigation={safeInvestigation.parentInvestigation}
-                childInvestigations={safeInvestigation.childInvestigations}
-            />
-        </div >
+            {/* Two-column layout: Main Tabs + Case Control Panel */}
+            <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-6 items-start">
+                {/* Main Content Tabs */}
+                <InvestigationDetailClient 
+                    investigationId={id}
+                    initialEvidence={safeInvestigation.evidence}
+                    initialEntities={safeInvestigation.entities}
+                    initialReports={safeInvestigation.reports}
+                    initialCount={safeInvestigation._count}
+                    title={safeInvestigation.title}
+                    subjectImageUrl={safeInvestigation.subjectImageUrl}
+                    isScanning={isScanning}
+                    parentInvestigation={safeInvestigation.parentInvestigation}
+                    childInvestigations={safeInvestigation.childInvestigations}
+                />
+
+                {/* Case Control Panel (Sticky Sidebar) */}
+                <CaseControlPanel
+                    investigationId={id}
+                    initialStatus={safeInvestigation.status}
+                    initialNotes={safeInvestigation.notes || null}
+                    initialTags={safeInvestigation.tags || ''}
+                    initialIsShared={safeInvestigation.isShared || false}
+                    initialShareToken={safeInvestigation.shareToken || null}
+                />
+            </div>
+        </div>
     );
 }
 

@@ -11,6 +11,16 @@ export default async function InvestigationsIndexPage() {
     const investigations = await prisma.investigation.findMany({
         where: { userId: user.id },
         orderBy: { updatedAt: 'desc' },
+        select: {
+            id: true,
+            title: true,
+            status: true,
+            updatedAt: true,
+            subjectUsername: true,
+            tags: true,
+            notes: true,
+            isShared: true,
+        }
     });
 
     return (

@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Users, Mail, Globe, AtSign, Shield, Fingerprint, Zap, Car } from 'lucide-react';
 
-export function EntitiesTab({ entities, investigationId }: { entities: any[], investigationId: string }) {
+export function EntitiesTab({ entities, investigationId, readOnly = false }: { entities: any[], investigationId: string, readOnly?: boolean }) {
     if (entities.length === 0) {
         return (
             <Card className="border-dashed border-border-bright bg-transparent">
@@ -70,14 +70,16 @@ export function EntitiesTab({ entities, investigationId }: { entities: any[], in
                                 <span className="text-[10px] text-text-primary/20 font-mono font-black tracking-widest uppercase">
                                     DISC_PULSE: {new Date(entity.createdAt).toISOString().substring(11, 19)}
                                 </span>
-                                <a 
-                                    href={`/dashboard/investigations/new?target=${encodeURIComponent(entity.value)}`}
-                                    className="text-[10px] text-accent hover:text-text-primary font-black uppercase tracking-[0.2em] transition-all relative group/btn flex items-center gap-2"
-                                >
-                                    <Zap className="w-3 h-3 group-hover:scale-125 transition-transform" />
-                                    <span className="relative z-10">PIVOT_CORE</span>
-                                    <div className="absolute bottom-0 left-0 w-0 h-px bg-accent group-hover/btn:w-full transition-all duration-500" />
-                                </a>
+                                {!readOnly && (
+                                    <a 
+                                        href={`/dashboard/investigations/new?target=${encodeURIComponent(entity.value)}`}
+                                        className="text-[10px] text-accent hover:text-text-primary font-black uppercase tracking-[0.2em] transition-all relative group/btn flex items-center gap-2"
+                                    >
+                                        <Zap className="w-3 h-3 group-hover:scale-125 transition-transform" />
+                                        <span className="relative z-10">PIVOT_CORE</span>
+                                        <div className="absolute bottom-0 left-0 w-0 h-px bg-accent group-hover/btn:w-full transition-all duration-500" />
+                                    </a>
+                                )}
                             </div>
                         </CardContent>
                     </Card>

@@ -71,12 +71,32 @@ export async function PATCH(
         }
 
         const body = await request.json();
-        // Prevent users from overwriting the owner/userId
-        const { userId: _, ...safeBody } = body;
+        // Explicitly pick only allowed update fields (prevents injection of userId/id overrides)
+        const {
+            title, description, status, subjectName, subjectUsername,
+            subjectEmail, subjectPhone, subjectDomain, subjectImageUrl,
+            // Case management fields
+            notes, tags, isShared, shareToken
+        } = body;
+
+        const updateData: Record<string, any> = {};
+        if (title !== undefined) updateData.title = title;
+        if (description !== undefined) updateData.description = description;
+        if (status !== undefined) updateData.status = status;
+        if (subjectName !== undefined) updateData.subjectName = subjectName;
+        if (subjectUsername !== undefined) updateData.subjectUsername = subjectUsername;
+        if (subjectEmail !== undefined) updateData.subjectEmail = subjectEmail;
+        if (subjectPhone !== undefined) updateData.subjectPhone = subjectPhone;
+        if (subjectDomain !== undefined) updateData.subjectDomain = subjectDomain;
+        if (subjectImageUrl !== undefined) updateData.subjectImageUrl = subjectImageUrl;
+        if (notes !== undefined) updateData.notes = notes;
+        if (tags !== undefined) updateData.tags = tags;
+        if (isShared !== undefined) updateData.isShared = isShared;
+        if (shareToken !== undefined) updateData.shareToken = shareToken;
 
         const investigation = await prisma.investigation.update({
             where: { id },
-            data: safeBody,
+            data: updateData,
         });
 
         revalidatePath('/dashboard');

@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // Enums are not supported in SQLite, using strings instead
@@ -62,7 +63,7 @@ model Investigation {
   id          String   @id @default(uuid())
   title       String
   description String?
-  status      String   @default("active")
+  status      String   @default("active") // active, pending, closed, archived
   userId      String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -74,6 +75,12 @@ model Investigation {
   subjectPhone    String?
   subjectDomain   String?
   subjectImageUrl String?
+
+  // Case Management
+  notes       String?  // Investigator notes
+  tags        String   @default("") // Comma-separated tags for categorization
+  isShared    Boolean  @default(false) // Public read-only share toggle
+  shareToken  String?  @unique // Secure token for share URL
 
   parentId            String?
   parentInvestigation Investigation? @relation("RelatedInvestigations", fields: [parentId], references: [id], onDelete: SetNull)
@@ -87,6 +94,7 @@ model Investigation {
 
   @@index([userId])
   @@index([parentId])
+  @@index([shareToken])
   @@map("investigations")
 }
 
